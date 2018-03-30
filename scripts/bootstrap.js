@@ -33,7 +33,7 @@ files.forEach(pkg => {
         'simpli',
         'cli'
       ],
-      'author': 'Evan You',
+      'author': 'Felipe Gibran Eleuterio Toledo',
       'license': 'MIT',
       'bugs': {
         'url': 'https://github.com/simplitech/simpli-cli/issues'

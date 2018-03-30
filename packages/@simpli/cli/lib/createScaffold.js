@@ -12,6 +12,23 @@ async function create (projectName, options) {
   const targetDir = path.resolve(projectName || '.')
 
   await clearConsole(true)
+
+  const { type } = await inquirer.prompt([
+    {
+      name: 'type',
+      type: 'list',
+      message: 'What type of project is it?',
+      choices: [
+        { name: 'Web App project (frontend)', value: 'webapp' },
+        { name: 'Web Server project (backend)', value: 'webserver' },
+        { name: 'Cancel', value: false }
+      ]
+    }
+  ])
+  if (!type) {
+    return
+  }
+
   if (inCurrent) {
     const { ok } = await inquirer.prompt([
       {
