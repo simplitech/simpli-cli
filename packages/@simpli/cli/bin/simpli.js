@@ -28,7 +28,7 @@ program
   .description('create a new simpli frontend project')
   .option('-d, --default', 'Skip prompts and use default preset')
   .action((name, cmd) => {
-    require('../lib/createScaffold')(name, cleanArgs(cmd))
+    require('../lib/create')(name, cleanArgs(cmd))
   })
 
 // output help information on unknown commands
