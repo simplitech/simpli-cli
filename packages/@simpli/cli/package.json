@@ -6,6 +6,7 @@
     "simpli": "bin/simpli.js"
   },
   "files": [
+    "generator",
     "bin",
     "lib"
   ],

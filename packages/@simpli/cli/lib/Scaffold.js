@@ -102,7 +102,7 @@ module.exports = class Scaffold {
       const module = resolve.sync(`${id}/generator`, { basedir: this.context })
       return {
         id,
-        apply: require('../generator'),
+        apply: require(module),
         options: rawPlugins[id]
       }
     })
