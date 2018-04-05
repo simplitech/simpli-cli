@@ -5,7 +5,6 @@ const rimraf = require('rimraf')
 const inquirer = require('inquirer')
 const Scaffold = require('./Scaffold')
 const clearConsole = require('./util/clearConsole')
-const request = require('./util/request.js')
 const { error, stopSpinner } = require('@vue/cli-shared-utils')
 
 async function create (projectName, options) {
@@ -67,33 +66,25 @@ async function create (projectName, options) {
     return
   }
 
-  if (type === 'webapp') {
-    const { url } = await inquirer.prompt([
-      {
-        name: 'url',
-        type: 'input',
-        message: 'Enter swagger.json URL'
-      }
-    ])
+  if (type === 'webapp') return createScaffold(name, targetDir, options)
+  else if (type === 'webserver') return createApi(name, targetDir, options)
+}
 
-    let swaggerSetup
-    try {
-      const resp = await request.get(url)
-      swaggerSetup = resp.body
-    } catch (e) {
-      // error(e.message)
-      // process.exit(1)
-    }
+async function createScaffold (name, targetDir, options) {
+  // Insert module names
+  const promptModules = [
+  ].map(file => require(`./promptModules/${file}`))
 
-    // Insert module names
-    const promptModules = [
-    ].map(file => require(`./promptModules/${file}`))
-    //
-    const scaffold = new Scaffold(name, targetDir, swaggerSetup, promptModules)
-    await scaffold.create(options)
-  } else if (type === 'webserver') {
-    //
+  const scaffold = new Scaffold(name, targetDir, promptModules)
+
+  if (!options.default) {
+    await scaffold.setup()
   }
+
+  await scaffold.create(options)
+}
+
+async function createApi (name, targetDir, options) {
 }
 
 module.exports = (...args) => {

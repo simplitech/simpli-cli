@@ -86,7 +86,7 @@ module.exports = class Generator {
       for (const key in this.pkg) {
         extract(key)
       }
-    } else if (!process.env.VUE_CLI_TEST) {
+    } else if (!process.env.SIMPLI_CLI_TEST) {
       // by default, always extract vue.config.js
       extract('vue')
     }

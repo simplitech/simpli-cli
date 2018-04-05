@@ -27,8 +27,23 @@ program
   .command('new:project <project-name>')
   .description('create a new simpli frontend project')
   .option('-d, --default', 'Skip prompts and use default preset')
+  .option('-f, --force', 'Overwrite target directory if it exists')
   .action((name, cmd) => {
     require('../lib/create')(name, cleanArgs(cmd))
+  })
+
+program
+  .command('merge:scaffold <project-name>')
+  .description('merge selected frontend project')
+  .action((name, cmd) => {
+  //
+  })
+
+program
+  .command('merge:api <project-name>')
+  .description('merge selected backend project')
+  .action((name, cmd) => {
+    //
   })
 
 // output help information on unknown commands

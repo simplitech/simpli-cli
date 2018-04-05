@@ -14,6 +14,7 @@ const PromptModuleAPI = require('./PromptModuleAPI')
 const writeFileTree = require('./util/writeFileTree')
 const formatFeatures = require('./util/formatFeatures')
 const fetchRemotePreset = require('./util/fetchRemotePreset')
+const request = require('./util/request.js')
 
 const {
   log,
@@ -27,10 +28,10 @@ const {
 const isManualMode = answers => answers.preset === '__manual__'
 
 module.exports = class Scaffold {
-  constructor (name, context, swaggerSetup, promptModules) {
+  constructor (name, context, promptModules) {
     this.name = name
     this.context = process.env.SIMPLI_CLI_CONTEXT = context
-    this.swaggerSetup = swaggerSetup
+    this.swaggerSetup = {}
     const { presetPrompt, featurePrompt } = this.resolveIntroPrompts()
     this.presetPrompt = presetPrompt
     this.featurePrompt = featurePrompt
@@ -41,6 +42,24 @@ module.exports = class Scaffold {
 
     const promptAPI = new PromptModuleAPI(this)
     promptModules.forEach(m => m(promptAPI))
+  }
+
+  async setup () {
+    const { url } = await inquirer.prompt([
+      {
+        name: 'url',
+        type: 'input',
+        message: 'Enter swagger.json URL'
+      }
+    ])
+
+    try {
+      const resp = await request.get(url)
+      this.swaggerSetup = resp.body
+    } catch (e) {
+      error(e.message)
+      process.exit(1)
+    }
   }
 
   async create (cliOptions = {}) {
@@ -106,6 +125,25 @@ module.exports = class Scaffold {
     await generator.generate({
       extractConfigFiles: preset.useConfigFiles
     })
+
+    // install additional deps (injected by generators)
+    log(`📦  Installing additional dependencies...`)
+    log()
+    await installDeps(context, 'npm', cliOptions.registry)
+
+    // run complete cbs if any (injected by generators)
+    log()
+    logWithSpinner('⚓', `Running completion hooks...`)
+    for (const cb of createCompleteCbs) {
+      await cb()
+    }
+
+    // commit initial state
+    if (hasGit()) {
+      await run('git add -A')
+      await run(`git commit -m init`)
+    }
+
     // log instructions
     stopSpinner()
     log()

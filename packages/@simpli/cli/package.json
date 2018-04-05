@@ -18,9 +18,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "release": "yarn clean && node scripts/release.js"
-  },
   "dependencies": {
     "@vue/cli-shared-utils": "^3.0.0-beta.6",
     "chalk": "^2.3.0",
