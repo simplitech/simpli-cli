@@ -1,0 +1,22 @@
+{
+  "defaultSeverity": "warning",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "rules": {
+    "quotemark": [true, "single"],
+    "indent": [true, "spaces", 2],
+    "semicolon": [true, "never"],
+    "interface-name": false,
+    "ordered-imports": false,
+    "object-literal-sort-keys": false,
+    "no-consecutive-blank-lines": false,
+    "no-null-keyword": true,
+    "member-access": [true, "no-public"],
+    "no-console": false,
+    "no-shadowed-variable": false,
+    "curly": [true, "ignore-same-line"],
+    "no-var-requires": false,
+    "ban-types": false
+  }
+}

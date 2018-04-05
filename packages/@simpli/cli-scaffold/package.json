@@ -1,0 +1,23 @@
+{
+  "name": "@simpli/cli-scaffold",
+  "version": "0.2.4",
+  "description": "scaffold for simpli-cli",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simplitech/simpli-cli.git"
+  },
+  "keywords": [
+    "simpli",
+    "cli"
+  ],
+  "author": "Felipe Gibran Eleuterio Toledo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simplitech/simpli-cli/issues"
+  },
+  "homepage": "https://github.com/simplitech/simpli-cli/packages/@simpli/cli-scaffold#readme"
+}

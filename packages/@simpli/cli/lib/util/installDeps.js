@@ -5,8 +5,6 @@ const readline = require('readline')
 const inquirer = require('inquirer')
 const { pauseSpinner, resumeSpinner } = require('@vue/cli-shared-utils')
 
-const debug = require('debug')('vue-cli:install')
-
 const registries = {
   npm: 'https://registry.npmjs.org',
   yarn: 'https://registry.yarnpkg.com',
@@ -157,9 +155,6 @@ exports.installDeps = async function installDeps (targetDir, command, cliRegistr
 
   await addRegistryToArgs(command, args, cliRegistry)
 
-  debug(`command: `, command)
-  debug(`args: `, args)
-
   await executeCommand(command, args, targetDir)
 }
 
@@ -178,9 +173,6 @@ exports.installPackage = async function (targetDir, command, cliRegistry, packag
   await addRegistryToArgs(command, args, cliRegistry)
 
   args.push(packageName)
-
-  debug(`command: `, command)
-  debug(`args: `, args)
 
   await executeCommand(command, args, targetDir)
 }

@@ -4,7 +4,7 @@ const debug = require('debug')
 const execa = require('execa')
 const resolve = require('resolve')
 const inquirer = require('inquirer')
-const ScaffoldGenerator = require('./ScaffoldGenerator')
+const Generator = require('./Generator')
 const cloneDeep = require('lodash.clonedeep')
 const sortObject = require('./util/sortObject')
 const getVersions = require('./util/getVersions')
@@ -46,14 +46,21 @@ module.exports = class Scaffold {
   async create (cliOptions = {}) {
     const { name, context, createCompleteCbs, swaggerSetup } = this
 
+    const run = (command, args) => {
+      if (!args) { [command, ...args] = command.split(/\s+/) }
+      return execa(command, args, { cwd: context })
+    }
+
     let preset = await this.promptAndResolvePreset()
     // clone before mutating
     preset = cloneDeep(preset)
     // inject core service
-    preset.plugins['@simpli/cli'] = Object.assign({
+    preset.plugins['@simpli/cli-scaffold'] = Object.assign({
       projectName: name
     }, preset)
 
+    // get latest CLI version
+    const { latest } = await getVersions()
     // generate package.json with plugin dependencies
     const pkg = {
       name,
@@ -61,6 +68,11 @@ module.exports = class Scaffold {
       private: true,
       devDependencies: {}
     }
+    const deps = Object.keys(preset.plugins)
+    deps.forEach(dep => {
+      pkg.devDependencies[dep] = preset.plugins[dep].version ||
+        (/^@simpli/.test(dep) ? `^${latest}` : `latest`)
+    })
     // write package.json
     await writeFileTree(context, {
       'package.json': JSON.stringify(pkg, null, 2)
@@ -69,11 +81,24 @@ module.exports = class Scaffold {
     await clearConsole()
     logWithSpinner(`✨`, `Creating project in ${chalk.yellow(context)}.`)
 
+    // intilaize git repository before installing deps
+    // so that vue-cli-service can setup git hooks.
+    if (hasGit()) {
+      logWithSpinner(`🗃`, `Initializing git repository...`)
+      await run('git init')
+    }
+
+    // install plugins
+    stopSpinner()
+    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log()
+    await installDeps(context, 'npm', cliOptions.registry)
+
     // run generator
     log()
     log(`🚀  Invoking generators...`)
     const plugins = this.resolvePlugins(preset.plugins)
-    const generator = new ScaffoldGenerator(context, {
+    const generator = new Generator(context, {
       pkg,
       plugins,
       completeCbs: createCompleteCbs
@@ -97,7 +122,7 @@ module.exports = class Scaffold {
 
   resolvePlugins (rawPlugins) {
     // ensure cli-service is invoked first
-    rawPlugins = sortObject(rawPlugins, ['@simpli/cli'])
+    rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
       const module = resolve.sync(`${id}/generator`, { basedir: this.context })
       return {

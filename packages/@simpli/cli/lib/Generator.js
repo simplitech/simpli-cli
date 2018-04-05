@@ -38,10 +38,7 @@ module.exports = class Generator {
     this.exitLogs = []
 
     // apply generators from plugins
-    // const apply = require('../generator')
-    // const api = new GeneratorAPI('', this, {}, {})
-    // apply(api, {}, {})
-    const cliService = plugins.find(p => p.id === '@vue/cli-service')
+    const cliService = plugins.find(p => p.id === '@simpli/cli-scaffold')
     const rootOptions = cliService && cliService.options
     // apply generators from plugins
     plugins.forEach(({ id, apply, options }) => {

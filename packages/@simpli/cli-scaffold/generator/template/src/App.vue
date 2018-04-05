@@ -1,0 +1,56 @@
+<template>
+  <div>
+    <router-view/>
+    <vue-snotify :class="toastStyle"/>
+  </div>
+</template>
+
+<style lang="scss">
+  @import './scss/main.scss';
+</style>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import {ToastDefaultConfig, ToastDefaultStyle, ToastGlobalConfig, ToastStyle} from '@/config/toast.config'
+import {Action, Getter} from 'vuex-class'
+
+@Component
+export default class App extends Vue {
+  @Action('auth/onSignIn') onSignIn?: Function
+  @Action('auth/onAuth') onAuth?: Function
+  @Action('auth/onSignOut') onSignOut?: Function
+
+  toastStyle: ToastStyle = ToastDefaultStyle
+
+  constructor() {
+    super()
+  }
+
+  // When the user or system signs in
+  signInEvent() {
+    //
+  }
+
+  // When an auth view is accessed successfully
+  authEvent() {
+    //
+  }
+
+  // When the user or system signs out
+  signOutEvent() {
+    //
+  }
+
+  // Standard Behaviours
+  created() {
+    this.onSignIn!(this.signInEvent)
+    this.onAuth!(this.authEvent)
+    this.onSignOut!(this.signOutEvent)
+
+    this.$snotify.setDefaults({
+      global: ToastGlobalConfig,
+      toast: ToastDefaultConfig,
+    })
+  }
+}
+</script>
