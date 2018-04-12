@@ -2,9 +2,8 @@
  * Conectado
  * @author martinlabs CRUD generator
  */
-import {ID, TAG} from '@/types/app'
-import {Resource} from '@/app/http/Resource'
-import {ValidationMaxLength, ValidationRequired} from '@/helpers/validation.helper'
+import {ID, TAG, Resource} from '@/simpli'
+import {ValidationMaxLength, ValidationRequired} from '@/simpli'
 
 export default class Conectado extends Resource {
   readonly $endpoint: string = '/Crud/Conectado{/id}'

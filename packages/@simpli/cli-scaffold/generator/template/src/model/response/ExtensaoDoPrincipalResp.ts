@@ -2,11 +2,11 @@
  * ExtensaoDoPrincipalResp
  * @author martinlabs CRUD generator
  */
-import {Resource} from '@/app/http/Resource'
+import {ID, TAG, Resource} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import ExtensaoDoPrincipal from '@/model/ExtensaoDoPrincipal'
-import {ResponseSerialize} from '@/helpers/http.helper'
 import Principal from '@/model/Principal'
-import {ID, TAG} from '@/types/app'
 
 export default class ExtensaoDoPrincipalResp extends Resource {
   readonly $endpoint: string = '/Crud/ExtensaoDoPrincipal{/id}'

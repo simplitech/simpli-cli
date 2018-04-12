@@ -2,20 +2,18 @@
  * Principal
  * @author martinlabs CRUD generator
  */
-import {ID, TAG} from '@/types/app'
-import {Resource} from '@/app/http/Resource'
-import Tag from '@/model/Tag'
-import GrupoDoPrincipal from '@/model/GrupoDoPrincipal'
-import ImageRender from '@/app/render/ImageRender'
-import AnchorRender from '@/app/render/AnchorRender'
-import { bool, date, datetime, cnpj, cpf, phone } from '@/helpers'
+import {ID, TAG, Resource, ImageRender, AnchorRender} from '@/simpli'
 import {
   ValidationRequired,
   ValidationEmail,
   ValidationMaxLength,
   ValidationPasswordLength,
-} from '@/helpers/validation.helper'
-import {ResponseHidden, ResponseSerialize} from '@/helpers/http.helper'
+} from '@/simpli'
+import {ResponseHidden, ResponseSerialize} from '@/simpli'
+import { bool, date, datetime, cnpj, cpf, phone } from '@/simpli'
+
+import Tag from '@/model/Tag'
+import GrupoDoPrincipal from '@/model/GrupoDoPrincipal'
 
 export default class Principal extends Resource {
   readonly $endpoint: string = '/Crud/Principal{/id}'

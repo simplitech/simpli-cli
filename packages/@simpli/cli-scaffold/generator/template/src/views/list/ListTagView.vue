@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.Tag.title')"
-                 :persistUrl="$uri.persistTag()"
+                 persistUrl="/persistTag"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import Tag from '@/model/Tag'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListTagView extends Vue {
-    collection: PagedResp<Tag> = new PagedResp(Tag)
-    toRemove: Tag = new Tag()
+    collection = new PagedResp(Tag)
+    toRemove = new Tag()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: Tag) {
-      push(uri.persistTag(item.$id))
+      pushByName('persistTag', item.$id)
     }
 
     openRemoveModal(item: Tag) {

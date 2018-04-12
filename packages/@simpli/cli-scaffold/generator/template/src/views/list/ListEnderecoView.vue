@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.Endereco.title')"
-                 :persistUrl="$uri.persistEndereco()"
+                 persistUrl="/persistEndereco"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import Endereco from '@/model/Endereco'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListEnderecoView extends Vue {
-    collection: PagedResp<Endereco> = new PagedResp(Endereco)
-    toRemove: Endereco = new Endereco()
+    collection = new PagedResp(Endereco)
+    toRemove = new Endereco()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: Endereco) {
-      push(uri.persistEndereco(item.$id))
+      pushByName('persistEndereco', item.$id)
     }
 
     openRemoveModal(item: Endereco) {

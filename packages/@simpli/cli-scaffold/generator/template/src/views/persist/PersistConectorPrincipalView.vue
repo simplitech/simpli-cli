@@ -40,13 +40,13 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import ConectorPrincipalResp from '@/model/response/ConectorPrincipalResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistConectorPrincipalView extends Vue {
     @Prop() id1?: string
     @Prop() id2?: string
-    model: ConectorPrincipalResp = new ConectorPrincipalResp()
+    model = new ConectorPrincipalResp()
 
     async mounted() {
       await this.model.findByQuery({ id1: this.id1 || 0, id2: this.id2 || 0 })
@@ -55,7 +55,7 @@
     async persist() {
       await this.model.conectorPrincipal.validate()
       await this.model.conectorPrincipal.save()
-      successAndPush('system.success.persist', uri.listConectorPrincipal)
+      successAndPush('system.success.persist', '/listConectorPrincipal')
     }
   }
 </script>

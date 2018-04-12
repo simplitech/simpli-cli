@@ -39,12 +39,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import UserResp from '@/model/response/UserResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush, encrypt} from '@/simpli'
 
   @Component
   export default class PersistUserView extends Vue {
     @Prop() id?: string
-    model: UserResp = new UserResp()
+    model = new UserResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -54,7 +54,7 @@
       await this.model.user.validate()
       this.model.user.senha = encrypt(this.model.user.senha || '')
       await this.model.user.save()
-      successAndPush('system.success.persist', uri.listUser)
+      successAndPush('system.success.persist', '/listUser')
     }
   }
 </script>

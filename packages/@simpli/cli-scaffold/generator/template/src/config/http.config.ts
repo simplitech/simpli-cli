@@ -1,12 +1,15 @@
 import {HttpOptions, HttpResponse} from 'vue-resource'
-import {getToken, getVersion, getLanguage, isLogged, signOut, HttpStatus, error, snotify} from '@/helpers'
-
-export const ApiURL: string = process.env.VUE_APP_API_URL || 'http:/localhost/api'
+import {$, getToken, getVersion, getLanguage, isLogged, signOut, HttpStatus, error} from '@/simpli'
 
 /*
- *** REGISTER HERE YOUR API Interceptor ***
+ *** SET HERE THE API ENDPOINT ***
  */
-export const HttpConfigInterceptor: any = (request: HttpOptions, next: any): void => {
+export const apiURL = process.env.VUE_APP_API_URL
+
+/*
+ *** REGISTER HERE THE API INTERCEPTOR ***
+ */
+export const httpInterceptor = (request: HttpOptions, next: any) => {
   request.headers.set('Accept-Language', getLanguage())
   request.headers.set('X-Client-Version', `w${getVersion()}`) // w = web
 
@@ -17,7 +20,7 @@ export const HttpConfigInterceptor: any = (request: HttpOptions, next: any): voi
     else if (resp.status >= 400) {
       if (resp.status === HttpStatus.UNAUTHORIZED) signOut()
 
-      snotify.error(resp.data.message || resp.statusText, resp.status.toString())
+      $.snotify.error(resp.data.message || resp.statusText, resp.status.toString())
     }
   })
 }

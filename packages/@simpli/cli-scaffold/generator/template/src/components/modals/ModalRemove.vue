@@ -18,8 +18,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import PageCollection from '@/app/http/PageCollection'
-  import {Resource} from '@/app/http/Resource'
+  import {PageCollection, Resource} from '@/simpli'
   import PagedResp from '@/model/response/PagedResp'
 
   @Component

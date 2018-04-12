@@ -1,13 +1,12 @@
 import User from '@/model/User'
-import {ID} from '@/types/app'
-import {CURRENCY, Lang} from '@/config/locale.config'
+import {ID, Currency, Lang} from '@/simpli'
 /**
  * Root
  */
 export interface RootState {
   version: string
   language: Lang
-  currency: CURRENCY
+  currency: Currency
 }
 
 /**

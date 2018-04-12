@@ -2,11 +2,11 @@
  * TagResp
  * @author martinlabs CRUD generator
  */
-import {Resource} from '@/app/http/Resource'
+import {ID, TAG, Resource} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import Tag from '@/model/Tag'
 import Principal from '@/model/Principal'
-import {ResponseSerialize} from '@/helpers/http.helper'
-import {ID, TAG} from '@/types/app'
 
 export default class TagResp extends Resource {
   readonly $endpoint: string = '/Crud/Tag{/id}'

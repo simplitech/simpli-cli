@@ -1,5 +1,5 @@
 import {store} from '@/store'
-import LoginHolder from '@/app/params/LoginHolder'
+import LoginHolder from '@/model/LoginHolder'
 
 export const isLogged = () => store.getters['auth/isLogged']
 export const getId = () => store.getters['auth/id']

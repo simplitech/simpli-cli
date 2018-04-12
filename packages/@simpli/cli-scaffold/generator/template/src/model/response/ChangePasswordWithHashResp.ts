@@ -2,8 +2,8 @@
  * ForgotPasswordResp
  * @author martinlabs CRUD generator
  */
-import HttpBody from '@/app/http/HttpBody'
-import LoginHolder from '@/app/params/LoginHolder'
+import {HttpBody} from '@/simpli'
+import LoginHolder from '@/model/LoginHolder'
 
 export default class ChangePasswordWithHashResp extends HttpBody {
   async changePasswordWithHash(model: LoginHolder) {

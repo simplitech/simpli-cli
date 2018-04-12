@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.Conectado.title')"
-                 :persistUrl="$uri.persistConectado()"
+                 persistUrl="/persistConectado"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import Conectado from '@/model/Conectado'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListConectadoView extends Vue {
-    collection: PagedResp<Conectado> = new PagedResp(Conectado)
-    toRemove: Conectado = new Conectado()
+    collection = new PagedResp(Conectado)
+    toRemove = new Conectado()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: Conectado) {
-      push(uri.persistConectado(item.$id))
+      pushByName('persistConectado', item.$id)
     }
 
     openRemoveModal(item: Conectado) {

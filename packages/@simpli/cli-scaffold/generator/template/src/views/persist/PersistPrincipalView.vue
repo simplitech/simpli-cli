@@ -211,12 +211,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import PrincipalResp from '@/model/response/PrincipalResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistPrincipalView extends Vue {
     @Prop() id?: string
-    model: PrincipalResp = new PrincipalResp()
+    model = new PrincipalResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -225,7 +225,7 @@
     async persist() {
       await this.model.principal.validate()
       await this.model.principal.save()
-      successAndPush('system.success.persist', uri.listPrincipal)
+      successAndPush('system.success.persist', '/listPrincipal')
     }
   }
 </script>

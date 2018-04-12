@@ -33,12 +33,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import TagResp from '@/model/response/TagResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistTagView extends Vue {
     @Prop() id?: string
-    model: TagResp = new TagResp()
+    model = new TagResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -47,7 +47,7 @@
     async persist() {
       await this.model.tag.validate()
       await this.model.tag.save()
-      successAndPush('system.success.persist', uri.listTag)
+      successAndPush('system.success.persist', '/listTag')
     }
   }
 </script>

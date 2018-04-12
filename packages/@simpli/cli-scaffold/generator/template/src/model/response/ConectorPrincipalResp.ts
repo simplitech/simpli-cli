@@ -2,12 +2,12 @@
  * ConectorPrincipalResp
  * @author martinlabs CRUD generator
  */
-import {Resource} from '@/app/http/Resource'
+import {ID, TAG, Resource} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import ConectorPrincipal from '@/model/ConectorPrincipal'
-import {ResponseSerialize} from '@/helpers/http.helper'
 import Principal from '@/model/Principal'
 import Conectado from '@/model/Conectado'
-import {ID, TAG} from '@/types/app'
 
 export default class ConectorPrincipalResp extends Resource {
   readonly $endpoint: string = '/Crud/ConectorPrincipal{/id1}{/id2}'

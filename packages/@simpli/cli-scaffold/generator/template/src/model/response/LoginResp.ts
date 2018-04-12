@@ -2,11 +2,11 @@
  * LoginResp
  * @author martinlabs CRUD generator
  */
-import {ID} from '@/types/app'
-import HttpBody from '@/app/http/HttpBody'
+import {ID, encrypt} from '@/simpli'
+import {HttpBody} from '@/simpli'
+
 import User from '@/model/User'
-import LoginHolder from '@/app/params/LoginHolder'
-import {encrypt} from '@/helpers'
+import LoginHolder from '@/model/LoginHolder'
 
 export default class LoginResp extends HttpBody {
   id?: ID = 0

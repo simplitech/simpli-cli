@@ -2,11 +2,11 @@
  * ItemDoPrincipal
  * @author martinlabs CRUD generator
  */
-import {ID, TAG} from '@/types/app'
-import {Resource} from '@/app/http/Resource'
+import {ID, TAG, Resource} from '@/simpli'
+import {ValidationMaxLength, ValidationRequired} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import Principal from '@/model/Principal'
-import {ValidationMaxLength, ValidationRequired} from '@/helpers/validation.helper'
-import {ResponseSerialize} from '@/helpers/http.helper'
 
 export default class ItemDoPrincipal extends Resource {
   readonly $endpoint: string = '/Crud/ItemDoPrincipal{/id}'

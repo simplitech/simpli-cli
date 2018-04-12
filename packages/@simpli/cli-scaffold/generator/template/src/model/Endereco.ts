@@ -2,10 +2,8 @@
  * Endereco
  * @author martinlabs CRUD generator
  */
-import {ID} from '@/types/app'
-import {Resource} from '@/app/http/Resource'
-import {ValidationRequired} from '@/helpers/validation.helper'
-import {cep} from '@/helpers/filter.helper'
+import {ID, Resource, cep} from '@/simpli'
+import {ValidationRequired} from '@/simpli'
 
 export default class Endereco extends Resource {
   readonly $endpoint: string = '/Crud/Endereco{/id}'

@@ -2,10 +2,10 @@
  * EnderecoResp
  * @author martinlabs CRUD generator
  */
-import {Resource} from '@/app/http/Resource'
+import {ID, Resource} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import Endereco from '@/model/Endereco'
-import {ResponseSerialize} from '@/helpers/http.helper'
-import {ID} from '@/types/app'
 
 export default class EnderecoResp extends Resource {
   readonly $endpoint: string = '/Crud/Endereco{/id}'

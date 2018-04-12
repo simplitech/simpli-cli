@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.ItemDoPrincipal.title')"
-                 :persistUrl="$uri.persistItemDoPrincipal()"
+                 persistUrl="/persistItemDoPrincipal"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import ItemDoPrincipal from '@/model/ItemDoPrincipal'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListItemDoPrincipalView extends Vue {
-    collection: PagedResp<ItemDoPrincipal> = new PagedResp(ItemDoPrincipal)
-    toRemove: ItemDoPrincipal = new ItemDoPrincipal()
+    collection = new PagedResp(ItemDoPrincipal)
+    toRemove = new ItemDoPrincipal()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: ItemDoPrincipal) {
-      push(uri.persistItemDoPrincipal(item.$id))
+      pushByName('persistItemDoPrincipal', item.$id)
     }
 
     openRemoveModal(item: ItemDoPrincipal) {

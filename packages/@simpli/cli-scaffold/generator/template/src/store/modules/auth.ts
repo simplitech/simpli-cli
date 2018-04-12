@@ -1,12 +1,12 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import LoginHolder from '@/app/params/LoginHolder'
-import {uri, push, route, successAndPush, errorAndPush, infoAndPush} from '@/helpers'
-import LoginResp from '@/model/response/LoginResp'
 import User from '@/model/User'
+import LoginHolder from '@/model/LoginHolder'
+import LoginResp from '@/model/response/LoginResp'
 import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
 import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
+import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
 
 // initial state
 const state: AuthState = {
@@ -51,10 +51,10 @@ const actions: ActionTree<AuthState, RootState> = {
 
     commit(types.POPULATE)
 
-    if (getters!.unauthenticatedPath && route.path !== uri.login) {
+    if (getters!.unauthenticatedPath && $.route.name !== 'login') {
       infoAndPush('system.info.welcome', getters!.unauthenticatedPath)
     } else {
-      infoAndPush('system.info.welcome', uri.dashboard)
+      infoAndPush('system.info.welcome', '/dashboard')
     }
     commit(types.SET_UNAUTHENTICATED_PATH, undefined)
 
@@ -79,7 +79,7 @@ const actions: ActionTree<AuthState, RootState> = {
       dispatch('refresh', loginResp)
       state.eventListener.auth.forEach((item) => item(loginResp))
     } else {
-      commit(types.SET_UNAUTHENTICATED_PATH, route.path)
+      commit(types.SET_UNAUTHENTICATED_PATH, $.route.path)
       dispatch('signOut', true)
     }
   },
@@ -91,8 +91,8 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param showError
    */
   signOut: ({state, commit}, showError: boolean = false) => {
-    if (showError) errorAndPush('system.error.unauthorized', uri.login)
-    else push(uri.login)
+    if (showError) errorAndPush('system.error.unauthorized', '/login')
+    else push('/login')
 
     commit(types.FORGET)
     state.eventListener.signOut.forEach((item) => item())
@@ -108,7 +108,7 @@ const actions: ActionTree<AuthState, RootState> = {
 
     await forgotPasswordResp.forgotPassword(model)
 
-    successAndPush('system.success.forgotPasswordSuccess', uri.login)
+    successAndPush('system.success.forgotPasswordSuccess', '/login')
   },
 
   /**
@@ -121,7 +121,7 @@ const actions: ActionTree<AuthState, RootState> = {
 
     await changePasswordWithHashResp.changePasswordWithHash(model)
 
-    successAndPush('system.success.changePasswordSuccess', uri.login)
+    successAndPush('system.success.changePasswordSuccess', '/login')
   },
 
   /**

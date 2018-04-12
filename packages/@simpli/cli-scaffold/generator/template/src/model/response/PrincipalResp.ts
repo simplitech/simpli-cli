@@ -2,12 +2,12 @@
  * PrincipalResp
  * @author martinlabs CRUD generator
  */
+import {ID, TAG, Resource} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
+
 import Principal from '@/model/Principal'
-import {Resource} from '@/app/http/Resource'
 import Tag from '@/model/Tag'
 import GrupoDoPrincipal from '@/model/GrupoDoPrincipal'
-import {ResponseSerialize} from '@/helpers/http.helper'
-import {ID, TAG} from '@/types/app'
 
 export default class PrincipalResp extends Resource {
   readonly $endpoint: string = '/Crud/Principal{/id}'

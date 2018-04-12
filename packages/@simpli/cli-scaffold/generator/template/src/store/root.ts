@@ -1,15 +1,15 @@
 import {ActionTree, GetterTree, MutationTree} from 'vuex'
+import {$, Lang, Currency} from '@/simpli'
 import * as types from '@/store/mutation-types'
 import {RootState} from '@/types/store'
-import {CURRENCY, DefaultCurrency, DefaultLang, Lang} from '@/config/locale.config'
-import {i18n} from '@/helpers'
+import {defaultCurrency, defaultLang} from '@/config/locale.config'
 const app = require('../../package.json')
 
 // initial root state
 export const state: RootState = {
   version: app.version,
-  language: DefaultLang,
-  currency: DefaultCurrency,
+  language: defaultLang,
+  currency: defaultCurrency,
 }
 
 // root getters
@@ -27,7 +27,7 @@ export const actions: ActionTree<RootState, RootState> = {
    * @param val
    */
   setLang: ({commit}, val: Lang) => {
-    i18n.locale = val
+    $.i18n.locale = val
     commit(types.SET_LANG, val)
   },
 
@@ -36,7 +36,7 @@ export const actions: ActionTree<RootState, RootState> = {
    * @param commit
    * @param val
    */
-  setCurrency: ({commit}, val: CURRENCY) => {
+  setCurrency: ({commit}, val: Currency) => {
     commit(types.SET_CURRENCY, val)
   },
 }

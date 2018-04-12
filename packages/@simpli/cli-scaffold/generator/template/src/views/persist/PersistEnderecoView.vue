@@ -81,12 +81,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import EnderecoResp from '@/model/response/EnderecoResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistEnderecoView extends Vue {
     @Prop() id?: string
-    model: EnderecoResp = new EnderecoResp()
+    model = new EnderecoResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -95,7 +95,7 @@
     async persist() {
       await this.model.endereco.validate()
       await this.model.endereco.save()
-      successAndPush('system.success.persist', uri.listEndereco)
+      successAndPush('system.success.persist', '/listEndereco')
     }
   }
 </script>

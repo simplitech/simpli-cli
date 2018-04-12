@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.ConectorPrincipal.title')"
-                 :persistUrl="$uri.persistConectorPrincipal()"
+                 persistUrl="/persistConectorPrincipal"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import ConectorPrincipal from '@/model/ConectorPrincipal'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListConectorPrincipalView extends Vue {
-    collection: PagedResp<ConectorPrincipal> = new PagedResp(ConectorPrincipal)
-    toRemove: ConectorPrincipal = new ConectorPrincipal()
+    collection = new PagedResp(ConectorPrincipal)
+    toRemove = new ConectorPrincipal()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: ConectorPrincipal) {
-      push(uri.persistConectorPrincipal(item.$id, item.$secondaryId))
+      pushByName('persistConectorPrincipal', item.$id, item.$secondaryId)
     }
 
     openRemoveModal(item: ConectorPrincipal) {

@@ -2,10 +2,9 @@
  * Tag
  * @author martinlabs CRUD generator
  */
-import {Resource} from '@/app/http/Resource'
-import {ID, TAG} from '@/types/app'
-import {ValidationMaxLength, ValidationRequired} from '@/helpers/validation.helper'
-import {ResponseSerialize} from '@/helpers/http.helper'
+import {ID, TAG, Resource} from '@/simpli'
+import {ValidationMaxLength, ValidationRequired} from '@/simpli'
+import {ResponseSerialize} from '@/simpli'
 
 export default class Tag extends Resource {
   readonly $endpoint: string = '/Crud/Tag{/id}'

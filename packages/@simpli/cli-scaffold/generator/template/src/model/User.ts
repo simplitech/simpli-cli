@@ -2,10 +2,9 @@
  * User
  * @author martinlabs CRUD generator
  */
-import {ID} from '@/types/app'
-import {Resource} from '@/app/http/Resource'
-import {ValidationEmail, ValidationPasswordLength, ValidationRequired} from '@/helpers/validation.helper'
-import {ResponseFill, ResponseHidden} from '@/helpers/http.helper'
+import {ID, Resource} from '@/simpli'
+import {ValidationEmail, ValidationPasswordLength, ValidationRequired} from '@/simpli'
+import {ResponseHidden} from '@/simpli'
 
 export default class User extends Resource {
   readonly $endpoint: string = '/Crud/User{/id}'

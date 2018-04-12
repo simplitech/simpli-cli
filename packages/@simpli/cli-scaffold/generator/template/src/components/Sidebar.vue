@@ -4,7 +4,7 @@
       <div class="horiz items-center">
         <a class="mobile icon icon-menu" @click="toggleMenu"></a>
         <h1 class="weight-1 accent">
-          <img src="@/assets/logo.png"
+          <img src="@/assets/img/logo.png"
                class="ml-10"
                width="32"
                height="32"
@@ -24,62 +24,62 @@
         <ul class="verti h-full p-0 py-10">
 
           <li>
-            <router-link :to="$uri.dashboard" @click.native="menuOff">
+            <router-link to="/dashboard" @click.native="menuOff">
               <i class="icon icon-home mr-3"></i>
               {{ $t('view.dashboard.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listPrincipal" @click.native="menuOff">
+            <router-link to="/listPrincipal" @click.native="menuOff">
               {{ $t('classes.Principal.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listUser" @click.native="menuOff">
+            <router-link to="/listUser" @click.native="menuOff">
               {{ $t('classes.User.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listEndereco" @click.native="menuOff">
+            <router-link to="/listEndereco" @click.native="menuOff">
               {{ $t('classes.Endereco.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listTag" @click.native="menuOff">
+            <router-link to="/listTag" @click.native="menuOff">
               {{ $t('classes.Tag.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listConectado" @click.native="menuOff">
+            <router-link to="/listConectado" @click.native="menuOff">
               {{ $t('classes.Conectado.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listGrupoDoPrincipal" @click.native="menuOff">
+            <router-link to="/listGrupoDoPrincipal" @click.native="menuOff">
               {{ $t('classes.GrupoDoPrincipal.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listItemDoPrincipal" @click.native="menuOff">
+            <router-link to="/listItemDoPrincipal" @click.native="menuOff">
               {{ $t('classes.ItemDoPrincipal.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listExtensaoDoPrincipal" @click.native="menuOff">
+            <router-link to="/listExtensaoDoPrincipal" @click.native="menuOff">
               {{ $t('classes.ExtensaoDoPrincipal.title') }}
             </router-link>
           </li>
 
           <li>
-            <router-link :to="$uri.listConectorPrincipal" @click.native="menuOff">
+            <router-link to="/listConectorPrincipal" @click.native="menuOff">
               {{ $t('classes.ConectorPrincipal.title') }}
             </router-link>
           </li>

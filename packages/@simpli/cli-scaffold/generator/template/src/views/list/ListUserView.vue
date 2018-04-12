@@ -2,7 +2,7 @@
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.User.title')"
-                 :persistUrl="$uri.persistUser()"
+                 persistUrl="/persistUser"
                  hasSearch hasCsv/>
 
     <section>
@@ -19,12 +19,12 @@
   import {Component, Vue} from 'vue-property-decorator'
   import User from '@/model/User'
   import PagedResp from '@/model/response/PagedResp'
-  import {uri, push} from '@/helpers'
+  import {pushByName} from '@/simpli'
 
   @Component
   export default class ListUserView extends Vue {
-    collection: PagedResp<User> = new PagedResp(User)
-    toRemove: User = new User()
+    collection = new PagedResp(User)
+    toRemove = new User()
 
     async mounted() {
       await this.collection.search()
@@ -37,7 +37,7 @@
     }
 
     openPersist(item: User) {
-      push(uri.persistUser(item.$id))
+      pushByName('persistUser', item.$id)
     }
 
     openRemoveModal(item: User) {

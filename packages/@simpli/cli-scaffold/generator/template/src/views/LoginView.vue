@@ -14,11 +14,11 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
 import { State, Action, Getter } from 'vuex-class'
-import LoginHolder from '@/app/params/LoginHolder'
+import LoginHolder from '@/model/LoginHolder'
 
 @Component
 export default class LoginView extends Vue {
   @Action('auth/signIn') signIn?: Function
-  model: LoginHolder = new LoginHolder()
+  model = new LoginHolder()
 }
 </script>

@@ -34,12 +34,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import ExtensaoDoPrincipalResp from '@/model/response/ExtensaoDoPrincipalResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistExtensaoDoPrincipalView extends Vue {
     @Prop() id?: string
-    model: ExtensaoDoPrincipalResp = new ExtensaoDoPrincipalResp()
+    model = new ExtensaoDoPrincipalResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -48,7 +48,7 @@
     async persist() {
       await this.model.extensaoDoPrincipal.validate()
       await this.model.extensaoDoPrincipal.save()
-      successAndPush('system.success.persist', uri.listExtensaoDoPrincipal)
+      successAndPush('system.success.persist', '/listExtensaoDoPrincipal')
     }
   }
 </script>

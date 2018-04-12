@@ -36,12 +36,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import ItemDoPrincipalResp from '@/model/response/ItemDoPrincipalResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistItemDoPrincipalView extends Vue {
     @Prop() id?: string
-    model: ItemDoPrincipalResp = new ItemDoPrincipalResp()
+    model = new ItemDoPrincipalResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -50,7 +50,7 @@
     async persist() {
       await this.model.itemDoPrincipal.validate()
       await this.model.itemDoPrincipal.save()
-      successAndPush('system.success.persist', uri.listItemDoPrincipal)
+      successAndPush('system.success.persist', '/listItemDoPrincipal')
     }
   }
 </script>

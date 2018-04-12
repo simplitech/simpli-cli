@@ -29,12 +29,12 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import GrupoDoPrincipalResp from '@/model/response/GrupoDoPrincipalResp'
-  import {successAndPush, uri, encrypt} from '@/helpers'
+  import {successAndPush} from '@/simpli'
 
   @Component
   export default class PersistGrupoDoPrincipalView extends Vue {
     @Prop() id?: string
-    model: GrupoDoPrincipalResp = new GrupoDoPrincipalResp()
+    model = new GrupoDoPrincipalResp()
 
     async mounted() {
       await this.model.find(this.id || 0)
@@ -43,7 +43,7 @@
     async persist() {
       await this.model.grupoDoPrincipal.validate()
       await this.model.grupoDoPrincipal.save()
-      successAndPush('system.success.persist', uri.listGrupoDoPrincipal)
+      successAndPush('system.success.persist', '/listGrupoDoPrincipal')
     }
   }
 </script>
