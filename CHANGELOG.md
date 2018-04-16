@@ -1,3 +1,13 @@
+<a name="0.3.0-alpha.1"></a>
+# [0.3.0-alpha.1](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.0...v0.3.0-alpha.1) (2018-04-16)
+
+
+### Features
+
+* **scaffold:** Populate correctly swagger.json ([5bbd00f](https://github.com/simplitech/simpli-cli/commit/5bbd00f))
+
+
+
 <a name="0.3.0-alpha.0"></a>
 # [0.3.0-alpha.0](https://github.com/simplitech/simpli-cli/compare/v0.2.8-1...v0.3.0-alpha.0) (2018-04-12)
 
