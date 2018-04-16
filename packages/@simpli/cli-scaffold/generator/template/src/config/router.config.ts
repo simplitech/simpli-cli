@@ -1,15 +1,14 @@
 import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import LoginView from '@/views/LoginView.vue'
-
 <% var resources = rootOptions.swaggerSetup.nonResponses() %>
 
 <%_ for (var i in resources) { var resource = resources[i] _%>
-import List<%resource.name%>View from '@/views/list/List<%resource.name%>View.vue'
+import List<%-resource.name%>View from '@/views/list/List<%-resource.name%>View.vue'
 <%_ } _%>
 
 <%_ for (var i in resources) { var resource = resources[i] _%>
-import Persist<%resource.name%>View from '@/views/persist/Persist<%resource.name%>View.vue'
+import Persist<%-resource.name%>View from '@/views/persist/Persist<%-resource.name%>View.vue'
 <%_ } _%>
 
 /*
@@ -34,17 +33,17 @@ export const router = {
 
 <%_ for (var i in resources) { var resource = resources[i] _%>
         {
-          path: '/list<%resource.name%>',
-          component: List<%resource.name%>View,
+          path: '/list<%-resource.name%>',
+          component: List<%-resource.name%>View,
         },
         {
-          path: '/persist<%resource.name%>',
-          component: Persist<%resource.name%>View,
+          path: '/persist<%-resource.name%>',
+          component: Persist<%-resource.name%>View,
         },
         {
-          path: '/persist<%resource.name%>/:id',
-          name: 'persist<%resource.name%>',
-          component: Persist<%resource.name%>View,
+          path: '/persist<%-resource.name%><%-resource.strParams()%>',
+          name: 'persist<%-resource.name%>',
+          component: Persist<%-resource.name%>View,
           props: true,
         },
 <%_ } _%>

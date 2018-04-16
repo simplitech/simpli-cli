@@ -31,6 +31,14 @@ module.exports = class Resource {
     return this.attrs.filter((resource) => resource.isRequired)
   }
 
+  strParams () {
+    let str = ''
+    this.endpointParams.forEach((param) => {
+      str += `/:${param}`
+    })
+    return str
+  }
+
   setAttr (belongsTo, property = {}, required = []) {
     const attrs = map(property, (prop, name) => new Attr(name, belongsTo, prop)) || []
 
