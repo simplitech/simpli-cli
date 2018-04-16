@@ -1,7 +1,3 @@
-/**
- * LoginHolder
- * @author martinlabs CRUD generator
- */
 import {Validator, IValidator, ValidationRequired} from '@/simpli'
 
 export default class LoginHolder implements IValidator {
