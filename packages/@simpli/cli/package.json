@@ -34,6 +34,7 @@
     "javascript-stringify": "^1.6.0",
     "js-yaml": "^3.10.0",
     "klaw-sync": "^3.0.2",
+    "lodash.map": "^4.5.0",
     "lodash.clonedeep": "^4.5.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",

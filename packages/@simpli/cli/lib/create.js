@@ -3,7 +3,7 @@ const path = require('path')
 const chalk = require('chalk')
 const rimraf = require('rimraf')
 const inquirer = require('inquirer')
-const Scaffold = require('./Scaffold')
+const Scaffold = require('./scaffold/Scaffold')
 const clearConsole = require('./util/clearConsole')
 const { error, stopSpinner } = require('@vue/cli-shared-utils')
 

@@ -42,13 +42,13 @@ section {
   /* Track */
   ::-webkit-scrollbar-track {
     background: lighten($accent-color, 40%);
-    border-radius: 0 0 5px 5px;
+    border-radius: 5px;
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
     background: $accent-color;
-    border-radius: 0 0 5px 5px;
+    border-radius: 5px;
   }
 
   /* Handle on hover */

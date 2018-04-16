@@ -4,17 +4,18 @@ const debug = require('debug')
 const execa = require('execa')
 const resolve = require('resolve')
 const inquirer = require('inquirer')
-const Generator = require('./Generator')
+const Generator = require('../Generator')
+const SwaggerSetup = require('./SwaggerSetup')
 const cloneDeep = require('lodash.clonedeep')
-const sortObject = require('./util/sortObject')
-const getVersions = require('./util/getVersions')
-const { installDeps } = require('./util/installDeps')
-const clearConsole = require('./util/clearConsole')
-const PromptModuleAPI = require('./PromptModuleAPI')
-const writeFileTree = require('./util/writeFileTree')
-const formatFeatures = require('./util/formatFeatures')
-const fetchRemotePreset = require('./util/fetchRemotePreset')
-const request = require('./util/request.js')
+const sortObject = require('../util/sortObject')
+const getVersions = require('../util/getVersions')
+const { installDeps } = require('../util/installDeps')
+const clearConsole = require('../util/clearConsole')
+const PromptModuleAPI = require('../PromptModuleAPI')
+const writeFileTree = require('../util/writeFileTree')
+const formatFeatures = require('../util/formatFeatures')
+const fetchRemotePreset = require('../util/fetchRemotePreset')
+const request = require('../util/request.js')
 
 const {
   log,
@@ -31,7 +32,8 @@ module.exports = class Scaffold {
   constructor (name, context, promptModules) {
     this.name = name
     this.context = process.env.SIMPLI_CLI_CONTEXT = context
-    this.swaggerSetup = {}
+    this.swaggerJSON = {}
+    this.swaggerSetup = new SwaggerSetup()
     const { presetPrompt, featurePrompt } = this.resolveIntroPrompts()
     this.presetPrompt = presetPrompt
     this.featurePrompt = featurePrompt
@@ -55,7 +57,18 @@ module.exports = class Scaffold {
 
     try {
       const resp = await request.get(url)
-      this.swaggerSetup = resp.body
+      this.swaggerJSON = resp.body
+
+      const { swagger, info, paths, definitions } = this.swaggerJSON
+
+      if (!swagger) {
+        throw new Error('This file is not a valid Swagger')
+      }
+
+      // Remove last directory of the URL
+      this.swaggerSetup.apiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
+      this.swaggerSetup.title = info && info.title
+      this.swaggerSetup.setResources(definitions, paths)
     } catch (e) {
       error(e.message)
       process.exit(1)
