@@ -1,5 +1,5 @@
 module.exports = (api, options) => {
-  api.render('./template')
+  api.render('./template', options.swaggerSetup = {})
 
   api.extendPackage({
     scripts: {

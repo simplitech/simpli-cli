@@ -9,6 +9,10 @@ import {store} from '@/store'
 
 Vue.config.productionTip = false
 
+<%_ console.log(rootOptions) _%>
+<%_ console.log(options) _%>
+<%_ console.log(swaggerSetup) _%>
+
 new Vue({
   router: $.router,
   i18n: $.i18n,

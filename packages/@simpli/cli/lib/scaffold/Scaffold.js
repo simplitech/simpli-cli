@@ -88,7 +88,8 @@ module.exports = class Scaffold {
     preset = cloneDeep(preset)
     // inject core service
     preset.plugins['@simpli/cli-scaffold'] = Object.assign({
-      projectName: name
+      projectName: name,
+      swaggerSetup
     }, preset)
 
     // get latest CLI version

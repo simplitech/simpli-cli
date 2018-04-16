@@ -16,6 +16,10 @@ module.exports = class SwaggerSetup {
     return this.resources.filter((resource) => resource.isResponse)
   }
 
+  nonPaged () {
+    return this.resources.filter((resource) => !resource.isPagedResponse)
+  }
+
   onlyPagedResponses () {
     return this.resources.filter((resource) => resource.isPagedResponse)
   }
