@@ -1,3 +1,8 @@
+<a name="0.3.0-alpha.13"></a>
+# [0.3.0-alpha.13](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.12...v0.3.0-alpha.13) (2018-04-17)
+
+
+
 <a name="0.3.0-alpha.12"></a>
 # [0.3.0-alpha.12](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.11...v0.3.0-alpha.12) (2018-04-17)
 
