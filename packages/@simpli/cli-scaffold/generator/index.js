@@ -1,7 +1,7 @@
 module.exports = (api, options) => {
   api.render('./template')
 
-  api.renderFile('./dynamics/models.ts')
+  api.renderFrom('./dynamics', './models.js')
 
   api.extendPackage({
     scripts: {

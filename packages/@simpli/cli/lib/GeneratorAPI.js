@@ -123,6 +123,7 @@ class GeneratorAPI {
         const data = this._resolveData(additionalData)
         const _files = await globby(['**/*'], { cwd: source })
         for (const rawPath of _files) {
+          console.log(rawPath)
           let filename = path.basename(rawPath)
           // dotfiles are ignored when published to npm, therefore in templates
           // we need to use underscore instead (e.g. "_gitignore")
@@ -131,7 +132,7 @@ class GeneratorAPI {
           }
           const targetPath = path.join(path.dirname(rawPath), filename)
           const sourcePath = path.resolve(source, rawPath)
-          const content = this.renderFile(sourcePath, data, ejsOptions)
+          const content = renderFile(sourcePath, data, ejsOptions)
           // only set file if it's not all whitespace, or is a Buffer (binary files)
           if (Buffer.isBuffer(content) || /[^\s]/.test(content)) {
             files[targetPath] = content
@@ -143,7 +144,7 @@ class GeneratorAPI {
         const data = this._resolveData(additionalData)
         for (const targetPath in source) {
           const sourcePath = path.resolve(baseDir, source[targetPath])
-          const content = this.renderFile(sourcePath, data, ejsOptions)
+          const content = renderFile(sourcePath, data, ejsOptions)
           if (Buffer.isBuffer(content) || content.trim()) {
             files[targetPath] = content
           }
@@ -152,6 +153,14 @@ class GeneratorAPI {
     } else if (isFunction(source)) {
       this._injectFileMiddleware(source)
     }
+  }
+
+  renderFrom (source, rawPath, additionalData = {}, ejsOptions = {}) {
+    const baseDir = extractCallDir()
+    source = path.resolve(baseDir, source)
+    const data = this._resolveData(additionalData)
+    const sourcePath = path.resolve(source, rawPath)
+    renderFile(sourcePath, data, ejsOptions)
   }
 
   /**
@@ -182,49 +191,6 @@ class GeneratorAPI {
   exitLog (msg, type = 'log') {
     this.generator.exitLogs.push({ id: this.id, msg, type })
   }
-
-  renderFile (name, data, ejsOptions) {
-    if (isBinary.sync(name)) {
-      return fs.readFileSync(name) // return buffer
-    }
-    const template = fs.readFileSync(name, 'utf-8')
-
-    // custom template inheritance via yaml front matter.
-    // ---
-    // extend: 'source-file'
-    // replace: !!js/regexp /some-regex/
-    // OR
-    // replace:
-    //   - !!js/regexp /foo/
-    //   - !!js/regexp /bar/
-    // ---
-    const parsed = yaml.loadFront(template)
-    const content = parsed.__content
-    let finalTemplate = content.trim() + `\n`
-    if (parsed.extend) {
-      const extendPath = path.isAbsolute(parsed.extend)
-        ? parsed.extend
-        : resolve.sync(parsed.extend, { basedir: path.dirname(name) })
-      finalTemplate = fs.readFileSync(extendPath, 'utf-8')
-      if (parsed.replace) {
-        if (Array.isArray(parsed.replace)) {
-          const replaceMatch = content.match(replaceBlockRE)
-          if (replaceMatch) {
-            const replaces = replaceMatch.map(m => {
-              return m.replace(replaceBlockRE, '$1').trim()
-            })
-            parsed.replace.forEach((r, i) => {
-              finalTemplate = finalTemplate.replace(r, replaces[i])
-            })
-          }
-        } else {
-          finalTemplate = finalTemplate.replace(parsed.replace, content.trim())
-        }
-      }
-    }
-
-    return ejs.render(finalTemplate, data, ejsOptions)
-  }
 }
 
 function extractCallDir () {
@@ -237,5 +203,48 @@ function extractCallDir () {
 }
 
 const replaceBlockRE = /<%# REPLACE %>([^]*?)<%# END_REPLACE %>/g
+
+function renderFile (name, data, ejsOptions) {
+  if (isBinary.sync(name)) {
+    return fs.readFileSync(name) // return buffer
+  }
+  const template = fs.readFileSync(name, 'utf-8')
+
+  // custom template inheritance via yaml front matter.
+  // ---
+  // extend: 'source-file'
+  // replace: !!js/regexp /some-regex/
+  // OR
+  // replace:
+  //   - !!js/regexp /foo/
+  //   - !!js/regexp /bar/
+  // ---
+  const parsed = yaml.loadFront(template)
+  const content = parsed.__content
+  let finalTemplate = content.trim() + `\n`
+  if (parsed.extend) {
+    const extendPath = path.isAbsolute(parsed.extend)
+      ? parsed.extend
+      : resolve.sync(parsed.extend, { basedir: path.dirname(name) })
+    finalTemplate = fs.readFileSync(extendPath, 'utf-8')
+    if (parsed.replace) {
+      if (Array.isArray(parsed.replace)) {
+        const replaceMatch = content.match(replaceBlockRE)
+        if (replaceMatch) {
+          const replaces = replaceMatch.map(m => {
+            return m.replace(replaceBlockRE, '$1').trim()
+          })
+          parsed.replace.forEach((r, i) => {
+            finalTemplate = finalTemplate.replace(r, replaces[i])
+          })
+        }
+      } else {
+        finalTemplate = finalTemplate.replace(parsed.replace, content.trim())
+      }
+    }
+  }
+
+  return ejs.render(finalTemplate, data, ejsOptions)
+}
 
 module.exports = GeneratorAPI
