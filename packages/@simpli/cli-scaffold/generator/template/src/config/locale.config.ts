@@ -13,7 +13,7 @@ import <%-camelCase(langs)%> from '@/locale/<%-langs%>/lang'
  * Note: US English is already imported by default
  */
 <%_ for (var i in availableLanguages) { var langs = availableLanguages[i] _%>
-<%_ if (langs !== 'en-us') { _%>
+<%_ if (langs !== 'en-US') { _%>
 import 'moment/locale/<%-kebabCase(langs)%>'
 <%_ } _%>
 <%_ } _%>

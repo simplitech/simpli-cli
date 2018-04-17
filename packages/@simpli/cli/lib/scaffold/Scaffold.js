@@ -16,6 +16,7 @@ const writeFileTree = require('../util/writeFileTree')
 const formatFeatures = require('../util/formatFeatures')
 const fetchRemotePreset = require('../util/fetchRemotePreset')
 const request = require('../util/request.js')
+const fs = require('fs')
 
 const {
   log,
@@ -176,6 +177,15 @@ module.exports = class Scaffold {
     this.scaffoldSetup.availableLanguages = availableLanguages
     this.scaffoldSetup.defaultLanguage = defaultLanguage
     this.scaffoldSetup.defaultCurrency = defaultCurrency
+
+    // require.extensions['.vue'] = (module, filename) => {
+    //   module.exports = fs.readFileSync(filename, 'utf8')
+    // }
+    //
+    // await writeFileTree(`${this.context}/src/views/list`, {
+    //   'foo.vue': require('./foo.vue')
+    // })
+    // process.exit(1)
   }
 
   async create (cliOptions = {}) {

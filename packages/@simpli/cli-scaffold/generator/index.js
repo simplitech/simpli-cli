@@ -1,6 +1,8 @@
 module.exports = (api, options) => {
   api.render('./template')
 
+  api.renderFile('./dynamics/models.ts')
+
   api.extendPackage({
     scripts: {
       'serve': 'vue-cli-service serve' + (
