@@ -30,59 +30,14 @@
             </router-link>
           </li>
 
+<%_ var resources = rootOptions.scaffoldSetup.exceptResponses() _%>
+<%_ for (var i in resources) { var resource = resources[i] _%>
           <li>
-            <router-link to="/listPrincipal" @click.native="menuOff">
-              {{ $t('classes.Principal.title') }}
+            <router-link to="/list<%-resource.name%>" @click.native="menuOff">
+              {{ $t('classes.<%-resource.name%>.title') }}
             </router-link>
           </li>
-
-          <li>
-            <router-link to="/listUser" @click.native="menuOff">
-              {{ $t('classes.User.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listEndereco" @click.native="menuOff">
-              {{ $t('classes.Endereco.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listTag" @click.native="menuOff">
-              {{ $t('classes.Tag.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listConectado" @click.native="menuOff">
-              {{ $t('classes.Conectado.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listGrupoDoPrincipal" @click.native="menuOff">
-              {{ $t('classes.GrupoDoPrincipal.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listItemDoPrincipal" @click.native="menuOff">
-              {{ $t('classes.ItemDoPrincipal.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listExtensaoDoPrincipal" @click.native="menuOff">
-              {{ $t('classes.ExtensaoDoPrincipal.title') }}
-            </router-link>
-          </li>
-
-          <li>
-            <router-link to="/listConectorPrincipal" @click.native="menuOff">
-              {{ $t('classes.ConectorPrincipal.title') }}
-            </router-link>
-          </li>
+<%_ } _%>
 
           <div class="weight-1"></div>
 
@@ -110,7 +65,8 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {Action, Getter} from 'vuex-class'
-  import User from '@/model/User'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+  import User from '@/model/<%-userModel%>'
 
   @Component
   export default class Sidebar extends Vue {

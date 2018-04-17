@@ -1,8 +1,9 @@
 <%_ var config = rootOptions.scaffoldSetup _%>
 VUE_APP_NAME=<%-config.appName%>
-VUE_APP_SWAGGER_URL=<%-config.swaggerUrl%>
 VUE_APP_LANG=<%-config.defaultLanguage%>
 VUE_APP_CURRENCY=<%-config.defaultCurrency%>
+
+SWAGGER_URL=<%-config.swaggerUrl%>
 
 BASE_URL=/
 OUTPUT_DIR=dist

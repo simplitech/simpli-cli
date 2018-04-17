@@ -1,7 +1,8 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import User from '@/model/User'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+import User from '@/model/<%-userModel%>'
 import LoginHolder from '@/model/LoginHolder'
 import LoginResp from '@/model/response/LoginResp'
 import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'

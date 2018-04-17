@@ -1,5 +1,8 @@
 const map = require('lodash.map')
 const Model = require('./Model')
+const camelCase = require('lodash.camelcase')
+const kebabCase = require('lodash.kebabcase')
+const snakeCase = require('lodash.snakecase')
 
 module.exports = class ScaffoldSetup {
   constructor () {
@@ -7,6 +10,7 @@ module.exports = class ScaffoldSetup {
     this.swaggerUrl = null
     this.apiUrlDev = null
     this.apiUrlProd = null
+    this.userModel = 'User'
     this.availableLanguages = null
     this.defaultLanguage = null
     this.defaultCurrency = null
@@ -41,6 +45,17 @@ module.exports = class ScaffoldSetup {
   // Get simple and resp Resources
   exceptPagedResponses () {
     return this.models.filter((resource) => !resource.isPagedResponse)
+  }
+
+  // Helpers
+  camelCase (prop) {
+    return camelCase(prop)
+  }
+  kebabCase (prop) {
+    return kebabCase(prop)
+  }
+  snakeUpperCase (prop) {
+    return (snakeCase(prop) || '').toUpperCase()
   }
 
   setModels (definition = {}, path = {}) {

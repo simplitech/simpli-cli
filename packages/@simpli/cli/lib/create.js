@@ -84,7 +84,7 @@ async function createScaffold (name, targetDir, options) {
         type: 'list',
         message: 'What method of preset will you use?',
         choices: [
-          { name: 'By swagger from the web server', value: 'swagger' },
+          { name: 'Swagger from the web server', value: 'swagger' },
           { name: 'No preset (empty project)', value: 'no-preset' },
           { name: 'Cancel', value: false }
         ]

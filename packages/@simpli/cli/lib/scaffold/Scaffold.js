@@ -58,107 +58,124 @@ module.exports = class Scaffold {
     try {
       const resp = await request.get(url)
       this.swaggerJSON = resp.body
-
-      const { swagger, info, paths, definitions } = this.swaggerJSON
-
-      if (!swagger) {
-        throw new Error('This file is not a valid Swagger')
-      }
-
-      const { appName } = await inquirer.prompt([
-        {
-          name: 'appName',
-          type: 'input',
-          default: info && info.title,
-          message: 'Enter the app name'
-        }
-      ])
-
-      // Remove last directory of the URL
-      const defaultApiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
-
-      const { apiUrlDev } = await inquirer.prompt([
-        {
-          name: 'apiUrlDev',
-          type: 'input',
-          default: defaultApiUrl,
-          message: 'Enter the API URL in development mode'
-        }
-      ])
-
-      const { apiUrlProd } = await inquirer.prompt([
-        {
-          name: 'apiUrlProd',
-          type: 'input',
-          default: defaultApiUrl,
-          message: 'Enter the API URL in production mode'
-        }
-      ])
-
-      const { availableLanguages } = await inquirer.prompt([
-        {
-          name: 'availableLanguages',
-          type: 'checkbox',
-          message: 'What languages are available?',
-          choices: [
-            'en-US',
-            'pt-BR'
-          ]
-        }
-      ])
-
-      if (availableLanguages.length === 0) {
-        throw new Error('Select at least one language')
-      }
-
-      const { defaultLanguage } = await inquirer.prompt([
-        {
-          name: 'defaultLanguage',
-          type: 'list',
-          message: 'What is the default language?',
-          choices: availableLanguages
-        }
-      ])
-
-      const { defaultCurrency } = await inquirer.prompt([
-        {
-          name: 'defaultCurrency',
-          type: 'list',
-          message: 'What is the default currency?',
-          choices: [
-            'USD',
-            'BRL'
-          ]
-        }
-      ])
-
-      const { confirm } = await inquirer.prompt([
-        {
-          name: 'confirm',
-          type: 'confirm',
-          message: 'Confirm this set?'
-        }
-      ])
-
-      if (!confirm) {
-        process.exit(1)
-      }
-
-      this.scaffoldSetup.appName = appName
-      this.scaffoldSetup.swaggerUrl = url
-      this.scaffoldSetup.apiUrlDev = apiUrlDev
-      this.scaffoldSetup.apiUrlProd = apiUrlProd
-      this.scaffoldSetup.availableLanguages = availableLanguages
-      this.scaffoldSetup.defaultLanguage = defaultLanguage
-      this.scaffoldSetup.defaultCurrency = defaultCurrency
-
-      this.scaffoldSetup.setModels(definitions, paths)
-      console.log(this.scaffoldSetup.exceptResponses())
-      process.exit(1)
     } catch (e) {
       error(e.message)
       process.exit(1)
     }
+
+    const { swagger, info, paths, definitions } = this.swaggerJSON
+    this.scaffoldSetup.setModels(definitions, paths)
+
+    if (!swagger) {
+      error('This file is not a valid swagger')
+      process.exit(1)
+    }
+
+    const { appName } = await inquirer.prompt([
+      {
+        name: 'appName',
+        type: 'input',
+        default: info && info.title,
+        message: 'Enter the app name'
+      }
+    ])
+
+    // Remove last directory of the URL
+    const defaultApiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
+
+    const { apiUrlDev } = await inquirer.prompt([
+      {
+        name: 'apiUrlDev',
+        type: 'input',
+        default: defaultApiUrl,
+        message: 'Enter the API URL in development mode'
+      }
+    ])
+
+    const { apiUrlProd } = await inquirer.prompt([
+      {
+        name: 'apiUrlProd',
+        type: 'input',
+        default: defaultApiUrl,
+        message: 'Enter the API URL in production mode'
+      }
+    ])
+
+    const { userModel } = await inquirer.prompt([
+      {
+        name: 'userModel',
+        type: 'input',
+        default: 'User',
+        message: 'What is the name of the user model'
+      }
+    ])
+
+    if (!userModel) {
+      error('User model name is required')
+      process.exit(1)
+    } else if (!this.scaffoldSetup.models.find((model) => model.name === userModel)) {
+      error(`The model \'${userModel}\' does not exist`)
+      process.exit(1)
+    }
+
+    const { availableLanguages } = await inquirer.prompt([
+      {
+        name: 'availableLanguages',
+        type: 'checkbox',
+        message: 'What languages are available?',
+        choices: [
+          'en-US',
+          'pt-BR'
+        ]
+      }
+    ])
+
+    if (availableLanguages.length === 0) {
+      error('Select at least one language')
+      process.exit(1)
+    }
+
+    const { defaultLanguage } = await inquirer.prompt([
+      {
+        name: 'defaultLanguage',
+        type: 'list',
+        message: 'What is the default language?',
+        choices: availableLanguages
+      }
+    ])
+
+    const { defaultCurrency } = await inquirer.prompt([
+      {
+        name: 'defaultCurrency',
+        type: 'list',
+        message: 'What is the default currency?',
+        choices: [
+          'USD',
+          'BRL'
+        ]
+      }
+    ])
+
+    const { confirm } = await inquirer.prompt([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        message: 'Confirm this set?'
+      }
+    ])
+
+    if (!confirm) {
+      process.exit(1)
+    }
+
+    this.scaffoldSetup.appName = appName
+    this.scaffoldSetup.swaggerUrl = url
+    this.scaffoldSetup.apiUrlDev = apiUrlDev
+    this.scaffoldSetup.apiUrlProd = apiUrlProd
+    this.scaffoldSetup.userModel = userModel
+    this.scaffoldSetup.availableLanguages = availableLanguages
+    this.scaffoldSetup.defaultLanguage = defaultLanguage
+    this.scaffoldSetup.defaultCurrency = defaultCurrency
   }
 
   async create (cliOptions = {}) {
