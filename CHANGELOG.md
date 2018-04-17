@@ -1,3 +1,13 @@
+<a name="0.3.0-alpha.6"></a>
+# [0.3.0-alpha.6](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.5...v0.3.0-alpha.6) (2018-04-17)
+
+
+### Features
+
+* **scaffold:** Created inspect:scaffold command ([86b99f8](https://github.com/simplitech/simpli-cli/commit/86b99f8))
+
+
+
 <a name="0.3.0-alpha.5"></a>
 # [0.3.0-alpha.5](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.4...v0.3.0-alpha.5) (2018-04-16)
 
