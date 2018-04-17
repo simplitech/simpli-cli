@@ -1,21 +1,23 @@
 const map = require('lodash.map')
 const Attr = require('./Attr')
 
-module.exports = class Resource {
+module.exports = class Model {
   constructor (name, definition, path) {
     this.name = name || ''
     this.endpoint = null
     this.endpointParams = []
     this.keyID = null
     this.keyTAG = null
-    this.isResponse = null
-    this.isPagedResponse = null
+    this.isResource = false
+    this.isResponse = false
+    this.isPagedResponse = false
     this.child = null
     this.attrs = []
 
     this.setAttr(name, definition.properties, definition.required)
     this.setResponse()
     this.setEndpoint(path)
+    this.setResource()
     this.setKey()
   }
 
@@ -81,10 +83,13 @@ module.exports = class Resource {
     })
   }
 
-  setResponse () {
-    this.isResponse = false
-    this.isPagedResponse = false
+  setResource () {
+    if (this.endpoint || this.isPagedResponse) {
+      this.isResource = true
+    }
+  }
 
+  setResponse () {
     if (this.name.match(/^\w+(Resp)$/)) {
       this.isResponse = true
       this.isPagedResponse = false

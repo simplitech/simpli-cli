@@ -25,7 +25,7 @@ program
 
 program
   .command('new:project <project-name>')
-  .description('create a new simpli frontend project')
+  .description('create a new simpli project')
   .option('-d, --default', 'Skip prompts and use default preset')
   .option('-f, --force', 'Overwrite target directory if it exists')
   .action((name, cmd) => {
@@ -33,17 +33,19 @@ program
   })
 
 program
-  .command('merge:scaffold <project-name>')
-  .description('merge selected frontend project')
-  .action((name, cmd) => {
-  //
+  .command('inspect:scaffold [paths...]')
+  .option('--url <url>')
+  .option('--mode <mode>')
+  .description('inspect a scaffold project')
+  .action((paths, cmd) => {
+    require('../lib/scaffold/inspect')(paths, cmd.url, cmd.mode)
   })
 
 program
-  .command('merge:api <project-name>')
-  .description('merge selected backend project')
+  .command('sync:scaffold')
+  .description('sync the swagger config from the current frontend project')
   .action((name, cmd) => {
-    //
+  //
   })
 
 // output help information on unknown commands

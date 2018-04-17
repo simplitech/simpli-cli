@@ -78,7 +78,23 @@ async function createScaffold (name, targetDir, options) {
   const scaffold = new Scaffold(name, targetDir, promptModules)
 
   if (!options.default) {
-    await scaffold.setup()
+    const { preset } = await inquirer.prompt([
+      {
+        name: 'preset',
+        type: 'list',
+        message: 'What method of preset do you prefer?',
+        choices: [
+          { name: 'No preset (empty project)', value: 'no-preset' },
+          { name: 'By Swagger from WebServer', value: 'swagger' },
+          { name: 'Cancel', value: false }
+        ]
+      }
+    ])
+    if (!preset) {
+      return
+    } else if (preset === 'swagger') {
+      await scaffold.swaggerSetup()
+    }
   }
 
   await scaffold.create(options)

@@ -1,8 +1,8 @@
 import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import LoginView from '@/views/LoginView.vue'
-<% var resources = rootOptions.swaggerSetup.nonResponses() %>
 
+<%_ var resources = rootOptions.scaffoldSetup.exceptResponses() _%>
 <%_ for (var i in resources) { var resource = resources[i] _%>
 import List<%-resource.name%>View from '@/views/list/List<%-resource.name%>View.vue'
 <%_ } _%>
@@ -30,8 +30,8 @@ export const router = {
           name: 'dashboard',
           component: DashboardView,
         },
-
 <%_ for (var i in resources) { var resource = resources[i] _%>
+
         {
           path: '/list<%-resource.name%>',
           component: List<%-resource.name%>View,

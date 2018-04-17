@@ -5,7 +5,7 @@ const execa = require('execa')
 const resolve = require('resolve')
 const inquirer = require('inquirer')
 const Generator = require('../Generator')
-const SwaggerSetup = require('./SwaggerSetup')
+const ScaffoldSetup = require('./ScaffoldSetup')
 const cloneDeep = require('lodash.clonedeep')
 const sortObject = require('../util/sortObject')
 const getVersions = require('../util/getVersions')
@@ -33,7 +33,7 @@ module.exports = class Scaffold {
     this.name = name
     this.context = process.env.SIMPLI_CLI_CONTEXT = context
     this.swaggerJSON = {}
-    this.swaggerSetup = new SwaggerSetup()
+    this.scaffoldSetup = new ScaffoldSetup()
     const { presetPrompt, featurePrompt } = this.resolveIntroPrompts()
     this.presetPrompt = presetPrompt
     this.featurePrompt = featurePrompt
@@ -46,7 +46,7 @@ module.exports = class Scaffold {
     promptModules.forEach(m => m(promptAPI))
   }
 
-  async setup () {
+  async swaggerSetup () {
     const { url } = await inquirer.prompt([
       {
         name: 'url',
@@ -66,9 +66,83 @@ module.exports = class Scaffold {
       }
 
       // Remove last directory of the URL
-      this.swaggerSetup.apiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
-      this.swaggerSetup.title = info && info.title
-      this.swaggerSetup.setResources(definitions, paths)
+      const defaultApiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
+
+      const { apiUrlDev } = await inquirer.prompt([
+        {
+          name: 'apiUrlDev',
+          type: 'input',
+          default: defaultApiUrl,
+          message: 'Enter the API URL in development mode'
+        }
+      ])
+
+      const { apiUrlProd } = await inquirer.prompt([
+        {
+          name: 'apiUrlProd',
+          type: 'input',
+          default: defaultApiUrl,
+          message: 'Enter the API URL in production mode'
+        }
+      ])
+
+      const { availableLanguages } = await inquirer.prompt([
+        {
+          name: 'availableLanguages',
+          type: 'checkbox',
+          message: 'What languages are available?',
+          choices: [
+            'en-US',
+            'pt-BR'
+          ]
+        }
+      ])
+
+      if (availableLanguages.length === 0) {
+        throw new Error('Select at least one language')
+      }
+
+      const { defaultLanguage } = await inquirer.prompt([
+        {
+          name: 'defaultLanguage',
+          type: 'list',
+          message: 'What is the default language?',
+          choices: availableLanguages
+        }
+      ])
+
+      const { defaultCurrency } = await inquirer.prompt([
+        {
+          name: 'defaultCurrency',
+          type: 'list',
+          message: 'What is the default currency?',
+          choices: [
+            'USD',
+            'BRL'
+          ]
+        }
+      ])
+
+      const { confirm } = await inquirer.prompt([
+        {
+          name: 'confirm',
+          type: 'confirm',
+          message: 'Confirm this set?'
+        }
+      ])
+
+      if (!confirm) {
+        process.exit(1)
+      }
+
+      this.scaffoldSetup.apiUrlDev = apiUrlDev
+      this.scaffoldSetup.apiUrlProd = apiUrlProd
+      this.scaffoldSetup.availableLanguages = availableLanguages
+      this.scaffoldSetup.defaultLanguage = defaultLanguage
+      this.scaffoldSetup.defaultCurrency = defaultCurrency
+      this.scaffoldSetup.title = info && info.title
+
+      this.scaffoldSetup.setModels(definitions, paths)
     } catch (e) {
       error(e.message)
       process.exit(1)
@@ -76,7 +150,7 @@ module.exports = class Scaffold {
   }
 
   async create (cliOptions = {}) {
-    const { name, context, createCompleteCbs, swaggerSetup } = this
+    const { name, context, createCompleteCbs, scaffoldSetup } = this
 
     const run = (command, args) => {
       if (!args) { [command, ...args] = command.split(/\s+/) }
@@ -89,7 +163,7 @@ module.exports = class Scaffold {
     // inject core service
     preset.plugins['@simpli/cli-scaffold'] = Object.assign({
       projectName: name,
-      swaggerSetup
+      scaffoldSetup
     }, preset)
 
     // get latest CLI version
