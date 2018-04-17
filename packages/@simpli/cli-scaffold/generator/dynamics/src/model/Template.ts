@@ -36,21 +36,19 @@ export default class <%-model.name%> extends Resource {
 <%_ } _%>
   }
 
-  get $tag() {
 <%_ if (model.keyTAG) { _%>
+  get $tag() {
     return this.<%-model.keyTAG%>
-<%_ } else { _%>
-    return 0
-<%_ } _%>
   }
 
   set $tag(val: TAG) {
-<%_ if (model.keyID) { _%>
     this.<%-model.keyTAG%> = val
-<%_ } _%>
   }
+<%_ } _%>
 
 <%_ for (var i in model.attrs) { var attr = model.attrs[i] _%>
+<%_ if (attr.name === model.keyID) continue _%>
+
   <%_ for (var j in attr.responses()) { var response = attr.responses()[j] _%>
   @<%-response.title%>(<%-response.attr%>)
   <%_ } _%>
@@ -58,6 +56,7 @@ export default class <%-model.name%> extends Resource {
   @<%-validation.title%>(<%-validation.attr%>)
   <%_ } _%>
   <%-attr.name%><%-attr.reqStr()%>: <%-attr.types()%> = <%-attr.defaults()%>
+
 <%_ } _%>
 
   get idGrupoDoPrincipalFk() {

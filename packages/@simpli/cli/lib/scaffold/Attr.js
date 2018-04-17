@@ -113,7 +113,7 @@ module.exports = class Attr {
   }
 
   reqStr () {
-    return this.isRequired ? '?' : ''
+    return this.isRequired ? '' : '?'
   }
 
   defaults () {
@@ -181,10 +181,6 @@ module.exports = class Attr {
       result.push({
         title: 'ValidationPasswordLength',
         attr: `6, 31`
-      })
-      result.push({
-        title: 'ResponseHidden',
-        attr: []
       })
     }
 
