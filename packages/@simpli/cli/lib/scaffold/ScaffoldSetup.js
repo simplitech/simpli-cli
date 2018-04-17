@@ -3,7 +3,8 @@ const Model = require('./Model')
 
 module.exports = class ScaffoldSetup {
   constructor () {
-    this.title = null
+    this.appName = null
+    this.swaggerUrl = null
     this.apiUrlDev = null
     this.apiUrlProd = null
     this.availableLanguages = null

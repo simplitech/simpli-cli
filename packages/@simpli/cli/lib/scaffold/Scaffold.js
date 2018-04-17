@@ -65,6 +65,15 @@ module.exports = class Scaffold {
         throw new Error('This file is not a valid Swagger')
       }
 
+      const { appName } = await inquirer.prompt([
+        {
+          name: 'appName',
+          type: 'input',
+          default: info && info.title,
+          message: 'Enter the app name'
+        }
+      ])
+
       // Remove last directory of the URL
       const defaultApiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
 
@@ -135,12 +144,13 @@ module.exports = class Scaffold {
         process.exit(1)
       }
 
+      this.scaffoldSetup.appName = appName
+      this.scaffoldSetup.swaggerUrl = url
       this.scaffoldSetup.apiUrlDev = apiUrlDev
       this.scaffoldSetup.apiUrlProd = apiUrlProd
       this.scaffoldSetup.availableLanguages = availableLanguages
       this.scaffoldSetup.defaultLanguage = defaultLanguage
       this.scaffoldSetup.defaultCurrency = defaultCurrency
-      this.scaffoldSetup.title = info && info.title
 
       this.scaffoldSetup.setModels(definitions, paths)
     } catch (e) {

@@ -82,10 +82,10 @@ async function createScaffold (name, targetDir, options) {
       {
         name: 'preset',
         type: 'list',
-        message: 'What method of preset do you prefer?',
+        message: 'What method of preset will you use?',
         choices: [
+          { name: 'By swagger from the web server', value: 'swagger' },
           { name: 'No preset (empty project)', value: 'no-preset' },
-          { name: 'By Swagger from WebServer', value: 'swagger' },
           { name: 'Cancel', value: false }
         ]
       }
@@ -101,6 +101,8 @@ async function createScaffold (name, targetDir, options) {
 }
 
 async function createApi (name, targetDir, options) {
+  console.info(`${chalk.yellowBright(`This generator was not done yet. Use the legacy generator instead`)}`)
+  console.info(`${chalk.bold(`https://www.npmjs.com/package/generator-martinlabs`)}`)
 }
 
 module.exports = (...args) => {
