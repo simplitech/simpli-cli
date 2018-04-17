@@ -57,7 +57,7 @@ export default class <%-model.name%> extends Resource {
   <%_ for (var j in attr.validations()) { var validation = attr.validations()[j] _%>
   @<%-validation.title%>(<%-validation.attr%>)
   <%_ } _%>
-  <%-attr.name%><%-attr.reqStr%>: <%-attr.types%> = <%-attr.defaults%>
+  <%-attr.name%><%-attr.reqStr()%>: <%-attr.types()%> = <%-attr.defaults()%>
 <%_ } _%>
 
   get idGrupoDoPrincipalFk() {
