@@ -1,7 +1,13 @@
 module.exports = (api, options) => {
   api.render('./template')
 
-  api.renderFrom('./dynamics', 'src/views/list/list.vue', 'kkk.vue')
+  const resources = options.scaffoldSetup.exceptResponses()
+  resources.forEach((resource) => {
+    const data = { model: resource }
+    const filename = `List${resource.name}View.vue`
+    const template = 'src/views/list/template.vue'
+    api.renderFrom('./dynamics', template, filename, data)
+  })
 
   api.extendPackage({
     scripts: {

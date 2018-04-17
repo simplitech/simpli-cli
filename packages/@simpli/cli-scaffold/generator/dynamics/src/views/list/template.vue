@@ -1,4 +1,5 @@
 <template>
+  <%_ console.log(model) _%>
   <div class="verti">
     <adap-header :collection="collection"
                  :title="$t('classes.Principal.title')"
