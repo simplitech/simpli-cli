@@ -1,9 +1,8 @@
 <template>
-  <%_ console.log(model) _%>
   <div class="verti">
     <adap-header :collection="collection"
-                 :title="$t('classes.Principal.title')"
-                 persistUrl="/persistPrincipal"
+                 :title="$t('classes.<%-model.name%>.title')"
+                 persistUrl="/persist<%-model.name%>"
                  hasSearch hasCsv/>
 
     <section>
@@ -24,14 +23,14 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
-import Principal from '@/model/Principal'
+import <%-model.name%> from '@/model/<%-model.name%>'
 import PagedResp from '@/model/response/PagedResp'
 import {pushByName} from '@/simpli'
 
 @Component
-export default class ListPrincipalView extends Vue {
-  collection = new PagedResp(Principal)
-  toRemove = new Principal()
+export default class List<%-model.name%>View extends Vue {
+  collection = new PagedResp(<%-model.name%>)
+  toRemove = new <%-model.name%>()
 
   async mounted() {
     await this.collection.search()
@@ -43,16 +42,16 @@ export default class ListPrincipalView extends Vue {
     await this.collection.search()
   }
 
-  openPersist(item: Principal) {
-    pushByName('persistPrincipal', item.$id)
+  openPersist(item: <%-model.name%>) {
+    pushByName('persist<%-model.name%>', item.$id)
   }
 
-  openRemoveModal(item: Principal) {
+  openRemoveModal(item: <%-model.name%>) {
     this.toRemove = item
   }
 
   resetRemove() {
-    this.toRemove = new Principal()
+    this.toRemove = new <%-model.name%>()
   }
 }
 </script>

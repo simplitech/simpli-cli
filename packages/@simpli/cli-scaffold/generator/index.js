@@ -4,9 +4,9 @@ module.exports = (api, options) => {
   const resources = options.scaffoldSetup.exceptResponses()
   resources.forEach((resource) => {
     const data = { model: resource }
-    const filename = `List${resource.name}View.vue`
-    const template = 'src/views/list/template.vue'
-    api.renderFrom('./dynamics', template, filename, data)
+    api.renderFrom('./dynamics', 'src/model/Template.vue', `${resource.name}.vue`, data)
+    api.renderFrom('./dynamics', 'src/model/response/TemplateResp.vue', `${resource.name}Resp.vue`, data)
+    api.renderFrom('./dynamics', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
   })
 
   api.extendPackage({

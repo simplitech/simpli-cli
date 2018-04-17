@@ -48,22 +48,6 @@ module.exports = class Attr {
   isDate () { return this.isPrimaryOrigin() && this.type === 'date' }
   isDatetime () { return this.isPrimaryOrigin() && this.type === 'datetime' }
 
-  // Type Origin
-  isPrimaryOrigin () { return this.typeOrigin() === 'primary' }
-  isArrayOrigin () { return this.typeOrigin() === 'array' }
-  isObjectOrigin () { return this.typeOrigin() === 'object' }
-
-  typeOrigin () {
-    if (!this.isArray && !this.isObject) {
-      return 'primary'
-    } else if (this.isArray && !this.isObject) {
-      return 'array'
-    } else if (!this.isArray && this.isObject) {
-      return 'object'
-    }
-    throw new Error(`The attribute '${this.name}' in '${this.belongsTo}' is both array and object`)
-  }
-
   isTAG () {
     const reservedWords = [
       'tag',
@@ -93,34 +77,110 @@ module.exports = class Attr {
     return !!reservedWords.find((word) => word === this.name)
   }
 
+  isUrl () {
+    const reservedWords = [
+      'url',
+      'link'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  isImageUrl () {
+    const reservedWords = [
+      'imageUrl',
+      'photoUrl',
+      'avatar',
+      'fotoUrl',
+      'urlImagem'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  // Type Origin
+  isPrimaryOrigin () { return this.typeOrigin() === 'primary' }
+  isArrayOrigin () { return this.typeOrigin() === 'array' }
+  isObjectOrigin () { return this.typeOrigin() === 'object' }
+
+  typeOrigin () {
+    if (!this.isArray && !this.isObject) {
+      return 'primary'
+    } else if (this.isArray && !this.isObject) {
+      return 'array'
+    } else if (!this.isArray && this.isObject) {
+      return 'object'
+    }
+    throw new Error(`The attribute '${this.name}' in '${this.belongsTo}' is both array and object`)
+  }
+
+  reqStr () {
+    return this.isRequired ? '?' : ''
+  }
+
+  defaults () {
+    if (this.isID() || this.isForeign()) return '0'
+    if (this.isInteger() || this.isDouble()) return '0'
+    if (this.isBoolean()) return 'false'
+    if (this.isObjectOrigin()) return `new ${this.type}()`
+    if (this.isArrayOrigin()) return `[]`
+
+    return '\'\''
+  }
+
+  types () {
+    if (this.isID() || this.isForeign()) return 'ID'
+    if (this.isInteger() || this.isDouble()) return 'number'
+    if (this.isBoolean()) return 'boolean'
+    if (this.isObjectOrigin()) return `${this.type}`
+    if (this.isArrayOrigin()) return `${this.type}[]`
+
+    return 'string'
+  }
+
+  responses () {
+    const result = []
+    if (this.isObjectOrigin() || this.isArrayOrigin()) {
+      result.push({
+        title: 'ResponseSerialize',
+        attr: `${this.type}`
+      })
+    }
+    if (this.isPassword()) {
+      result.push({
+        title: 'ResponseHidden',
+        attr: ``
+      })
+    }
+    return result
+  }
+
   validations () {
     const result = []
 
     if (this.isRequired) {
       result.push({
         title: 'ValidationRequired',
-        attr: []
+        attr: ``
       })
     }
 
     if (this.isString()) {
       result.push({
         title: 'MaxLength',
-        attr: [255]
+        attr: `255`
       })
     }
 
     if (this.isEmail()) {
       result.push({
         title: 'ValidationEmail',
-        attr: []
+        attr: ``
       })
     }
 
     if (this.isPassword()) {
       result.push({
         title: 'ValidationPasswordLength',
-        attr: [6, 31]
+        attr: `6, 31`
       })
       result.push({
         title: 'ResponseHidden',
