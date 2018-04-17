@@ -154,17 +154,11 @@ class GeneratorAPI {
     }
   }
 
-  renderFrom (source, rawPath, additionalData = {}, ejsOptions = {}) {
+  renderFrom (source, rawPath, filename, additionalData = {}, ejsOptions = {}) {
     const baseDir = extractCallDir()
     source = path.resolve(baseDir, source)
     this._injectFileMiddleware(async (files) => {
       const data = this._resolveData(additionalData)
-      let filename = path.basename(rawPath)
-      // dotfiles are ignored when published to npm, therefore in templates
-      // we need to use underscore instead (e.g. "_gitignore")
-      if (filename.charAt(0) === '_') {
-        filename = `.${filename.slice(1)}`
-      }
       const targetPath = path.join(path.dirname(rawPath), filename)
       const sourcePath = path.resolve(source, rawPath)
       const content = renderFile(sourcePath, data, ejsOptions)
