@@ -1,7 +1,7 @@
 module.exports = (api, options) => {
   api.render('./template')
 
-  api.renderFrom('./dynamics', './models.js')
+  api.renderFrom('./dynamics', 'dynamic.vue')
 
   api.extendPackage({
     scripts: {

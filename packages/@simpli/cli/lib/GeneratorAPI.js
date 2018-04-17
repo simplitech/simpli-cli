@@ -123,7 +123,6 @@ class GeneratorAPI {
         const data = this._resolveData(additionalData)
         const _files = await globby(['**/*'], { cwd: source })
         for (const rawPath of _files) {
-          console.log(rawPath)
           let filename = path.basename(rawPath)
           // dotfiles are ignored when published to npm, therefore in templates
           // we need to use underscore instead (e.g. "_gitignore")
@@ -158,9 +157,22 @@ class GeneratorAPI {
   renderFrom (source, rawPath, additionalData = {}, ejsOptions = {}) {
     const baseDir = extractCallDir()
     source = path.resolve(baseDir, source)
-    const data = this._resolveData(additionalData)
-    const sourcePath = path.resolve(source, rawPath)
-    renderFile(sourcePath, data, ejsOptions)
+    this._injectFileMiddleware(async (files) => {
+      const data = this._resolveData(additionalData)
+      let filename = path.basename(rawPath)
+      // dotfiles are ignored when published to npm, therefore in templates
+      // we need to use underscore instead (e.g. "_gitignore")
+      if (filename.charAt(0) === '_') {
+        filename = `.${filename.slice(1)}`
+      }
+      const targetPath = path.join(path.dirname(rawPath), filename)
+      const sourcePath = path.resolve(source, rawPath)
+      const content = renderFile(sourcePath, data, ejsOptions)
+      // only set file if it's not all whitespace, or is a Buffer (binary files)
+      if (Buffer.isBuffer(content) || /[^\s]/.test(content)) {
+        files[targetPath] = content
+      }
+    })
   }
 
   /**

@@ -1,0 +1,3 @@
+<template>
+  Gibs kkk
+</template>
