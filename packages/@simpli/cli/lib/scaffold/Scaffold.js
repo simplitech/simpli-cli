@@ -153,6 +153,8 @@ module.exports = class Scaffold {
       this.scaffoldSetup.defaultCurrency = defaultCurrency
 
       this.scaffoldSetup.setModels(definitions, paths)
+      console.log(this.scaffoldSetup.exceptResponses())
+      process.exit(1)
     } catch (e) {
       error(e.message)
       process.exit(1)

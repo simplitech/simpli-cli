@@ -25,7 +25,7 @@ module.exports = class ScaffoldSetup {
 
   // Get simple Resources
   exceptResponses () {
-    return this.models.filter((resource) => resource.isResource && !resource.isResponse && !resource.isResponse)
+    return this.models.filter((resource) => resource.isResource && !resource.isResponse && !resource.isPagedResponse)
   }
 
   // Get resp Resources
