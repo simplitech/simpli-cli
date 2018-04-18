@@ -2,12 +2,12 @@ import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
 <%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-import User from '@/model/<%-userModel%>'
+import User from '@/model/resource/<%-userModel%>'
 import LoginHolder from '@/model/LoginHolder'
 import LoginResp from '@/model/response/LoginResp'
-import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
-import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+// import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
+// import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 
 // initial state
 const state: AuthState = {
@@ -105,11 +105,9 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param model
    */
   forgotPassword: async (context, model: LoginHolder) => {
-    const forgotPasswordResp: ForgotPasswordResp = new ForgotPasswordResp(Number)
-
-    await forgotPasswordResp.forgotPassword(model)
-
-    successAndPush('system.success.forgotPasswordSuccess', '/login')
+    // const forgotPasswordResp = new ForgotPasswordResp(Number)
+    // await forgotPasswordResp.forgotPassword(model)
+    // successAndPush('system.success.forgotPasswordSuccess', '/login')
   },
 
   /**
@@ -118,11 +116,9 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param model
    */
   changePasswordWithHash: async (context, model: LoginHolder) => {
-    const changePasswordWithHashResp: ChangePasswordWithHashResp = new ChangePasswordWithHashResp(Number)
-
-    await changePasswordWithHashResp.changePasswordWithHash(model)
-
-    successAndPush('system.success.changePasswordSuccess', '/login')
+    // const changePasswordWithHashResp = new ChangePasswordWithHashResp(Number)
+    // await changePasswordWithHashResp.changePasswordWithHash(model)
+    // successAndPush('system.success.changePasswordSuccess', '/login')
   },
 
   /**

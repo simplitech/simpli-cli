@@ -66,7 +66,7 @@
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {Action, Getter} from 'vuex-class'
 <%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-  import User from '@/model/<%-userModel%>'
+  import User from '@/model/resource/<%-userModel%>'
 
   @Component
   export default class Sidebar extends Vue {

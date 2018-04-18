@@ -1,6 +1,6 @@
 /**
  * <%-model.name%>
- * @author Simpli© CRUD generator
+ * @author Simpli© CLI generator
  */
 import {ID, TAG, Resource, ImageRender, AnchorRender} from '@/simpli'
 import {
@@ -12,16 +12,16 @@ import {
 import {ResponseHidden, ResponseSerialize} from '@/simpli'
 import { bool, date, datetime, cnpj, cpf, phone } from '@/simpli'
 
-import Tag from '@/model/Tag'
-import GrupoDoPrincipal from '@/model/GrupoDoPrincipal'
+import Tag from '@/model/resource/Tag'
+import GrupoDoPrincipal from '@/model/resource/GrupoDoPrincipal'
 
 export default class <%-model.name%> extends Resource {
   readonly $endpoint: string = '<%-model.endpoint%>'
 
 <%_ if (model.keyID) { _%>
   <%-model.keyID%>?: ID = 0
-<%_ } _%>
 
+<%_ } _%>
   get $id() {
 <%_ if (model.keyID) { _%>
     return this.<%-model.keyID%>
@@ -44,11 +44,10 @@ export default class <%-model.name%> extends Resource {
   set $tag(val: TAG) {
     this.<%-model.keyTAG%> = val
   }
-<%_ } _%>
 
+<%_ } _%>
 <%_ for (var i in model.attrs) { var attr = model.attrs[i] _%>
 <%_ if (attr.name === model.keyID) continue _%>
-
   <%_ for (var j in attr.responses()) { var response = attr.responses()[j] _%>
   @<%-response.title%>(<%-response.attr%>)
   <%_ } _%>

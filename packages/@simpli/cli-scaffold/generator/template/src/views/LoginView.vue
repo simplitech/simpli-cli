@@ -1,5 +1,4 @@
 <template>
-
   <div class="verti w-window h-window items-center">
     <form @submit.prevent="signIn(model)" class="verti w-300 elevated p-30">
       <h2 class="mt-0">{{ $t("view.login.subtitle") }}</h2>
@@ -8,7 +7,6 @@
       <button class="accent" type="submit">{{ $t("view.login.signin") }}</button>
     </form>
   </div>
-
 </template>
 
 <script lang="ts">

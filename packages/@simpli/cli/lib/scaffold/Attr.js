@@ -165,7 +165,7 @@ module.exports = class Attr {
 
     if (this.isString()) {
       result.push({
-        title: 'MaxLength',
+        title: 'ValidationMaxLength',
         attr: `255`
       })
     }

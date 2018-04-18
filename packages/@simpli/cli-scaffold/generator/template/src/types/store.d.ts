@@ -1,5 +1,5 @@
 <%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-import User from '@/model/<%-userModel%>'
+import User from '@/model/resource/<%-userModel%>'
 import {ID, Currency, Lang} from '@/simpli'
 /**
  * Root

@@ -4,8 +4,7 @@ module.exports = (api, options) => {
   const resources = options.scaffoldSetup.exceptResponses()
   resources.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamics', 'src/model/Template.ts', `${resource.name}.ts`, data)
-    api.renderFrom('./dynamics', 'src/model/response/TemplateResp.ts', `${resource.name}Resp.ts`, data)
+    api.renderFrom('./dynamics', 'src/model/resource/ResourceTemplate.ts', `${resource.name}.ts`, data)
     api.renderFrom('./dynamics', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
   })
 
@@ -37,7 +36,7 @@ module.exports = (api, options) => {
       'normalize-scss': '^7.0.1',
       'register-service-worker': '^1.1.1',
       'simple-line-icons': '^2.4.1',
-      'simpli-ts-vue': '^1.1.3',
+      'simpli-ts-vue': '^1.2.0',
       'vue': '^2.5.16',
       'vue-chartjs': '^3.2.1',
       'vue-chartkick': '^0.2.1',
