@@ -12,30 +12,31 @@ module.exports = async (inspectPaths = [], url, mode) => {
   const { paths, definitions } = swaggerJSON
 
   const scaffoldSetup = new ScaffoldSetup()
-  scaffoldSetup.apiUrlDev = null
-  scaffoldSetup.apiUrlProd = null
-  scaffoldSetup.availableLanguages = null
-  scaffoldSetup.defaultLanguage = null
-  scaffoldSetup.defaultCurrency = null
-  scaffoldSetup.title = null
+  const swagger = {
+    api: null,
+    model: null
+  }
 
   if (inspectPaths.length > 0) {
-    scaffoldSetup.setModels(definitions, paths)
-    scaffoldSetup.models = keyBy(scaffoldSetup.models, 'name')
+    scaffoldSetup.injectSwagger(definitions, paths)
+    swagger.api = keyBy(scaffoldSetup.apis, 'name')
+    swagger.model = keyBy(scaffoldSetup.models, 'name')
   } else {
-    scaffoldSetup.models = 'Object {/* omitted */}'
+    console.info(`Use ${chalk.yellow(`simpli inspect:scaffold api[.?]`)} 
+or ${chalk.yellow(`simpli inspect:scaffold model[.?]`)}`)
+    return
   }
 
   let res
   if (inspectPaths.length > 1) {
     res = {}
     inspectPaths.forEach(path => {
-      res[path] = get(scaffoldSetup, path)
+      res[path] = get(swagger, path)
     })
   } else if (inspectPaths.length === 1) {
-    res = get(scaffoldSetup, inspectPaths[0])
+    res = get(swagger, inspectPaths[0])
   } else {
-    res = scaffoldSetup
+    res = swagger
   }
 
   console.log(stringify(res, (value, indent, stringify) => {
@@ -44,8 +45,4 @@ module.exports = async (inspectPaths = [], url, mode) => {
     }
     return stringify(value)
   }, 2))
-
-  if (inspectPaths.length === 0) {
-    console.info(`Note: use ${chalk.yellow(`simpli inspect:scaffold models[.?]`)} to show the models`)
-  }
 }

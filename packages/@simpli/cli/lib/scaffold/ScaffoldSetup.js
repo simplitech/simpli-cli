@@ -1,5 +1,6 @@
 const map = require('lodash.map')
 const Model = require('./Model')
+const Api = require('./Api')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const snakeCase = require('lodash.snakecase')
@@ -11,40 +12,68 @@ module.exports = class ScaffoldSetup {
     this.apiUrlDev = null
     this.apiUrlProd = null
     this.userModel = 'User'
+    this.LoginHolderModel = 'LoginHolder'
+    this.LoginRespModel = 'LoginResp'
     this.availableLanguages = null
     this.defaultLanguage = null
     this.defaultCurrency = null
+    this.apis = []
     this.models = []
   }
 
-  // Get Models
-  exceptResources () {
-    return this.models.filter((resource) => !resource.isResource)
+  /**
+   * Filter simple models: 000
+   */
+  get simpleModels () {
+    return this.models.filter((resource) =>
+      !resource.isResource &&
+      !resource.isResp &&
+      !resource.isPagedResp
+    )
   }
 
-  // Get all kinds of Resources (simple, resp or paged)
-  onlyResources () {
-    return this.models.filter((resource) => resource.isResource)
+  /**
+   * Filter simple resp models: 010
+   */
+  get simpleRespModels () {
+    return this.models.filter((resource) =>
+      !resource.isResource &&
+      resource.isResp &&
+      !resource.isPagedResp
+    )
   }
 
-  // Get simple Resources
-  exceptResponses () {
-    return this.models.filter((resource) => resource.isResource && !resource.isResponse && !resource.isPagedResponse)
+  /**
+   * Filter resource models: 100
+   */
+  get resourceModels () {
+    return this.models.filter((resource) =>
+      resource.isResource &&
+      !resource.isResp &&
+      !resource.isPagedResp
+    )
   }
 
-  // Get resp Resources
-  onlyResponses () {
-    return this.models.filter((resource) => resource.isResponse)
+  /**
+   * Filter resp resource models: 110
+   */
+  get respResourceModels () {
+    return this.models.filter((resource) =>
+      resource.isResource &&
+      resource.isResp &&
+      !resource.isPagedResp
+    )
   }
 
-  // Get paged Resources
-  onlyPagedResponses () {
-    return this.models.filter((resource) => resource.isPagedResponse)
-  }
-
-  // Get simple and resp Resources
-  exceptPagedResponses () {
-    return this.models.filter((resource) => !resource.isPagedResponse)
+  /**
+   * Filter paged resp resource models: 101
+   */
+  get pagedRespResourceModels () {
+    return this.models.filter((resource) =>
+      resource.isResource &&
+      !resource.isResp &&
+      resource.isPagedResp
+    )
   }
 
   // Helpers
@@ -58,7 +87,36 @@ module.exports = class ScaffoldSetup {
     return (snakeCase(prop) || '').toUpperCase()
   }
 
+  injectSwagger (definition, path) {
+    this.setApis(path)
+    this.setModels(definition, path)
+  }
+
+  /**
+   * Set apis from swagger.json
+   * @param path Paths of swagger.json
+   */
+  setApis (path = {}) {
+    const apis = []
+    // Normalize
+    Object.keys(path).forEach((endpoint) => {
+      const method = path[endpoint]
+      Object.keys(method).forEach((name) => {
+        const apiConfig = method[name]
+        apiConfig.method = name
+        apiConfig.endpoint = endpoint
+        apis.push(new Api(apiConfig))
+      })
+    })
+    this.apis = apis
+  }
+
+  /**
+   * Set model from swagger.json
+   * @param definition Definitions of swagger.json
+   * @param path Paths of swagger.json
+   */
   setModels (definition = {}, path = {}) {
-    this.models = map(definition, (def, name) => new Model(name, def, path)) || []
+    this.models = map(definition, (def, name) => new Model(name, def, path, this.apis)) || []
   }
 }

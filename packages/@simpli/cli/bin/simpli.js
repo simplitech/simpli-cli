@@ -33,7 +33,7 @@ program
   })
 
 program
-  .command('inspect:scaffold [paths...]')
+  .command('inspect:swagger [paths...]')
   .option('--url <url>')
   .option('--mode <mode>')
   .description('inspect a scaffold project')

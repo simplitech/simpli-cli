@@ -65,7 +65,7 @@ module.exports = class Scaffold {
     }
 
     const { swagger, info, paths, definitions } = this.swaggerJSON
-    this.scaffoldSetup.setModels(definitions, paths)
+    this.scaffoldSetup.injectSwagger(definitions, paths)
 
     if (!swagger) {
       error('This file is not a valid swagger')
