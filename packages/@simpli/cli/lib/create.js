@@ -101,7 +101,7 @@ async function createScaffold (name, targetDir, options) {
 }
 
 async function createApi (name, targetDir, options) {
-  console.info(`${chalk.yellowBright(`This generator was not done yet. Use the legacy generator instead`)}`)
+  console.info(`${chalk.yellowBright(`Backend generator was not done yet. Use the legacy generator instead`)}`)
   console.info(`${chalk.bold(`https://www.npmjs.com/package/generator-martinlabs`)}`)
 }
 

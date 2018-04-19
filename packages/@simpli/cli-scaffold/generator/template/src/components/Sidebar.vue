@@ -11,7 +11,7 @@
                alt="Logo"
                style="vertical-align: middle;">
           <span>
-          Webapp
+          <%_ rootOptions.scaffoldSetup.appName _%>
           </span>
         </h1>
       </div>
