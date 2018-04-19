@@ -30,7 +30,7 @@
             </router-link>
           </li>
 
-<%_ var resources = rootOptions.scaffoldSetup.exceptResponses() _%>
+<%_ var resources = rootOptions.scaffoldSetup.resourceModels _%>
 <%_ for (var i in resources) { var resource = resources[i] _%>
           <li>
             <router-link to="/list<%-resource.name%>" @click.native="menuOff">
@@ -65,7 +65,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {Action, Getter} from 'vuex-class'
-<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+<%_ var userModel = rootOptions.scaffoldSetup.userModel || 'User' _%>
   import User from '@/model/resource/<%-userModel%>'
 
   @Component

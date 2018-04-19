@@ -1,11 +1,13 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-import User from '@/model/resource/<%-userModel%>'
-import LoginHolder from '@/model/LoginHolder'
-import LoginResp from '@/model/response/LoginResp'
 import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel || 'User' _%>
+import User from '@/model/resource/<%-userModel%>'
+<%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel || 'LoginHolder' _%>
+import LoginHolder from '@/model/<%-loginHolderModel%>'
+<%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel || 'LoginResp' _%>
+import LoginResp from '@/model/response/<%-loginRespModel%>'
 // import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
 // import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 

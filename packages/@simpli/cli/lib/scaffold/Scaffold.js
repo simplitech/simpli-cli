@@ -72,6 +72,10 @@ module.exports = class Scaffold {
       process.exit(1)
     }
 
+    const resourceModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
+    const simpleModels = this.scaffoldSetup.simpleModels.map((model) => model.name)
+    const simpleRespModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
+
     const { appName } = await inquirer.prompt([
       {
         name: 'appName',
@@ -105,19 +109,32 @@ module.exports = class Scaffold {
     const { userModel } = await inquirer.prompt([
       {
         name: 'userModel',
-        type: 'input',
-        default: 'User',
-        message: 'What is the name of the user model'
+        type: 'list',
+        choices: resourceModels,
+        default: this.scaffoldSetup.resourceModels.findIndex((model) => model.name === 'User') || 0,
+        message: 'Which one of these is the user model?'
       }
     ])
 
-    if (!userModel) {
-      error('User model name is required')
-      process.exit(1)
-    } else if (!this.scaffoldSetup.models.find((model) => model.name === userModel)) {
-      error(`The model \'${userModel}\' does not exist`)
-      process.exit(1)
-    }
+    const { loginHolderModel } = await inquirer.prompt([
+      {
+        name: 'loginHolderModel',
+        type: 'list',
+        choices: simpleModels,
+        default: this.scaffoldSetup.simpleModels.findIndex((model) => model.name === 'LoginHolder') || 0,
+        message: 'Which one of these is the login holder model?'
+      }
+    ])
+
+    const { loginRespModel } = await inquirer.prompt([
+      {
+        name: 'loginRespModel',
+        type: 'list',
+        choices: simpleRespModels,
+        default: this.scaffoldSetup.simpleRespModels.findIndex((model) => model.name === 'LoginResp') || 0,
+        message: 'Which one of these is the login response model?'
+      }
+    ])
 
     const { availableLanguages } = await inquirer.prompt([
       {
@@ -174,6 +191,8 @@ module.exports = class Scaffold {
     this.scaffoldSetup.apiUrlDev = apiUrlDev
     this.scaffoldSetup.apiUrlProd = apiUrlProd
     this.scaffoldSetup.userModel = userModel
+    this.scaffoldSetup.loginHolderModel = loginHolderModel
+    this.scaffoldSetup.loginRespModel = loginRespModel
     this.scaffoldSetup.availableLanguages = availableLanguages
     this.scaffoldSetup.defaultLanguage = defaultLanguage
     this.scaffoldSetup.defaultCurrency = defaultCurrency

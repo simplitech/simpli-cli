@@ -1,11 +1,30 @@
 module.exports = (api, options) => {
   api.render('./template')
 
-  const resources = options.scaffoldSetup.exceptResponses()
-  resources.forEach((resource) => {
+  const simpleModels = options.scaffoldSetup.simpleModels
+  const simpleRespModels = options.scaffoldSetup.simpleRespModels
+  const resourceModels = options.scaffoldSetup.resourceModels
+  const respResourceModels = options.scaffoldSetup.respResourceModels
+
+  simpleModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamics', 'src/model/resource/ResourceTemplate.ts', `${resource.name}.ts`, data)
+    api.renderFrom('./dynamics', 'src/model/Template.ts', `./${resource.name}.ts`, data)
+  })
+
+  simpleRespModels.forEach((resource) => {
+    const data = { model: resource }
+    api.renderFrom('./dynamics', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
+  })
+
+  resourceModels.forEach((resource) => {
+    const data = { model: resource }
+    api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
     api.renderFrom('./dynamics', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
+  })
+
+  respResourceModels.forEach((resource) => {
+    const data = { model: resource }
+    api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
   })
 
   api.extendPackage({

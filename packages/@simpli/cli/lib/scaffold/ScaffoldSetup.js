@@ -11,9 +11,9 @@ module.exports = class ScaffoldSetup {
     this.swaggerUrl = null
     this.apiUrlDev = null
     this.apiUrlProd = null
-    this.userModel = 'User'
-    this.LoginHolderModel = 'LoginHolder'
-    this.LoginRespModel = 'LoginResp'
+    this.userModel = null
+    this.loginHolderModel = null
+    this.loginRespModel = null
     this.availableLanguages = null
     this.defaultLanguage = null
     this.defaultCurrency = null
@@ -73,6 +73,25 @@ module.exports = class ScaffoldSetup {
       resource.isResource &&
       !resource.isResp &&
       resource.isPagedResp
+    )
+  }
+
+  /**
+   * Filter simple and resource models: 000 & 100
+   */
+  get exceptRespModels () {
+    return this.models.filter((resource) =>
+      !resource.isResp &&
+      !resource.isPagedResp
+    )
+  }
+
+  /**
+   * Filter all except paged resp models
+   */
+  get exceptPagedRespModels () {
+    return this.models.filter((resource) =>
+      !resource.isPagedResp
     )
   }
 

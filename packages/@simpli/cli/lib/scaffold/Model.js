@@ -98,6 +98,7 @@ module.exports = class Model {
    * Resource Models
    * Resp Resource Models
    * Paged Resp Resource Model
+   * @param path Path from swagger
    */
   setDefinition (path) {
     this.isResource = false
@@ -267,7 +268,7 @@ module.exports = class Model {
     let result = ''
     if (!this.isResource) return result
 
-    result += `  readonly $endpoint: string = '${this.resource.endpoint}'`
+    result += `  readonly $endpoint: string = '${this.resource.endpoint}\n\n'`
 
     result += `  get $id() {\n`
     if (this.resource.keyID) {
