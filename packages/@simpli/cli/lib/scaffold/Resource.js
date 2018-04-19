@@ -8,7 +8,7 @@ module.exports = class Resource {
 
   get endpointParamsImploded () {
     let str = ''
-    this.resource.endpointParams.forEach((param) => {
+    this.endpointParams.forEach((param) => {
       str += `/:${param}`
     })
     return str
