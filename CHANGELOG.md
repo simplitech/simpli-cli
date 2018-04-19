@@ -1,3 +1,13 @@
+<a name="0.3.0-alpha.19"></a>
+# [0.3.0-alpha.19](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.18...v0.3.0-alpha.19) (2018-04-19)
+
+
+### Bug Fixes
+
+* **scaffold:** updated template ([a2de4fa](https://github.com/simplitech/simpli-cli/commit/a2de4fa))
+
+
+
 <a name="0.3.0-alpha.18"></a>
 # [0.3.0-alpha.18](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.17...v0.3.0-alpha.18) (2018-04-17)
 
