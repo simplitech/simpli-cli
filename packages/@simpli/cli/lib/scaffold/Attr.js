@@ -14,7 +14,7 @@ module.exports = class Attr {
   }
 
   setType (entry) {
-    if (this.name.match(/^(id)\w+(Pk)$/)) {
+    if (this.name.match(/^(id)\w+(Pk)$/) || (this.name || '').toLowerCase() === 'id') {
       this.type = 'ID'
     } else if (this.name.match(/^(id)\w+(Fk)$/)) {
       this.type = 'foreign'
@@ -41,7 +41,7 @@ module.exports = class Attr {
   }
 
   // Type Primary
-  get isID () { return this.isPrimaryOrigin && this.type === 'id' }
+  get isID () { return this.isPrimaryOrigin && this.type === 'ID' }
   get isForeign () { return this.isPrimaryOrigin && this.type === 'foreign' }
   get isString () { return this.isPrimaryOrigin && this.type === 'string' }
   get isInteger () { return this.isPrimaryOrigin && this.type === 'integer' }
@@ -208,23 +208,17 @@ module.exports = class Attr {
     })
 
     if (!this.foreign || !this.foreignType) {
-      result += `  ${this.name + this.requiredBuild}: ${this.typeBuild} = ${this.valueBuild}\n`
+      result += `  ${this.name}: ${this.typeBuild} = ${this.valueBuild}\n`
     } else {
       result += `  get ${this.name}() {\n`
-      result += `    if (!this.${this.foreign}) return 0\n`
-      result += `    return this.${this.foreign}.$id || 0\n`
+      result += `    return this.${this.foreign}.$id\n`
       result += `  }\n`
       result += `  set ${this.name}(${this.name}: ID) {\n`
-      result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
       result += `    this.${this.foreign}.$id = ${this.name}\n`
       result += `  }\n`
     }
 
     return result
-  }
-
-  get requiredBuild () {
-    return this.isRequired ? '' : '?'
   }
 
   get typeBuild () {

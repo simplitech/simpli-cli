@@ -210,7 +210,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import {PrincipalResp} from '@/model
+  import {PrincipalResp} from '@/model'
   import {successAndPush} from '@/simpli'
 
   @Component

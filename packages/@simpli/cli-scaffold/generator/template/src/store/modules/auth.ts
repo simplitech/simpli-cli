@@ -1,7 +1,7 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+import {$, encrypt, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
 <%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
 <%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel _%>
@@ -42,6 +42,7 @@ const actions: ActionTree<AuthState, RootState> = {
    */
   signIn: async ({state, commit, getters}, model: <%-loginHolderModel%>) => {
     const loginResp: <%-loginRespModel%> = new <%-loginRespModel%>()
+    model.password = encrypt(model.password)
 
     await model.validate()
     await loginResp.signIn(model)
