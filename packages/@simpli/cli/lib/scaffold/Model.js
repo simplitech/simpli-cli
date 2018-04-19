@@ -259,7 +259,7 @@ module.exports = class Model {
 
     const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
     apisWithModel.forEach((api) => {
-      dep.addChild(api.type)
+      dep.addChild(api.bodyModel)
     })
   }
 
@@ -278,18 +278,20 @@ module.exports = class Model {
     } else {
       result += `    return 0\n`
     }
-    result += `  }`
+    result += `  }\n`
 
     result += `  set $id(val: ID) {\n`
     if (this.resource.keyID) {
       result += `    this.${this.resource.keyID} = val\n`
+    } else {
+      result += `    /**/`
     }
     result += `  }\n`
 
     if (this.resource.keyTAG) {
       result += `  get $tag() {\n`
       result += `    return this.${this.resource.keyTAG}\n`
-      result += `  }`
+      result += `  }\n`
       result += `  set $tag(val: TAG) {\n`
       result += `    this.${this.resource.keyTAG} = val\n`
       result += `  }\n`

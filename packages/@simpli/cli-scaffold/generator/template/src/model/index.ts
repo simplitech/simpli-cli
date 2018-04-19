@@ -3,4 +3,4 @@
 export {<%-resource.name%>} from '<%-resource.modulePath%>'
 <%_ } _%>
 
-export {PagedResp} from '@/model/collection'
+export {PagedResp} from '@/model/collection/PagedResp'
