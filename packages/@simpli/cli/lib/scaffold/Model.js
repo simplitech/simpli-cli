@@ -61,6 +61,17 @@ module.exports = class Model {
   }
 
   /**
+   * Get module path
+   */
+  get modulePath () {
+    if (!this.isResource && !this.isResp && !this.isPagedResp) return `@/model/${this.name}`
+    if (!this.isResource && this.isResp && !this.isPagedResp) return `@/model/response/${this.name}`
+    if (this.isResource && !this.isResp && !this.isPagedResp) return `@/model/resource/${this.name}`
+    if (this.isResource && this.isResp && !this.isPagedResp) return `@/model/resource/response/${this.name}`
+    if (this.isResource && !this.isResp && this.isPagedResp) return `@/model/collection/${this.name}`
+  }
+
+  /**
    * Populate attributes
    * @param belongsTo This model name
    * @param property Properties from swagger
@@ -237,6 +248,7 @@ module.exports = class Model {
 
   generateModelResources () {
     const list = []
+    const modelsModule = name => `@/model/${name}`
     const modelResourcesModule = name => `@/model/resource/${name}`
 
     this.objectAtrrs.forEach((attr) => {
@@ -253,7 +265,7 @@ module.exports = class Model {
 
     const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
     apisWithModel.forEach((api) => {
-      const modelResource = new Dependence(modelResourcesModule(api.bodyModel), true, false)
+      const modelResource = new Dependence(modelsModule(api.bodyModel), true, false)
       modelResource.addChild(api.bodyModel)
       list.push(modelResource)
     })
@@ -268,7 +280,7 @@ module.exports = class Model {
     let result = ''
     if (!this.isResource) return result
 
-    result += `  readonly $endpoint: string = '${this.resource.endpoint}\n\n'`
+    result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n`
 
     result += `  get $id() {\n`
     if (this.resource.keyID) {
@@ -276,21 +288,21 @@ module.exports = class Model {
     } else {
       result += `    return 0\n`
     }
-    result += `  }\n`
+    result += `  }`
 
     result += `  set $id(val: ID) {\n`
     if (this.resource.keyID) {
       result += `    this.${this.resource.keyID} = val\n`
     }
-    result += `  }\n\n`
+    result += `  }\n`
 
     if (this.resource.keyTAG) {
       result += `  get $tag() {\n`
       result += `    return this.${this.resource.keyTAG}\n`
-      result += `  }\n`
+      result += `  }`
       result += `  set $tag(val: TAG) {\n`
       result += `    this.${this.resource.keyTAG} = val\n`
-      result += `  }\n\n`
+      result += `  }\n`
     }
 
     return result
@@ -331,7 +343,7 @@ module.exports = class Model {
       }
     })
     result += `    }\n`
-    result += `  }\n\n`
+    result += `  }\n`
 
     return result
   }

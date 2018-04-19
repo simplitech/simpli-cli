@@ -37,11 +37,11 @@ module.exports = class Api {
     if (method === 'GET') {
       result += `  async ${this.name}() {\n`
       result += `    return await this.GET('${this.endpoint}')\n`
-      result += `  }\n\n`
+      result += `  }\n`
     } else if (method === 'POST') {
       result += `  async ${this.name}(model: ${this.bodyModel}) {\n`
       result += `    return await this.POST('${this.endpoint}', model)\n`
-      result += `  }\n\n`
+      result += `  }\n`
     }
     return result
   }

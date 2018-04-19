@@ -208,7 +208,7 @@ module.exports = class Attr {
     })
 
     if (!this.foreign || !this.foreignType) {
-      result += `  ${this.name}${this.requiredBuild}: ${this.typeBuild} = ${this.valueBuild}\n\n`
+      result += `  ${this.name + this.requiredBuild}: ${this.typeBuild} = ${this.valueBuild}\n\n`
     } else {
       result += `  get ${this.name}() {\n`
       result += `    if (!this.${this.foreign}) return 0\n`
@@ -217,7 +217,7 @@ module.exports = class Attr {
       result += `  set ${this.name}(${this.name}: ID) {\n`
       result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
       result += `    this.${this.foreign}.$id = ${this.name}\n`
-      result += `  }\n\n`
+      result += `  }\n`
     }
 
     return result

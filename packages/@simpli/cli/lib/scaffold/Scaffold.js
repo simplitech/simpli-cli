@@ -73,8 +73,12 @@ module.exports = class Scaffold {
     }
 
     const resourceModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
-    const simpleModels = this.scaffoldSetup.simpleModels.map((model) => model.name)
-    const simpleRespModels = this.scaffoldSetup.simpleRespModels.map((model) => model.name)
+    const exceptPagedRespModels = this.scaffoldSetup.exceptPagedRespModels.map((model) => model.name)
+
+    if (exceptPagedRespModels.length === 0) {
+      error('There is no a valid model in this swagger\nUse simpli inspect:swagger to analise your swagger')
+      process.exit(1)
+    }
 
     const { appName } = await inquirer.prompt([
       {
@@ -120,8 +124,8 @@ module.exports = class Scaffold {
       {
         name: 'loginHolderModel',
         type: 'list',
-        choices: simpleModels,
-        default: this.scaffoldSetup.simpleModels.findIndex((model) => model.name === 'LoginHolder') || 0,
+        choices: exceptPagedRespModels,
+        default: this.scaffoldSetup.exceptPagedRespModels.findIndex((model) => model.name === 'LoginHolder') || 0,
         message: 'Which one of these is the login holder model?'
       }
     ])
@@ -130,8 +134,8 @@ module.exports = class Scaffold {
       {
         name: 'loginRespModel',
         type: 'list',
-        choices: simpleRespModels,
-        default: this.scaffoldSetup.simpleRespModels.findIndex((model) => model.name === 'LoginResp') || 0,
+        choices: exceptPagedRespModels,
+        default: this.scaffoldSetup.exceptPagedRespModels.findIndex((model) => model.name === 'LoginResp') || 0,
         message: 'Which one of these is the login response model?'
       }
     ])

@@ -24,10 +24,10 @@ module.exports = class Dependence {
   build () {
     if (this.singleLine) {
       if (!this.inside) {
-        return `import ${this.children[0]} from '${this.module}'\n\n`
+        return `import ${this.children[0]} from '${this.module}'`
       }
-      return `import {${this.children.join(', ')}} from '${this.module}'\n\n`
+      return `import {${this.children.join(', ')}} from '${this.module}'`
     }
-    return `import {\n  ${this.children.join(', \n  ')},\n} from '${this.module}'\n\n`
+    return `import {\n  ${this.children.join(', \n  ')},\n} from '${this.module}'`
   }
 }
