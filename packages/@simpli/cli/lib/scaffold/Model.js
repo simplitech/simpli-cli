@@ -349,7 +349,7 @@ module.exports = class Model {
     let result = ''
 
     result += `    ${this.name}: {\n`
-    result += `      title: ${startCase(this.name)},\n`
+    result += `      title: '${startCase(this.name)}',\n`
     if (this.attrs.length > 0) {
       result += `      columns: {\n`
       this.attrs.forEach((attr) => {

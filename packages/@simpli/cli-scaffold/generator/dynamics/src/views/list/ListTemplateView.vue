@@ -23,8 +23,7 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
-import <%-model.name%> from '@/model/<%-model.name%>'
-import PagedResp from '@/model/response/PagedResp'
+import {<%-model.name%>, PagedResp} from '@/model'
 import {pushByName} from '@/simpli'
 
 @Component
