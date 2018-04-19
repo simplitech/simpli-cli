@@ -90,12 +90,14 @@ async function createScaffold (name, targetDir, options) {
         ]
       }
     ])
-    if (!preset) {
-      return
+    if (preset === 'no-preset') {
+      await scaffold.swaggerDefaultSetup()
     } else if (preset === 'swagger') {
       await scaffold.swaggerSetup()
+    } else {
+      return
     }
-  }
+  } else await scaffold.swaggerDefaultSetup()
 
   await scaffold.create(options)
 }

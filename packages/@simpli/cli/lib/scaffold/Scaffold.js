@@ -201,6 +201,24 @@ module.exports = class Scaffold {
     this.scaffoldSetup.defaultCurrency = defaultCurrency
   }
 
+  async swaggerDefaultSetup () {
+    this.swaggerJSON = require('./defaultSwagger.json')
+
+    const { info, paths, definitions } = this.swaggerJSON
+
+    this.scaffoldSetup.injectSwagger(definitions, paths)
+    this.scaffoldSetup.appName = info && info.title
+    this.scaffoldSetup.swaggerUrl = ''
+    this.scaffoldSetup.apiUrlDev = 'http://localhost/api/'
+    this.scaffoldSetup.apiUrlProd = 'http://localhost/api/'
+    this.scaffoldSetup.userModel = 'User'
+    this.scaffoldSetup.loginHolderModel = 'LoginHolder'
+    this.scaffoldSetup.loginRespModel = 'LoginResp'
+    this.scaffoldSetup.availableLanguages = ['en-US']
+    this.scaffoldSetup.defaultLanguage = 'en-US'
+    this.scaffoldSetup.defaultCurrency = 'USD'
+  }
+
   async create (cliOptions = {}) {
     const { name, context, createCompleteCbs, scaffoldSetup } = this
 

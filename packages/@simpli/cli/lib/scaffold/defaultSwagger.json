@@ -1,0 +1,381 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Welcome to Generator API documentation.",
+    "title": "Webapp"
+  },
+  "tags": [
+    {
+      "name": "Crud"
+    }
+  ],
+  "paths": {
+    "/Crud/Auth": {
+      "get": {
+        "tags": [
+          "Crud"
+        ],
+        "summary": "Get user authentication",
+        "description": "",
+        "operationId": "auth",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "en",
+              "pt"
+            ]
+          },
+          {
+            "name": "X-Client-Version",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "w1.1.0"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "Bearer mytokenhere"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/LoginResp"
+            }
+          }
+        }
+      }
+    },
+    "/Crud/SignIn": {
+      "post": {
+        "tags": [
+          "Crud"
+        ],
+        "summary": "Submit user authentication",
+        "description": "",
+        "operationId": "signIn",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "en",
+              "pt"
+            ]
+          },
+          {
+            "name": "X-Client-Version",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "w1.1.0"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginHolder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/LoginResp"
+            }
+          }
+        }
+      }
+    },
+    "/Crud/User": {
+      "get": {
+        "tags": [
+          "Crud"
+        ],
+        "summary": "List User informations",
+        "description": "",
+        "operationId": "listUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "en",
+              "pt"
+            ]
+          },
+          {
+            "name": "X-Client-Version",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "w1.1.0"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "Bearer mytokenhere"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Query of search",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page index, null to not paginate",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size, null to not paginate",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Identifier for sorting, usually a property name",
+            "required": false,
+            "type": "string",
+            "x-example": "idUserPk"
+          },
+          {
+            "name": "ascending",
+            "in": "query",
+            "description": "True for ascending order",
+            "required": false,
+            "type": "boolean",
+            "default": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PagedRespUser"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Crud"
+        ],
+        "summary": "Persist a new or existing User",
+        "description": "1 - Informed User have an ID editing the existing User; 2 - Informed User don't have an ID creating a new User",
+        "operationId": "persistUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "en",
+              "pt"
+            ]
+          },
+          {
+            "name": "X-Client-Version",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "w1.1.0"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "Bearer mytokenhere"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "/Crud/User/{id}": {
+      "get": {
+        "tags": [
+          "Crud"
+        ],
+        "summary": "Gets User of informed id",
+        "description": "",
+        "operationId": "getUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "en",
+              "pt"
+            ]
+          },
+          {
+            "name": "X-Client-Version",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "w1.1.0"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "x-example": "Bearer mytokenhere"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserResp"
+            }
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Authorization": {
+      "type": "oauth2",
+      "authorizationUrl": "Crud/Login",
+      "flow": "implicit"
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "required": [
+        "email",
+        "idUserPk",
+        "senha"
+      ],
+      "properties": {
+        "idUserPk": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "email": {
+          "type": "string"
+        },
+        "senha": {
+          "type": "string"
+        }
+      }
+    },
+    "LoginResp": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "UserResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "LoginHolder": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "PagedRespUser": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "recordsTotal": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
