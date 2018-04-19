@@ -41,6 +41,7 @@
     "lodash.keyby": "^4.5.0",
     "lodash.map": "^4.5.0",
     "lodash.snakecase": "^4.1.1",
+    "lodash.startcase": "^4.1.1",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.5.0",
     "minimist": "^1.2.0",

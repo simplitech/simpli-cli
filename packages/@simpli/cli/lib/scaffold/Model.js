@@ -3,6 +3,7 @@ const Attr = require('./Attr')
 const Resource = require('./Resource')
 const Resp = require('./Resp')
 const Dependence = require('./Dependence')
+const startCase = require('lodash.startcase')
 
 module.exports = class Model {
   constructor (name, definition, path, apis) {
@@ -337,6 +338,26 @@ module.exports = class Model {
     })
     result += `    }\n`
     result += `  }\n`
+
+    return result
+  }
+
+  /**
+   * Print the locale classes into the template generator
+   */
+  buildLocale () {
+    let result = ''
+
+    result += `    ${this.name}: {\n`
+    result += `      title: ${startCase(this.name)},\n`
+    if (this.attrs.length > 0) {
+      result += `      columns: {\n`
+      this.attrs.forEach((attr) => {
+        result += `        ${attr.name}: '${startCase(attr.name)}',\n`
+      })
+      result += `      },\n`
+    }
+    result += `    },\n`
 
     return result
   }
