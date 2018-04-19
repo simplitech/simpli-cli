@@ -4,6 +4,7 @@ module.exports = class Resource {
     this.endpointParams = []
     this.keyID = null
     this.keyTAG = null
+    this.deletable = null
   }
 
   get endpointParamsImploded () {
@@ -49,5 +50,12 @@ module.exports = class Resource {
   setKeys (keyID, keyTAG) {
     this.keyID = keyID || null
     this.keyTAG = keyTAG || null
+  }
+
+  /**
+   * Set deletable
+   */
+  setDeletable (val) {
+    this.deletable = val
   }
 }

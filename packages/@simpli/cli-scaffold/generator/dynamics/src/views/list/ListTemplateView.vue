@@ -1,23 +1,29 @@
 <template>
   <div class="verti">
-    <adap-header :collection="collection"
-                 :title="$t('classes.<%-model.name%>.title')"
-                 persistUrl="/persist<%-model.name%>"
-                 hasSearch hasCsv/>
+    <adap-header
+      :collection="collection"
+      :title="$t('classes.<%-model.name%>.title')"
+      persistUrl="/persist<%-model.name%>"
+      hasSearch hasCsv
+    />
 
     <section>
       <adap-table :collection="collection">
         <div slot="options" slot-scope="props">
           <a @click="openPersist(props.item)" class="icon icon-pencil"></a>
+<%_ if (model.resource.deletable) { _%>
           <a @click="openRemoveModal(props.item)" class="icon icon-trash"></a>
+<%_ } _%>
         </div>
       </adap-table>
     </section>
 
-    <modal-remove :active="!!toRemove.$id"
-                  :text="toRemove.nome"
-                  @cancel="resetRemove"
-                  @confirm="removeItem"/>
+    <modal-remove
+      :active="!!toRemove.$id"
+      :text="toRemove.nome"
+      @cancel="resetRemove"
+      @confirm="removeItem"
+    />
   </div>
 </template>
 

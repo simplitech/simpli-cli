@@ -95,6 +95,14 @@ module.exports = class ScaffoldSetup {
     )
   }
 
+  /**
+   * Get origin model
+   */
+  findOriginModel (target = new Model()) {
+    if (!target.isResp) return null
+    return this.models.find((model) => model.name === target.resp.origin) || null
+  }
+
   // Helpers
   camelCase (prop) {
     return camelCase(prop)

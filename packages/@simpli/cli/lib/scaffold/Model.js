@@ -137,6 +137,7 @@ module.exports = class Model {
     const match = pattern.exec(this.name)
     const attr = this.attrs.find((attr) => attr.type === (match && match[1]))
     this.resp.setOrigin(attr && attr.type)
+    this.resp.setOriginAttr(attr && attr.name)
   }
 
   definePagedResp () {
@@ -167,6 +168,9 @@ module.exports = class Model {
     }
 
     this.resource.setKeys(keyID, keyTAG)
+
+    const deletable = !!this.attrs.find((attr) => attr.isSoftDelete)
+    this.resource.setDeletable(deletable)
   }
 
   /**
@@ -208,9 +212,11 @@ module.exports = class Model {
   }
 
   populateSimpliCommons (dep = new Dependence()) {
+    const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
+    if (hasID) dep.addChild('ID')
+
     if (this.isResource) {
       dep.addChild('Resource')
-      dep.addChild('ID')
       if (this.resource.keyTAG) dep.addChild('TAG')
     } else {
       dep.addChild('Model')

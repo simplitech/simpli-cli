@@ -50,6 +50,21 @@ module.exports = class Attr {
   get isDate () { return this.isPrimaryOrigin && this.type === 'date' }
   get isDatetime () { return this.isPrimaryOrigin && this.type === 'datetime' }
 
+  get isSoftDelete () {
+    const reservedWords = [
+      'active',
+      'deleted',
+      'softDeleted',
+      'ativo'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isTextarea () {
+    // TODO: add textarea type
+    return false
+  }
+
   get isTAG () {
     const reservedWords = [
       'tag',
@@ -98,6 +113,16 @@ module.exports = class Attr {
     return !!reservedWords.find((word) => word === this.name)
   }
 
+  get isMoney () {
+    const reservedWords = [
+      'price',
+      'value',
+      'preco',
+      'valor'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
   get isPhone () {
     const reservedWords = [
       'phone',
@@ -119,6 +144,11 @@ module.exports = class Attr {
 
   get isCnpj () {
     const reservedWords = ['cnpj']
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isRg () {
+    const reservedWords = ['rg']
     return !!reservedWords.find((word) => word === this.name)
   }
 
@@ -168,7 +198,7 @@ module.exports = class Attr {
     if (this.isEmail || this.isTAG) {
       result.push({
         title: 'ValidationMaxLength',
-        attr: `31`
+        attr: `100`
       })
     } else if (this.isString) {
       result.push({
@@ -187,11 +217,31 @@ module.exports = class Attr {
     if (this.isPassword) {
       result.push({
         title: 'ValidationPasswordLength',
-        attr: `6, 31`
+        attr: `6, 100`
       })
     }
 
     return result
+  }
+
+  get typeBuild () {
+    if (this.isID || this.isForeign) return 'ID'
+    if (this.isInteger || this.isDouble) return 'number'
+    if (this.isBoolean) return 'boolean'
+    if (this.isObjectOrigin) return `${this.type}`
+    if (this.isArrayOrigin) return `${this.type}[]`
+
+    return 'string'
+  }
+
+  get valueBuild () {
+    if (this.isID || this.isForeign) return '0'
+    if (this.isInteger || this.isDouble) return '0'
+    if (this.isBoolean) return 'false'
+    if (this.isObjectOrigin) return `new ${this.type}()`
+    if (this.isArrayOrigin) return `[]`
+
+    return '\'\''
   }
 
   /**
@@ -221,23 +271,87 @@ module.exports = class Attr {
     return result
   }
 
-  get typeBuild () {
-    if (this.isID || this.isForeign) return 'ID'
-    if (this.isInteger || this.isDouble) return 'number'
-    if (this.isBoolean) return 'boolean'
-    if (this.isObjectOrigin) return `${this.type}`
-    if (this.isArrayOrigin) return `${this.type}[]`
+  /**
+   * Print this attribute into the template generator
+   * @param origin Name of class (e.g. User)
+   * @param originAttr Name of property (e.g. user)
+   */
+  buildPersist (origin, originAttr) {
+    let result = ''
+    if (!origin || !originAttr) return result
 
-    return 'string'
-  }
+    if (this.isObjectOrigin || this.isArrayOrigin) {
+      result += `        <multiselect-group\n`
+      if (this.isRequired) {
+        result += `          required\n`
+      }
+      result += `          v-model="model.${originAttr}.${this.name}"\n`
+      result += `          :items="model.all${this.type}"\n`
+      result += `        >\n`
+      result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
+      result += `        </multiselect-group>\n`
+    } else if (this.isBoolean) {
+      result += `        <checkbox-group\n`
+      result += `          v-model="model.${originAttr}.${this.name}"\n`
+      result += `        >\n`
+      result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
+      result += `        </checkbox-group>\n`
+    } else if (this.isTextarea) {
+      result += `        <textarea-group\n`
+      result += `          row="3"\n`
+      result += `          v-model="model.${originAttr}.${this.name}"\n`
+      result += `        >\n`
+      result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
+      result += `        </textarea-group>\n`
+    } else {
+      result += `        <input-group\n`
+      if (this.isRequired) {
+        result += `          required\n`
+      }
+      if (this.isInteger || this.isDouble) {
+        result += `          type="number"\n`
+        if (this.isInteger) {
+          result += `          step="1"\n`
+        }
+        if (this.isDouble) {
+          result += `          step="any"\n`
+        }
+        result += `          :placeholder="$t('persist.number')"\n`
+      } else if (this.isDate) {
+        result += `          type="date"\n`
+        result += `          :placeholder="$t('dateFormat.date')"\n`
+      } else if (this.isDatetime) {
+        result += `          type="datetime"\n`
+        result += `          :placeholder="$t('dateFormat.datetime')"\n`
+      } else if (this.isEmail) {
+        result += `          type="email"\n`
+        result += `          maxLength="100"\n`
+      } else if (this.isPassword) {
+        result += `          type="password"\n`
+        result += `          maxLength="100"\n`
+        result += `          :placeholder="model.${originAttr}.$id ? $t('app.onlyIfWantChangePassword') : ''"\n`
+      } else if (this.isPhone) {
+        result += `          type="phone"\n`
+        result += `          maxLength="100"\n`
+      } else if (this.isCpf) {
+        result += `          type="cpf"\n`
+        result += `          maxLength="100"\n`
+      } else if (this.isCnpj) {
+        result += `          type="cpf"\n`
+        result += `          maxLength="100"\n`
+      } else if (this.isRg) {
+        result += `          type="rg"\n`
+        result += `          maxLength="100"\n`
+      } else {
+        result += `          type="type"\n`
+        result += `          maxLength="255"\n`
+      }
+      result += `          v-model="model.${originAttr}.${this.name}"\n`
+      result += `        >\n`
+      result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
+      result += `        </input-group>\n`
+    }
 
-  get valueBuild () {
-    if (this.isID || this.isForeign) return '0'
-    if (this.isInteger || this.isDouble) return '0'
-    if (this.isBoolean) return 'false'
-    if (this.isObjectOrigin) return `new ${this.type}()`
-    if (this.isArrayOrigin) return `[]`
-
-    return '\'\''
+    return result
   }
 }
