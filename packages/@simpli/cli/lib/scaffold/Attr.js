@@ -179,6 +179,10 @@ module.exports = class Attr {
 
   get responses () {
     const result = []
+
+    // Decorator in type 'ID' is not allowed
+    if (this.isID || this.isForeign) return result
+
     if (this.isObjectOrigin || this.isArrayOrigin) {
       result.push({
         title: 'ResponseSerialize',
@@ -196,6 +200,9 @@ module.exports = class Attr {
 
   get validations () {
     const result = []
+
+    // Decorator in type 'ID' is not allowed
+    if (this.isID || this.isForeign) return result
 
     if (this.isRequired) {
       result.push({
