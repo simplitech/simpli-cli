@@ -12,7 +12,7 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
 import { State, Action, Getter } from 'vuex-class'
-import LoginHolder from '@/model/LoginHolder'
+import {LoginHolder} from '@/model'
 
 @Component
 export default class LoginView extends Vue {

@@ -1,5 +1,5 @@
-<%_ var userModel = rootOptions.scaffoldSetup.userModel || 'User' _%>
-import User from '@/model/resource/<%-userModel%>'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+import {<%-userModel%>} from '@/model'
 import {ID, Currency, Lang} from '@/simpli'
 /**
  * Root
@@ -16,7 +16,7 @@ export interface RootState {
 export interface AuthState {
   id?: ID,
   token?: string,
-  user: User,
+  user: <%-userModel%>,
   unauthenticatedPath?: string,
   eventListener: AuthEventListener,
 }

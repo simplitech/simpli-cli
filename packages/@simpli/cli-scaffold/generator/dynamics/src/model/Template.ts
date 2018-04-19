@@ -6,7 +6,7 @@
 <%-dependence.build()%>
 <%_ } _%>
 
-export default class <%-model.name%> extends <%-model.isResource ? 'Resource' : 'Model'%> {
+export class <%-model.name%> extends <%-model.isResource ? 'Resource' : 'Model'%> {
 <%-model.buildResource()%>
 <%_ for (var i in model.attrs) { var attr = model.attrs[i] _%>
 <%-attr.build()%>
@@ -15,5 +15,4 @@ export default class <%-model.name%> extends <%-model.isResource ? 'Resource' : 
 <%-api.build()%>
 <%_ } _%>
 <%-model.buildScheme()%>
-<%-model.buildScheme(true)%>
-}
+<%-model.buildScheme(true)%>}

@@ -65,13 +65,13 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {Action, Getter} from 'vuex-class'
-<%_ var userModel = rootOptions.scaffoldSetup.userModel || 'User' _%>
-  import User from '@/model/resource/<%-userModel%>'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+  import {<%-userModel%>} from '@/model'
 
   @Component
   export default class Sidebar extends Vue {
     @Getter('version') version?: string
-    @Getter('auth/user') user?: User
+    @Getter('auth/user') user?: <%-userModel%>
     @Action('auth/signOut') signOut?: Function
 
     menu: boolean = false

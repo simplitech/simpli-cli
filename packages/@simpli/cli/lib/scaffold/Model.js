@@ -3,7 +3,6 @@ const Attr = require('./Attr')
 const Resource = require('./Resource')
 const Resp = require('./Resp')
 const Dependence = require('./Dependence')
-const uniqBy = require('lodash.uniqby')
 
 module.exports = class Model {
   constructor (name, definition, path, apis) {
@@ -187,19 +186,22 @@ module.exports = class Model {
   setDependencies () {
     const dependencies = []
     const simpliModule = '@/simpli'
+    const modelModule = '@/model'
 
     const simpliCommons = new Dependence(simpliModule)
     const simpliDecorator = new Dependence(simpliModule, false)
     const simpliMisc = new Dependence(simpliModule)
+    const models = new Dependence(modelModule)
 
     this.populateSimpliCommons(simpliCommons)
     this.populateSimpliDecorator(simpliDecorator)
     this.populateSimpliMisc(simpliMisc)
+    this.populateModels(models)
 
     if (simpliCommons.hasChildren) dependencies.push(simpliCommons)
     if (simpliDecorator.hasChildren) dependencies.push(simpliDecorator)
     if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
-    dependencies.push(...this.generateModelResources())
+    if (models.hasChildren) dependencies.push(models)
 
     this.dependencies = dependencies
   }
@@ -246,31 +248,19 @@ module.exports = class Model {
     if (hasCnpj) dep.addChild('cnpj')
   }
 
-  generateModelResources () {
-    const list = []
-    const modelsModule = name => `@/model/${name}`
-    const modelResourcesModule = name => `@/model/resource/${name}`
-
+  populateModels (dep = new Dependence()) {
     this.objectAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(modelResourcesModule(attr.type), true, false)
-      modelResource.addChild(attr.type)
-      list.push(modelResource)
+      dep.addChild(attr.type)
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(modelResourcesModule(attr.type), true, false)
-      modelResource.addChild(attr.type)
-      list.push(modelResource)
+      dep.addChild(attr.type)
     })
 
     const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
     apisWithModel.forEach((api) => {
-      const modelResource = new Dependence(modelsModule(api.bodyModel), true, false)
-      modelResource.addChild(api.bodyModel)
-      list.push(modelResource)
+      dep.addChild(api.type)
     })
-
-    return uniqBy(list, 'module') || []
   }
 
   /**
@@ -280,7 +270,7 @@ module.exports = class Model {
     let result = ''
     if (!this.isResource) return result
 
-    result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n`
+    result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n\n`
 
     result += `  get $id() {\n`
     if (this.resource.keyID) {
@@ -316,8 +306,9 @@ module.exports = class Model {
     if (!this.isResource) return result
     // Exclude the hidden attributes
     const attrs = this.attrs.filter((attr) => !attr.responses.find((resp) => resp.title === 'ResponseHidden'))
+    const methodName = !isCsv ? 'scheme' : 'csvScheme'
 
-    result += `  scheme() {\n`
+    result += `  ${methodName}() {\n`
     result += `    return {\n`
     attrs.forEach((attr) => {
       if (attr.isObject) {

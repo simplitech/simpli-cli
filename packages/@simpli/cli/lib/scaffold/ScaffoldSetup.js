@@ -21,10 +21,6 @@ module.exports = class ScaffoldSetup {
     this.models = []
   }
 
-  findModelByName (name) {
-    return this.models.find((model) => model.name === name) || null
-  }
-
   /**
    * Filter simple models: 000
    */

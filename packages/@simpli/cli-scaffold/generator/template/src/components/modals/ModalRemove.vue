@@ -19,7 +19,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {PageCollection, Resource} from '@/simpli'
-  import PagedResp from '@/model/collection/PagedResp'
+  import {PagedResp} from '@/model'
 
   @Component
   export default class ModalRemove extends Vue {

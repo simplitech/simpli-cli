@@ -2,12 +2,10 @@ import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
 import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
-<%_ var userModel = rootOptions.scaffoldSetup.userModel || 'User' _%>
-import User from '@/model/resource/<%-userModel%>'
-<%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel || 'LoginHolder' _%>
-import LoginHolder from '@/model/<%-loginHolderModel%>'
-<%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel || 'LoginResp' _%>
-import LoginResp from '@/model/response/<%-loginRespModel%>'
+<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
+<%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
+<%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel _%>
+import {<%-userModel%>, <%-loginHolderModel%>, <%-loginRespModel%>} from '@/model'
 // import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
 // import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 
@@ -15,7 +13,7 @@ import LoginResp from '@/model/response/<%-loginRespModel%>'
 const state: AuthState = {
   id: undefined,
   token: undefined,
-  user: new User(),
+  user: new <%-userModel%>(),
   unauthenticatedPath: undefined,
   eventListener: {
     signIn: [],
@@ -42,8 +40,8 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param getters
    * @param model format => model: { account, password } (non-encrypted)
    */
-  signIn: async ({state, commit, getters}, model: LoginHolder) => {
-    const loginResp: LoginResp = new LoginResp()
+  signIn: async ({state, commit, getters}, model: <%-loginHolderModel%>) => {
+    const loginResp: <%-loginRespModel%> = new <%-loginRespModel%>()
 
     await model.validate()
     await loginResp.signIn(model)
@@ -75,7 +73,7 @@ const actions: ActionTree<AuthState, RootState> = {
     commit(types.POPULATE)
 
     if (getters.isLogged) {
-      const loginResp: LoginResp = new LoginResp()
+      const loginResp: <%-loginRespModel%> = new <%-loginRespModel%>()
 
       await loginResp.auth()
 
@@ -106,7 +104,7 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param context
    * @param model
    */
-  forgotPassword: async (context, model: LoginHolder) => {
+  forgotPassword: async (context, model: <%-loginHolderModel%>) => {
     // const forgotPasswordResp = new ForgotPasswordResp(Number)
     // await forgotPasswordResp.forgotPassword(model)
     // successAndPush('system.success.forgotPasswordSuccess', '/login')
@@ -117,7 +115,7 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param context
    * @param model
    */
-  changePasswordWithHash: async (context, model: LoginHolder) => {
+  changePasswordWithHash: async (context, model: <%-loginHolderModel%>) => {
     // const changePasswordWithHashResp = new ChangePasswordWithHashResp(Number)
     // await changePasswordWithHashResp.changePasswordWithHash(model)
     // successAndPush('system.success.changePasswordSuccess', '/login')
@@ -128,7 +126,7 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param commit
    * @param data
    */
-  refresh: ({commit}, data: LoginResp) => {
+  refresh: ({commit}, data: <%-loginRespModel%>) => {
     if (data.id) localStorage.setItem('id', data.id as string)
     if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
     commit(types.POPULATE)
@@ -186,7 +184,7 @@ const mutations: MutationTree<AuthState> = {
   [types.FORGET](state) {
     state.id = undefined
     state.token = undefined
-    state.user = new User()
+    state.user = new <%-userModel%>()
 
     localStorage.removeItem('id')
     localStorage.removeItem('token')
