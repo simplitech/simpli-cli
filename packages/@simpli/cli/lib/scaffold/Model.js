@@ -212,13 +212,13 @@ module.exports = class Model {
   }
 
   populateSimpliCommons (dep = new Dependence()) {
-    const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
-    if (hasID) dep.addChild('ID')
-
     if (this.isResource) {
       dep.addChild('Resource')
+      dep.addChild('ID')
       if (this.resource.keyTAG) dep.addChild('TAG')
     } else {
+      const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
+      if (hasID) dep.addChild('ID')
       dep.addChild('Model')
     }
   }
@@ -242,6 +242,7 @@ module.exports = class Model {
     const hasUrl = !!this.attrs.find((attr) => attr.isUrl)
     const hasImageUrl = !!this.attrs.find((attr) => attr.isImageUrl)
     const hasPhone = !!this.attrs.find((attr) => attr.isPhone)
+    const hasZipcode = !!this.attrs.find((attr) => attr.isZipcode)
     const hasCpf = !!this.attrs.find((attr) => attr.isCpf)
     const hasCnpj = !!this.attrs.find((attr) => attr.isCnpj)
 
@@ -251,6 +252,7 @@ module.exports = class Model {
     if (hasUrl) dep.addChild('AnchorRender')
     if (hasImageUrl) dep.addChild('ImageRender')
     if (hasPhone) dep.addChild('phone')
+    if (hasZipcode) dep.addChild('cep')
     if (hasCpf) dep.addChild('cpf')
     if (hasCnpj) dep.addChild('cnpj')
   }
@@ -334,6 +336,8 @@ module.exports = class Model {
         result += `      ${attr.name}: datetime(this.${attr.name}),\n`
       } else if (attr.isPhone) {
         result += `      ${attr.name}: phone(this.${attr.name}),\n`
+      } else if (attr.isZipcode) {
+        result += `      ${attr.name}: cep(this.${attr.name}),\n`
       } else if (attr.isCpf) {
         result += `      ${attr.name}: cpf(this.${attr.name}),\n`
       } else if (attr.isCnpj) {

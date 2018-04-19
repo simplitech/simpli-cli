@@ -137,6 +137,15 @@ module.exports = class Attr {
     return !!reservedWords.find((word) => word === this.name)
   }
 
+  get isZipcode () {
+    const reservedWords = [
+      'zipcode',
+      'zipCode',
+      'cep'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
   get isCpf () {
     const reservedWords = ['cpf']
     return !!reservedWords.find((word) => word === this.name)
@@ -303,7 +312,7 @@ module.exports = class Attr {
       result += `        >\n`
       result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
       result += `        </textarea-group>\n`
-    } else {
+    } else if (!this.isID || !this.isForeign) {
       result += `        <input-group\n`
       if (this.isRequired) {
         result += `          required\n`
@@ -332,18 +341,16 @@ module.exports = class Attr {
         result += `          :placeholder="model.${originAttr}.$id ? $t('app.onlyIfWantChangePassword') : ''"\n`
       } else if (this.isPhone) {
         result += `          type="phone"\n`
-        result += `          maxLength="100"\n`
+      } else if (this.isZipcode) {
+        result += `          type="cep"\n`
       } else if (this.isCpf) {
         result += `          type="cpf"\n`
-        result += `          maxLength="100"\n`
       } else if (this.isCnpj) {
         result += `          type="cpf"\n`
-        result += `          maxLength="100"\n`
       } else if (this.isRg) {
         result += `          type="rg"\n`
-        result += `          maxLength="100"\n`
       } else {
-        result += `          type="type"\n`
+        result += `          type="text"\n`
         result += `          maxLength="255"\n`
       }
       result += `          v-model="model.${originAttr}.${this.name}"\n`

@@ -27,7 +27,7 @@ module.exports = (api, options) => {
     const data = { model: resource, origin }
     api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
     if (origin) {
-      api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+      api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
     }
   })
 
