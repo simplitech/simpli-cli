@@ -312,9 +312,9 @@ module.exports = class Attr {
       result += `        >\n`
       result += `          {{ $t("classes.${origin}.columns.${this.name}") }}\n`
       result += `        </textarea-group>\n`
-    } else if (!this.isID || !this.isForeign) {
+    } else if (!this.isID && !this.isForeign) {
       result += `        <input-group\n`
-      if (this.isRequired) {
+      if (this.isRequired && !this.isPassword) {
         result += `          required\n`
       }
       if (this.isInteger || this.isDouble) {
@@ -339,6 +339,8 @@ module.exports = class Attr {
         result += `          type="password"\n`
         result += `          maxLength="100"\n`
         result += `          :placeholder="model.${originAttr}.$id ? $t('app.onlyIfWantChangePassword') : ''"\n`
+      } else if (this.isMoney) {
+        result += `          type="money"\n`
       } else if (this.isPhone) {
         result += `          type="phone"\n`
       } else if (this.isZipcode) {
@@ -346,7 +348,7 @@ module.exports = class Attr {
       } else if (this.isCpf) {
         result += `          type="cpf"\n`
       } else if (this.isCnpj) {
-        result += `          type="cpf"\n`
+        result += `          type="cnpj"\n`
       } else if (this.isRg) {
         result += `          type="rg"\n`
       } else {

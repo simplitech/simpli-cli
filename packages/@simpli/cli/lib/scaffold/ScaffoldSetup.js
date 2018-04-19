@@ -21,6 +21,18 @@ module.exports = class ScaffoldSetup {
     this.models = []
   }
 
+  // Remove CRUD APIs
+  get simpleAPIs () {
+    return this.apis.filter((api) => {
+      let isResource = false
+      this.resourceModels.forEach((model) => {
+        const regex = new RegExp(`^\/\\w+\/(?:${model.name})(?:\/\{\\w+\})*$`, 'g')
+        if ((api.endpoint || '').match(regex)) isResource = true
+      })
+      return !isResource
+    })
+  }
+
   /**
    * Filter simple models: 000
    */
@@ -120,7 +132,7 @@ module.exports = class ScaffoldSetup {
   }
 
   /**
-   * Set apis from swagger.json
+   * Set APIs from swagger.json
    * @param path Paths of swagger.json
    */
   setApis (path = {}) {
@@ -139,7 +151,7 @@ module.exports = class ScaffoldSetup {
   }
 
   /**
-   * Set model from swagger.json
+   * Set models from swagger.json
    * @param definition Definitions of swagger.json
    * @param path Paths of swagger.json
    */

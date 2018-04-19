@@ -61,17 +61,6 @@ module.exports = class Model {
   }
 
   /**
-   * Get module path
-   */
-  get modulePath () {
-    if (!this.isResource && !this.isResp && !this.isPagedResp) return `@/model/${this.name}`
-    if (!this.isResource && this.isResp && !this.isPagedResp) return `@/model/response/${this.name}`
-    if (this.isResource && !this.isResp && !this.isPagedResp) return `@/model/resource/${this.name}`
-    if (this.isResource && this.isResp && !this.isPagedResp) return `@/model/resource/response/${this.name}`
-    if (this.isResource && !this.isResp && this.isPagedResp) return `@/model/collection/${this.name}`
-  }
-
-  /**
    * Populate attributes
    * @param belongsTo This model name
    * @param property Properties from swagger
