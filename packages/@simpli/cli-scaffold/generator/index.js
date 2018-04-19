@@ -6,8 +6,6 @@ module.exports = (api, options) => {
   const resourceModels = options.scaffoldSetup.resourceModels
   const respResourceModels = options.scaffoldSetup.respResourceModels
 
-  const findOriginModel = options.scaffoldSetup.findOriginModel
-
   simpleModels.forEach((resource) => {
     const data = { model: resource }
     api.renderFrom('./dynamics', 'src/model/Template.ts', `./${resource.name}.ts`, data)
@@ -25,10 +23,12 @@ module.exports = (api, options) => {
   })
 
   respResourceModels.forEach((resource) => {
-    const origin = findOriginModel(resource)
+    const origin = options.scaffoldSetup.findOriginModel(resource)
     const data = { model: resource, origin }
     api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
-    api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+    if (origin) {
+      api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+    }
   })
 
   api.extendPackage({

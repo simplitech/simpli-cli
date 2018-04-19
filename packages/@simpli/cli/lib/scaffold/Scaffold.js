@@ -72,7 +72,6 @@ module.exports = class Scaffold {
       process.exit(1)
     }
 
-    const resourceModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
     const exceptPagedRespModels = this.scaffoldSetup.exceptPagedRespModels.map((model) => model.name)
 
     if (exceptPagedRespModels.length === 0) {
@@ -114,8 +113,8 @@ module.exports = class Scaffold {
       {
         name: 'userModel',
         type: 'list',
-        choices: resourceModels,
-        default: this.scaffoldSetup.resourceModels.findIndex((model) => model.name === 'User') || 0,
+        choices: exceptPagedRespModels,
+        default: this.scaffoldSetup.exceptPagedRespModels.findIndex((model) => model.name === 'User') || 0,
         message: 'Which one of these is the user model?'
       }
     ])
