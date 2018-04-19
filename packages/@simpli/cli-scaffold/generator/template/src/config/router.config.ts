@@ -41,7 +41,7 @@ export const router = {
           component: Persist<%-resource.name%>View,
         },
         {
-          path: '/persist<%-resource.name%><%-resource.strParams()%>',
+          path: '/persist<%-resource.name%><%-resource.resource.endpointParamsImploded%>',
           name: 'persist<%-resource.name%>',
           component: Persist<%-resource.name%>View,
           props: true,

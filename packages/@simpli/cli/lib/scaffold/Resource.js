@@ -6,7 +6,7 @@ module.exports = class Resource {
     this.keyTAG = null
   }
 
-  get endpointParamsExploded () {
+  get endpointParamsImploded () {
     let str = ''
     this.resource.endpointParams.forEach((param) => {
       str += `/:${param}`

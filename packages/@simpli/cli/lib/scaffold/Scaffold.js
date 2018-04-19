@@ -74,7 +74,7 @@ module.exports = class Scaffold {
 
     const resourceModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
     const simpleModels = this.scaffoldSetup.simpleModels.map((model) => model.name)
-    const simpleRespModels = this.scaffoldSetup.resourceModels.map((model) => model.name)
+    const simpleRespModels = this.scaffoldSetup.simpleRespModels.map((model) => model.name)
 
     const { appName } = await inquirer.prompt([
       {
