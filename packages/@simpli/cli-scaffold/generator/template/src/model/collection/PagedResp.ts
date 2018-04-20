@@ -5,7 +5,7 @@
 import {PageCollection, Resource, ResponseFill} from '@/simpli'
 import {Type} from 'class-transformer'
 
-export class PagedResp<T extends Resource> extends PageCollection<T> {
+export default class PagedResp<T extends Resource> extends PageCollection<T> {
   @ResponseFill('list')
   @Type((options) => (options!.newObject as PagedResp<T>).type)
   items: T[] = []

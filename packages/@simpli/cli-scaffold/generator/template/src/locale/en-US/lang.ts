@@ -105,8 +105,8 @@ export default {
   },
 
   boolean: {
-    true: 'True',
-    false: 'False',
+    true: 'Yes',
+    false: 'No',
   },
 
   httpResponse: {

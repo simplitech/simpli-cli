@@ -12,11 +12,14 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
 import { State, Action, Getter } from 'vuex-class'
-import {LoginHolder} from '@/model'
+<%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
+<%_ var dependence = rootOptions.scaffoldSetup.injectIntoDependence(loginHolderModel) _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
+<%-dependence.build()%>
 
 @Component
 export default class LoginView extends Vue {
   @Action('auth/signIn') signIn?: Function
-  model = new LoginHolder()
+  model = new <%-loginHolderModel%>()
 }
 </script>
