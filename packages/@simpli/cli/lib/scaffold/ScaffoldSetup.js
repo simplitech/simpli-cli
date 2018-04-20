@@ -132,7 +132,7 @@ module.exports = class ScaffoldSetup {
     const name = dep.module
     const model = this.models.find((model) => model.name === name)
     if (model) {
-      dep.module = model.modulePath()
+      dep.module = model.modulePath
     }
   }
 
