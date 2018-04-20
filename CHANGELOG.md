@@ -1,3 +1,13 @@
+<a name="0.3.0-beta.0"></a>
+# [0.3.0-beta.0](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.38...v0.3.0-beta.0) (2018-04-20)
+
+
+### Features
+
+* Released beta ([6cae194](https://github.com/simplitech/simpli-cli/commit/6cae194))
+
+
+
 <a name="0.3.0-alpha.38"></a>
 # [0.3.0-alpha.38](https://github.com/simplitech/simpli-cli/compare/v0.3.0-alpha.37...v0.3.0-alpha.38) (2018-04-20)
 
