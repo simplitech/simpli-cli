@@ -33,12 +33,10 @@ program
   })
 
 program
-  .command('inspect:swagger [paths...]')
-  .option('--url <url>')
-  .option('--mode <mode>')
-  .description('inspect a scaffold project')
-  .action((paths, cmd) => {
-    require('../lib/scaffold/inspect')(paths, cmd.url, cmd.mode)
+  .command('inspect:swagger <swagger-url> [paths...]')
+  .description('inspect a JSON swagger and convert it into api and model object')
+  .action((url, paths) => {
+    require('../lib/scaffold/inspect')(url, paths)
   })
 
 program

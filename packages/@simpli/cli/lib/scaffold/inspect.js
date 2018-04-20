@@ -3,7 +3,7 @@ const ScaffoldSetup = require('./ScaffoldSetup')
 const keyBy = require('lodash.keyby')
 const chalk = require('chalk')
 
-module.exports = async (inspectPaths = [], url, mode) => {
+module.exports = async (url, inspectPaths = []) => {
   const get = require('get-value')
   const stringify = require('javascript-stringify')
   const resp = await request.get(url)
@@ -22,8 +22,7 @@ module.exports = async (inspectPaths = [], url, mode) => {
     swagger.api = keyBy(scaffoldSetup.apis, 'name')
     swagger.model = keyBy(scaffoldSetup.models, 'name')
   } else {
-    console.info(`Use ${chalk.yellow(`simpli inspect:scaffold api[.?]`)} 
-or ${chalk.yellow(`simpli inspect:scaffold model[.?]`)}`)
+    console.info(`Use ${chalk.yellow(`simpli inspect:swagger <swagger-url> api[.?]`)} or ${chalk.yellow(`simpli inspect:swagger <swagger-url> model[.?]`)}`)
     return
   }
 
