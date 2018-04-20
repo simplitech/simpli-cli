@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli",
-  "version": "0.3.0-alpha.37",
+  "version": "0.3.0-alpha.38",
   "description": "Simpli CLI commands",
   "bin": {
     "simpli": "bin/simpli.js"
