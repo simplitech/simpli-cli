@@ -298,15 +298,6 @@ module.exports = class Model {
   }
 
   /**
-   * Inject this model into a dependence
-   */
-  injectIntoDependence () {
-    const dependence = new Dependence(this.name, true, false)
-    dependence.onlyName = true
-    return dependence
-  }
-
-  /**
    * Print the resource header into the template generator
    */
   buildResource () {

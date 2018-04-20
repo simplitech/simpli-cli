@@ -122,6 +122,7 @@ module.exports = class ScaffoldSetup {
   injectIntoDependence (modelName) {
     const dependence = new Dependence(modelName, true, false)
     dependence.onlyName = true
+    dependence.addChild(modelName)
     return dependence
   }
 
