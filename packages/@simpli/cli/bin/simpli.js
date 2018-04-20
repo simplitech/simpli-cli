@@ -29,21 +29,21 @@ program
   .option('-d, --default', 'Skip prompts and use default preset')
   .option('-f, --force', 'Overwrite target directory if it exists')
   .action((name, cmd) => {
-    require('../lib/create')(name, cleanArgs(cmd))
+    require('../lib/cmd/newProject')(name, cleanArgs(cmd))
   })
 
 program
   .command('inspect:swagger <swagger-url> [paths...]')
   .description('inspect a JSON swagger and convert it into api and model object')
   .action((url, paths) => {
-    require('../lib/scaffold/inspect')(url, paths)
+    require('../lib/cmd/inspectSwagger')(url, paths)
   })
 
 program
   .command('sync:scaffold')
-  .description('sync the swagger config from the current frontend project')
-  .action((name, cmd) => {
-  //
+  .description('sync the current frontend project based in its webserver swagger')
+  .action(() => {
+    require('../lib/cmd/syncScaffold')()
   })
 
 // output help information on unknown commands

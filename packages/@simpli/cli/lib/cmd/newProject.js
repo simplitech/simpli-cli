@@ -3,8 +3,8 @@ const path = require('path')
 const chalk = require('chalk')
 const rimraf = require('rimraf')
 const inquirer = require('inquirer')
-const Scaffold = require('./scaffold/Scaffold')
-const clearConsole = require('./util/clearConsole')
+const Scaffold = require('../scaffold/Scaffold')
+const clearConsole = require('../util/clearConsole')
 const { error, stopSpinner } = require('@vue/cli-shared-utils')
 
 async function create (projectName, options) {
@@ -12,11 +12,11 @@ async function create (projectName, options) {
   const name = inCurrent ? path.relative('../', process.cwd()) : projectName
   const targetDir = path.resolve(projectName || '.')
 
+  await clearConsole(true)
   if (fs.existsSync(targetDir)) {
     if (options.force) {
       rimraf.sync(targetDir)
     } else {
-      await clearConsole(true)
       if (inCurrent) {
         const { ok } = await inquirer.prompt([
           {

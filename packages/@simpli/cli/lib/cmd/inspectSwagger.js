@@ -1,5 +1,5 @@
 const request = require('../util/request.js')
-const ScaffoldSetup = require('./ScaffoldSetup')
+const ScaffoldSetup = require('../scaffold/setup/ScaffoldSetup')
 const keyBy = require('lodash.keyby')
 const chalk = require('chalk')
 
