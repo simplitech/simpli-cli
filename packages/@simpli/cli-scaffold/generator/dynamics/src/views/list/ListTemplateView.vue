@@ -30,42 +30,41 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator'
-<%_ var dependence = model.injectIntoDependence() _%>
+  import {Component, Vue} from 'vue-property-decorator'
+<%_ var dependence = rootOptions.scaffoldSetup.injectIntoDependence(model.name) _%>
 <%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
 <%-dependence.build()%>
-<%_  _%>
-import PagedResp from '@/model/collection/PagedResp'
-import {pushByName} from '@/simpli'
+  import PagedResp from '@/model/collection/PagedResp'
+  import {pushByName} from '@/simpli'
 
-@Component
-export default class List<%-model.name%>View extends Vue {
-  collection = new PagedResp(<%-model.name%>)
+  @Component
+  export default class List<%-model.name%>View extends Vue {
+    collection = new PagedResp(<%-model.name%>)
 <%_ if (model.resource.deletable) { _%>
-  toRemove = new <%-model.name%>()
+    toRemove = new <%-model.name%>()
 <%_ } _%>
 
-  async mounted() {
-    await this.collection.search()
-  }
+    async mounted() {
+      await this.collection.search()
+    }
 
-  openPersist(item: <%-model.name%>) {
-    pushByName('persist<%-model.name%>', item.$id)
-  }
+    openPersist(item: <%-model.name%>) {
+      pushByName('persist<%-model.name%>', item.$id)
+    }
 <%_ if (model.resource.deletable) { _%>
 
-  async removeItem() {
-    await this.toRemove.remove()
-    this.resetRemove()
-    await this.collection.search()
-  }
+    async removeItem() {
+      await this.toRemove.remove()
+      this.resetRemove()
+      await this.collection.search()
+    }
 
-  openRemoveModal(item: <%-model.name%>) {
-    this.toRemove = item
-  }
+    openRemoveModal(item: <%-model.name%>) {
+      this.toRemove = item
+    }
 
-  resetRemove() {
-    this.toRemove = new <%-model.name%>()
-  }
-<%_ } _%>}
+    resetRemove() {
+      this.toRemove = new <%-model.name%>()
+    }
+<%_ } _%>  }
 </script>
