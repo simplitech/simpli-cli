@@ -5,6 +5,7 @@ module.exports = class Dependence {
     this.module = module || null
     this.singleLine = singleLine
     this.inside = inside
+    this.onlyName = false
     this.children = []
   }
 

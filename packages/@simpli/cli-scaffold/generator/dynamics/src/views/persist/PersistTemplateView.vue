@@ -20,7 +20,10 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import {<%-model.name%>} from '@/model'
+<%_ var dependence = model.injectIntoDependence() _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
+<%-dependence.build()%>
+<%_  _%>
   import {successAndPush} from '@/simpli'
 
   @Component

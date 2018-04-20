@@ -1,6 +1,8 @@
 import {store} from '@/store'
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
-import {<%-loginHolderModel%>} from '@/model'
+<%_ var dependence = rootOptions.scaffoldSetup.injectIntoDependence(loginHolderModel) _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
+<%-dependence.build()%>
 
 export const isLogged = () => store.getters['auth/isLogged']
 export const getId = () => store.getters['auth/id']

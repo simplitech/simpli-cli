@@ -4,6 +4,7 @@ const Resource = require('./Resource')
 const Resp = require('./Resp')
 const Dependence = require('./Dependence')
 const startCase = require('lodash.startcase')
+const uniqBy = require('lodash.uniqby')
 
 module.exports = class Model {
   constructor (name, definition, path, apis) {
@@ -58,6 +59,20 @@ module.exports = class Model {
    */
   get arrayAtrrs () {
     return this.attrs.filter((attr) => attr.isArray)
+  }
+
+  /**
+   * Filter dependence by onlyName = true
+   */
+  get onlyNameDeps () {
+    return this.dependencies.filter((dep) => dep.onlyName)
+  }
+
+  /**
+   * Filter dependence by onlyName = false
+   */
+  get withPathDeps () {
+    return this.dependencies.filter((dep) => !dep.onlyName)
   }
 
   /**
@@ -191,22 +206,19 @@ module.exports = class Model {
   setDependencies () {
     const dependencies = []
     const simpliModule = '@/simpli'
-    const modelModule = '@/model'
 
     const simpliCommons = new Dependence(simpliModule)
     const simpliDecorator = new Dependence(simpliModule, false)
     const simpliMisc = new Dependence(simpliModule)
-    const models = new Dependence(modelModule)
 
     this.populateSimpliCommons(simpliCommons)
     this.populateSimpliDecorator(simpliDecorator)
     this.populateSimpliMisc(simpliMisc)
-    this.populateModels(models)
 
     if (simpliCommons.hasChildren) dependencies.push(simpliCommons)
     if (simpliDecorator.hasChildren) dependencies.push(simpliDecorator)
     if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
-    if (models.hasChildren) dependencies.push(models)
+    dependencies.push(...this.generateModelResources())
 
     this.dependencies = dependencies
   }
@@ -257,19 +269,41 @@ module.exports = class Model {
     if (hasCnpj) dep.addChild('cnpj')
   }
 
-  populateModels (dep = new Dependence()) {
+  generateModelResources () {
+    const list = []
+
     this.objectAtrrs.forEach((attr) => {
-      dep.addChild(attr.type)
+      const modelResource = new Dependence(attr.type, true, false)
+      modelResource.onlyName = true
+      modelResource.addChild(attr.type)
+      list.push(modelResource)
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      dep.addChild(attr.type)
+      const modelResource = new Dependence(attr.type, true, false)
+      modelResource.onlyName = true
+      modelResource.addChild(attr.type)
+      list.push(modelResource)
     })
 
     const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
     apisWithModel.forEach((api) => {
-      dep.addChild(api.bodyModel)
+      const modelResource = new Dependence(api.bodyModel, true, false)
+      modelResource.onlyName = true
+      modelResource.addChild(api.bodyModel)
+      list.push(modelResource)
     })
+
+    return uniqBy(list, 'module') || []
+  }
+
+  /**
+   * Inject this model into a dependence
+   */
+  injectIntoDependence () {
+    const dependence = new Dependence(this.name, true, false)
+    dependence.onlyName = true
+    return dependence
   }
 
   /**

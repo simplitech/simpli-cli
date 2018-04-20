@@ -5,7 +5,15 @@ import {$, encrypt, push, successAndPush, errorAndPush, infoAndPush} from '@/sim
 <%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
 <%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel _%>
-import {<%-userModel%>, <%-loginHolderModel%>, <%-loginRespModel%>} from '@/model'
+<%_ var dependence1 = rootOptions.scaffoldSetup.injectIntoDependence(userModel) _%>
+<%_ var dependence2 = rootOptions.scaffoldSetup.injectIntoDependence(loginHolderModel) _%>
+<%_ var dependence3 = rootOptions.scaffoldSetup.injectIntoDependence(loginRespModel) _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence1) _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence2) _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence3) _%>
+<%-dependence1.build()%>
+<%-dependence2.build()%>
+<%-dependence3.build()%>
 // import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
 // import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 

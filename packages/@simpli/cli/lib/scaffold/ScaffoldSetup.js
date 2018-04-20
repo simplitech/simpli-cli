@@ -1,6 +1,7 @@
 const map = require('lodash.map')
 const Model = require('./Model')
 const Api = require('./Api')
+const Dependence = require('./Dependence')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const snakeCase = require('lodash.snakecase')
@@ -113,6 +114,26 @@ module.exports = class ScaffoldSetup {
   findOriginModel (target = new Model()) {
     if (!target.isResp) return null
     return this.models.find((model) => model.name === target.resp.origin) || null
+  }
+
+  /**
+   * Inject a model into a dependence
+   */
+  injectIntoDependence (modelName) {
+    const dependence = new Dependence(modelName, true, false)
+    dependence.onlyName = true
+    return dependence
+  }
+
+  /**
+   * Resolve path of a given dependence
+   */
+  resolvePath (dep = new Dependence()) {
+    const name = dep.module
+    const model = this.models.find((model) => model.name === name)
+    if (model) {
+      dep.module = model.modulePath()
+    }
   }
 
   // Helpers

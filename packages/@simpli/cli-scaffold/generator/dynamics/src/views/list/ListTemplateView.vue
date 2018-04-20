@@ -17,6 +17,7 @@
         </div>
       </adap-table>
     </section>
+<%_ if (model.resource.deletable) { _%>
 
     <modal-remove
       :active="!!toRemove.$id"
@@ -24,31 +25,39 @@
       @cancel="resetRemove"
       @confirm="removeItem"
     />
+<%_ } _%>
   </div>
 </template>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
-import {<%-model.name%>, PagedResp} from '@/model'
+<%_ var dependence = model.injectIntoDependence() _%>
+<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
+<%-dependence.build()%>
+<%_  _%>
+import PagedResp from '@/model/collection/PagedResp'
 import {pushByName} from '@/simpli'
 
 @Component
 export default class List<%-model.name%>View extends Vue {
   collection = new PagedResp(<%-model.name%>)
+<%_ if (model.resource.deletable) { _%>
   toRemove = new <%-model.name%>()
+<%_ } _%>
 
   async mounted() {
     await this.collection.search()
   }
 
+  openPersist(item: <%-model.name%>) {
+    pushByName('persist<%-model.name%>', item.$id)
+  }
+<%_ if (model.resource.deletable) { _%>
+
   async removeItem() {
     await this.toRemove.remove()
     this.resetRemove()
     await this.collection.search()
-  }
-
-  openPersist(item: <%-model.name%>) {
-    pushByName('persist<%-model.name%>', item.$id)
   }
 
   openRemoveModal(item: <%-model.name%>) {
@@ -58,5 +67,5 @@ export default class List<%-model.name%>View extends Vue {
   resetRemove() {
     this.toRemove = new <%-model.name%>()
   }
-}
+<%_ } _%>}
 </script>
