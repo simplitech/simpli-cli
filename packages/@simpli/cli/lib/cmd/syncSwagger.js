@@ -62,7 +62,6 @@ async function sync () {
   }
 
   await clearConsole()
-
   const scaffold = new Scaffold(appName, targetDir, [])
   await scaffold.syncModels(swaggerUrl)
 }
