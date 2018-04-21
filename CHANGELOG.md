@@ -1,3 +1,13 @@
+<a name="0.3.0-beta.2"></a>
+# [0.3.0-beta.2](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.1...v0.3.0-beta.2) (2018-04-21)
+
+
+### Features
+
+* **scaffold:** Added command sync:swagger ([bc94929](https://github.com/simplitech/simpli-cli/commit/bc94929))
+
+
+
 <a name="0.3.0-beta.1"></a>
 # [0.3.0-beta.1](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.0...v0.3.0-beta.1) (2018-04-20)
 
