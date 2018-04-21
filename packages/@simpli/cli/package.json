@@ -25,6 +25,7 @@
     "conventional-changelog": "^1.1.22",
     "debug": "^3.1.0",
     "download-git-repo": "^1.0.2",
+    "dotenv": "^5.0.1",
     "ejs": "^2.5.7",
     "execa": "^0.8.0",
     "get-value": "^3.0.0",

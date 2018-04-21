@@ -1,5 +1,7 @@
 module.exports = (api, options) => {
-  api.render('./template')
+  if (!options.sync) {
+    api.render('./template')
+  }
 
   const simpleModels = options.scaffoldSetup.simpleModels
   const simpleRespModels = options.scaffoldSetup.simpleRespModels
@@ -30,6 +32,8 @@ module.exports = (api, options) => {
       api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
     }
   })
+
+  if (options.sync) return
 
   api.extendPackage({
     typings: 'types/index.d.ts',

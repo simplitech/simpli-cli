@@ -40,10 +40,10 @@ program
   })
 
 program
-  .command('sync:scaffold')
+  .command('sync:swagger')
   .description('sync the current frontend project based in its webserver swagger')
   .action(() => {
-    require('../lib/cmd/syncScaffold')()
+    require('../lib/cmd/syncSwagger')()
   })
 
 // output help information on unknown commands

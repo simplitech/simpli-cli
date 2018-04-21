@@ -42,6 +42,7 @@ module.exports = class Scaffold {
     this.injectedPrompts = []
     this.promptCompleteCbs = []
     this.createCompleteCbs = []
+    this.sync = false
 
     const promptAPI = new PromptModuleAPI(this)
     promptModules.forEach(m => m(promptAPI))
@@ -65,12 +66,13 @@ module.exports = class Scaffold {
     }
 
     const { swagger, info, paths, definitions } = this.swaggerJSON
-    this.scaffoldSetup.injectSwagger(definitions, paths)
 
     if (!swagger) {
       error('This file is not a valid swagger')
       process.exit(1)
     }
+
+    this.scaffoldSetup.injectSwagger(definitions, paths)
 
     const models = this.scaffoldSetup.exceptPagedRespModels
 
@@ -314,6 +316,64 @@ module.exports = class Scaffold {
     log()
 
     generator.printExitLogs()
+  }
+
+  async syncModels (swaggerUrl) {
+    const { context, createCompleteCbs } = this
+    this.sync = true
+
+    try {
+      const resp = await request.get(swaggerUrl)
+      this.swaggerJSON = resp.body
+    } catch (e) {
+      error(e.message)
+      process.exit(1)
+    }
+
+    const { swagger, paths, definitions } = this.swaggerJSON
+
+    if (!swagger) {
+      error('This file is not a valid swagger')
+      process.exit(1)
+    }
+
+    this.scaffoldSetup.injectSwagger(definitions, paths)
+
+    const { modelsName } = await inquirer.prompt([
+      {
+        name: 'modelsName',
+        type: 'checkbox',
+        choices: this.scaffoldSetup.exceptPagedRespModels.map((model) => model.name),
+        message: 'Which models do you want to sync?'
+      }
+    ])
+
+    this.scaffoldSetup.models = this.scaffoldSetup.models
+      .filter((model) => modelsName.find((name) => name === model.name))
+
+    const preset = {
+      plugins: {
+        '@simpli/cli-scaffold': {
+          scaffoldSetup: this.scaffoldSetup,
+          sync: this.sync
+        }
+      }
+    }
+
+    log()
+    log(`⚙️  Synchronizing models...`)
+    const plugins = this.resolvePlugins(preset.plugins)
+    const generator = new Generator(context, {
+      pkg: { _ignore: true },
+      plugins,
+      completeCbs: createCompleteCbs
+    })
+    await generator.generate()
+
+    log()
+    log(`🎉  Successfully synchronized models ${chalk.yellow(modelsName.join(', '))}.`)
+    log(`👉  Run ${chalk.cyan('git status')} to see which files has changed.`)
+    log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
   }
 
   resolvePlugins (rawPlugins) {

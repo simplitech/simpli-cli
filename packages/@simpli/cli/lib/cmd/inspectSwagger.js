@@ -2,8 +2,11 @@ const request = require('../util/request.js')
 const ScaffoldSetup = require('../scaffold/setup/ScaffoldSetup')
 const keyBy = require('lodash.keyby')
 const chalk = require('chalk')
+const clearConsole = require('../util/clearConsole')
 
 module.exports = async (url, inspectPaths = []) => {
+  await clearConsole()
+
   const get = require('get-value')
   const stringify = require('javascript-stringify')
   const resp = await request.get(url)

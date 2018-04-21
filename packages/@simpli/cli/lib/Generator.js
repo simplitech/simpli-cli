@@ -57,7 +57,9 @@ module.exports = class Generator {
     await this.resolveFiles()
     // set package.json
     this.sortPkg()
-    this.files['package.json'] = JSON.stringify(this.pkg, null, 2)
+    if (!this.pkg._ignore) {
+      this.files['package.json'] = JSON.stringify(this.pkg, null, 2)
+    }
     // write file tree to disk
     await writeFileTree(this.context, this.files)
   }
