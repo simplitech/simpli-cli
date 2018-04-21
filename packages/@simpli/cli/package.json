@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0-beta.2",
   "description": "Simpli CLI commands",
   "bin": {
     "simpli": "bin/simpli.js"
@@ -24,8 +24,8 @@
     "commander": "^2.12.2",
     "conventional-changelog": "^1.1.22",
     "debug": "^3.1.0",
-    "download-git-repo": "^1.0.2",
     "dotenv": "^5.0.1",
+    "download-git-repo": "^1.0.2",
     "ejs": "^2.5.7",
     "execa": "^0.8.0",
     "get-value": "^3.0.0",
