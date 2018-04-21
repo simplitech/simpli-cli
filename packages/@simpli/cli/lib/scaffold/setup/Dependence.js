@@ -29,6 +29,6 @@ module.exports = class Dependence {
       }
       return `import {${this.children.join(', ')}} from '${this.module}'`
     }
-    return `import {\n  ${this.children.join(', \n  ')},\n} from '${this.module}'`
+    return `import {\n  ${this.children.join(',\n  ')},\n} from '${this.module}'`
   }
 }

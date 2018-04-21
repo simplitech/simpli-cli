@@ -6,6 +6,7 @@ const resolve = require('resolve')
 const inquirer = require('inquirer')
 const Generator = require('../Generator')
 const ScaffoldSetup = require('./setup/ScaffoldSetup')
+const Swagger = require('./Swagger')
 const cloneDeep = require('lodash.clonedeep')
 const sortObject = require('../util/sortObject')
 const getVersions = require('../util/getVersions')
@@ -33,7 +34,6 @@ module.exports = class Scaffold {
   constructor (name, context, promptModules) {
     this.name = name
     this.context = process.env.SIMPLI_CLI_CONTEXT = context
-    this.swaggerJSON = {}
     this.scaffoldSetup = new ScaffoldSetup()
     const { presetPrompt, featurePrompt } = this.resolveIntroPrompts()
     this.presetPrompt = presetPrompt
@@ -42,157 +42,43 @@ module.exports = class Scaffold {
     this.injectedPrompts = []
     this.promptCompleteCbs = []
     this.createCompleteCbs = []
-    this.sync = false
 
     const promptAPI = new PromptModuleAPI(this)
     promptModules.forEach(m => m(promptAPI))
   }
 
   async swaggerSetup () {
-    const { url } = await inquirer.prompt([
-      {
-        name: 'url',
-        type: 'input',
-        message: 'Enter swagger.json URL'
-      }
-    ])
+    const {
+      swaggerUrl,
+      swaggerJSON,
+      availableModels
+    } = await Swagger.requestSwagger(this.scaffoldSetup)
 
-    try {
-      const resp = await request.get(url)
-      this.swaggerJSON = resp.body
-    } catch (e) {
-      error(e.message)
-      process.exit(1)
-    }
-
-    const { swagger, info, paths, definitions } = this.swaggerJSON
-
-    if (!swagger) {
-      error('This file is not a valid swagger')
-      process.exit(1)
-    }
-
-    this.scaffoldSetup.injectSwagger(definitions, paths)
-
-    const models = this.scaffoldSetup.exceptPagedRespModels
-
-    if (models.length === 0) {
-      error('There is no a valid model in this swagger\nUse simpli inspect:swagger to analise your swagger')
-      process.exit(1)
-    }
-
-    const { appName } = await inquirer.prompt([
-      {
-        name: 'appName',
-        type: 'input',
-        default: info && info.title,
-        message: 'Enter the app name'
-      }
-    ])
+    const { info } = swaggerJSON
+    const { appName } = await Swagger.requestAppName(info && info.title)
 
     // Remove last directory of the URL
-    const defaultApiUrl = url.replace(/\/([^\/]+)\/?$/, '/')
+    const defaultApiUrl = swaggerUrl.replace(/\/([^\/]+)\/?$/, '/')
+    const { apiUrlDev, apiUrlProd } = await Swagger.requestApiUrl(defaultApiUrl)
 
-    const { apiUrlDev } = await inquirer.prompt([
-      {
-        name: 'apiUrlDev',
-        type: 'input',
-        default: defaultApiUrl,
-        message: 'Enter the API URL in development mode'
-      }
-    ])
+    const { filteredModels } = await Swagger.requestModels(availableModels, this.scaffoldSetup)
 
-    const { apiUrlProd } = await inquirer.prompt([
-      {
-        name: 'apiUrlProd',
-        type: 'input',
-        default: defaultApiUrl,
-        message: 'Enter the API URL in production mode'
-      }
-    ])
+    const {
+      userModel,
+      loginHolderModel,
+      loginRespModel
+    } = await Swagger.requestAuthPlugin(filteredModels)
 
-    const { userModel } = await inquirer.prompt([
-      {
-        name: 'userModel',
-        type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'User') || 0,
-        message: 'Which one of these is the user model?'
-      }
-    ])
+    const {
+      availableLanguages,
+      defaultLanguage,
+      defaultCurrency
+    } = await Swagger.requestLocalePlugin()
 
-    const { loginHolderModel } = await inquirer.prompt([
-      {
-        name: 'loginHolderModel',
-        type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'LoginHolder') || 0,
-        message: 'Which one of these is the login holder model?'
-      }
-    ])
-
-    const { loginRespModel } = await inquirer.prompt([
-      {
-        name: 'loginRespModel',
-        type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'LoginResp') || 0,
-        message: 'Which one of these is the login response model?'
-      }
-    ])
-
-    const { availableLanguages } = await inquirer.prompt([
-      {
-        name: 'availableLanguages',
-        type: 'checkbox',
-        message: 'What languages are available?',
-        choices: [
-          'en-US',
-          'pt-BR'
-        ]
-      }
-    ])
-
-    if (availableLanguages.length === 0) {
-      error('Select at least one language')
-      process.exit(1)
-    }
-
-    const { defaultLanguage } = await inquirer.prompt([
-      {
-        name: 'defaultLanguage',
-        type: 'list',
-        message: 'What is the default language?',
-        choices: availableLanguages
-      }
-    ])
-
-    const { defaultCurrency } = await inquirer.prompt([
-      {
-        name: 'defaultCurrency',
-        type: 'list',
-        message: 'What is the default currency?',
-        choices: [
-          'USD',
-          'BRL'
-        ]
-      }
-    ])
-
-    const { confirm } = await inquirer.prompt([
-      {
-        name: 'confirm',
-        type: 'confirm',
-        message: 'Confirm this set?'
-      }
-    ])
-
-    if (!confirm) {
-      process.exit(1)
-    }
+    await Swagger.confirm()
 
     this.scaffoldSetup.appName = appName
-    this.scaffoldSetup.swaggerUrl = url
+    this.scaffoldSetup.swaggerUrl = swaggerUrl
     this.scaffoldSetup.apiUrlDev = apiUrlDev
     this.scaffoldSetup.apiUrlProd = apiUrlProd
     this.scaffoldSetup.userModel = userModel
@@ -204,9 +90,9 @@ module.exports = class Scaffold {
   }
 
   async swaggerDefaultSetup () {
-    this.swaggerJSON = require('./defaultSwagger.json')
+    const swaggerJSON = require('./defaultSwagger.json')
 
-    const { info, paths, definitions } = this.swaggerJSON
+    const { info, paths, definitions } = swaggerJSON
 
     this.scaffoldSetup.injectSwagger(definitions, paths)
     this.scaffoldSetup.appName = info && info.title
@@ -319,43 +205,17 @@ module.exports = class Scaffold {
   }
 
   async syncModels (swaggerUrl) {
+    await Swagger.requestSwagger(this.scaffoldSetup, swaggerUrl)
+    const { syncModels } = await Swagger.requestSync(this.scaffoldSetup)
+    await Swagger.confirm()
+
     const { context, createCompleteCbs } = this
-    this.sync = true
-
-    try {
-      const resp = await request.get(swaggerUrl)
-      this.swaggerJSON = resp.body
-    } catch (e) {
-      error(e.message)
-      process.exit(1)
-    }
-
-    const { swagger, paths, definitions } = this.swaggerJSON
-
-    if (!swagger) {
-      error('This file is not a valid swagger')
-      process.exit(1)
-    }
-
-    this.scaffoldSetup.injectSwagger(definitions, paths)
-
-    const { modelsName } = await inquirer.prompt([
-      {
-        name: 'modelsName',
-        type: 'checkbox',
-        choices: this.scaffoldSetup.exceptPagedRespModels.map((model) => model.name),
-        message: 'Which models do you want to sync?'
-      }
-    ])
-
-    this.scaffoldSetup.models = this.scaffoldSetup.models
-      .filter((model) => modelsName.find((name) => name === model.name))
 
     const preset = {
       plugins: {
         '@simpli/cli-scaffold': {
           scaffoldSetup: this.scaffoldSetup,
-          sync: this.sync
+          sync: true
         }
       }
     }
@@ -371,7 +231,7 @@ module.exports = class Scaffold {
     await generator.generate()
 
     log()
-    log(`🎉  Successfully synchronized models ${chalk.yellow(modelsName.join(', '))}.`)
+    log(`🎉  Successfully synchronized models ${chalk.yellow(syncModels.map((models) => models.name).join(', '))}.`)
     log(`👉  Run ${chalk.cyan('git status')} to see which files has changed.`)
     log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
   }
