@@ -2,15 +2,38 @@ const request = require('../util/request.js')
 const ScaffoldSetup = require('../scaffold/setup/ScaffoldSetup')
 const keyBy = require('lodash.keyby')
 const chalk = require('chalk')
+const inquirer = require('inquirer')
+const { error } = require('@vue/cli-shared-utils')
 const clearConsole = require('../util/clearConsole')
 
-module.exports = async (url, inspectPaths = []) => {
-  await clearConsole()
-
+module.exports = async (inspectPaths = []) => {
+  require('dotenv').config()
   const get = require('get-value')
   const stringify = require('javascript-stringify')
-  const resp = await request.get(url)
-  const swaggerJSON = resp.body
+
+  await clearConsole()
+
+  let swaggerUrl = process.env.SWAGGER_URL
+  if (!swaggerUrl) {
+    const { url } = await inquirer.prompt([
+      {
+        name: 'url',
+        type: 'input',
+        message: 'Enter swagger.json URL'
+      }
+    ])
+
+    swaggerUrl = url
+  }
+
+  let swaggerJSON
+  try {
+    const resp = await request.get(swaggerUrl)
+    swaggerJSON = resp.body
+  } catch (e) {
+    error(e.message)
+    process.exit(1)
+  }
 
   const { paths, definitions } = swaggerJSON
 
@@ -25,7 +48,7 @@ module.exports = async (url, inspectPaths = []) => {
     swagger.api = keyBy(scaffoldSetup.apis, 'name')
     swagger.model = keyBy(scaffoldSetup.models, 'name')
   } else {
-    console.info(`Use ${chalk.yellow(`simpli inspect:swagger <swagger-url> api[.?]`)} or ${chalk.yellow(`simpli inspect:swagger <swagger-url> model[.?]`)}`)
+    console.info(`Use ${chalk.yellow(`simpli scaffold:inspect api[.?]`)} or ${chalk.yellow(`simpli scaffold:inspect model[.?]`)}`)
     return
   }
 

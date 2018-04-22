@@ -33,17 +33,17 @@ program
   })
 
 program
-  .command('inspect:swagger <swagger-url> [paths...]')
-  .description('inspect a JSON swagger and convert it into api and model object')
-  .action((url, paths) => {
-    require('../lib/cmd/inspectSwagger')(url, paths)
+  .command('scaffold:inspect [paths...]')
+  .description('inspect the models and APIs based on swagger')
+  .action((paths) => {
+    require('../lib/cmd/scaffoldInspect')(paths)
   })
 
 program
-  .command('sync:swagger')
+  .command('scaffold:sync')
   .description('sync the current frontend project based in its webserver swagger')
   .action(() => {
-    require('../lib/cmd/syncSwagger')()
+    require('../lib/cmd/scaffoldSync')()
   })
 
 // output help information on unknown commands
