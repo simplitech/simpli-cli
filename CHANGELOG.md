@@ -1,3 +1,13 @@
+<a name="0.3.0-beta.3"></a>
+# [0.3.0-beta.3](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.2...v0.3.0-beta.3) (2018-04-24)
+
+
+### Features
+
+* **scaffold:** added the possibility to choose the models when create a scaffold project ([214cac5](https://github.com/simplitech/simpli-cli/commit/214cac5))
+
+
+
 <a name="0.3.0-beta.2"></a>
 # [0.3.0-beta.2](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.1...v0.3.0-beta.2) (2018-04-21)
 
