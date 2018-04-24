@@ -94,12 +94,10 @@ async function createScaffold (name, targetDir, options) {
       await scaffold.swaggerDefaultSetup()
     } else if (preset === 'swagger') {
       await scaffold.swaggerSetup()
-    } else {
-      return
-    }
+    } else return
   } else await scaffold.swaggerDefaultSetup()
 
-  await scaffold.create(options)
+  await scaffold.create()
 }
 
 async function createApi (name, targetDir, options) {

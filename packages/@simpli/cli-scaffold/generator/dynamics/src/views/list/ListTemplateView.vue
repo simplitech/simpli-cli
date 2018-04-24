@@ -1,9 +1,10 @@
 <template>
+<%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
   <div class="verti">
     <adap-header
       :collection="collection"
       :title="$t('classes.<%-model.name%>.title')"
-      persistUrl="/persist<%-model.name%>"
+      persistUrl="/<%-kebabCase(model.name)%>/new"
       hasSearch hasCsv
     />
 
@@ -31,9 +32,7 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator'
-<%_ var dependence = rootOptions.scaffoldSetup.injectIntoDependence(model.name) _%>
-<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
-<%-dependence.build()%>
+  <%-model.injectIntoDependence().build()%>
   import PagedResp from '@/model/collection/PagedResp'
   import {pushByName} from '@/simpli'
 
@@ -49,7 +48,7 @@
     }
 
     openPersist(item: <%-model.name%>) {
-      pushByName('persist<%-model.name%>', item.$id)
+      pushByName('edit<%-model.name%>', item.$id)
     }
 <%_ if (model.resource.deletable) { _%>
 

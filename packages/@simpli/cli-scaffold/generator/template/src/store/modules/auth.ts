@@ -2,26 +2,22 @@ import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
 import {$, encrypt, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
-<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-<%_ var loginHolderModel = rootOptions.scaffoldSetup.loginHolderModel _%>
-<%_ var loginRespModel = rootOptions.scaffoldSetup.loginRespModel _%>
-<%_ var dependence1 = rootOptions.scaffoldSetup.injectIntoDependence(userModel) _%>
-<%_ var dependence2 = rootOptions.scaffoldSetup.injectIntoDependence(loginHolderModel) _%>
-<%_ var dependence3 = rootOptions.scaffoldSetup.injectIntoDependence(loginRespModel) _%>
-<%_ rootOptions.scaffoldSetup.resolvePath(dependence1) _%>
-<%_ rootOptions.scaffoldSetup.resolvePath(dependence2) _%>
-<%_ rootOptions.scaffoldSetup.resolvePath(dependence3) _%>
-<%-dependence1.build()%>
-<%-dependence2.build()%>
-<%-dependence3.build()%>
+<%_ var auth = rootOptions.scaffoldSetup.auth _%>
+<%_ var signInApi = auth.api.signIn _%>
+<%_ var authApi = auth.api.auth _%>
+<%_ var loginHolderModel = auth.model.loginHolder _%>
+<%_ var loginRespModel = auth.model.loginResp _%>
+<%-loginHolderModel.injectIntoDependence().build()%>
+<%-loginRespModel.injectIntoDependence().build()%>
+<%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
+<%-dependence.build()%>
+<%_ } _%>
 // import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
 // import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 
 // initial state
 const state: AuthState = {
-  id: undefined,
-  token: undefined,
-  user: new <%-userModel%>(),
+<%-rootOptions.scaffoldSetup.auth.buildState()-%>
   unauthenticatedPath: undefined,
   eventListener: {
     signIn: [],
@@ -32,10 +28,8 @@ const state: AuthState = {
 
 // getters
 const getters: GetterTree<AuthState, RootState> = {
-  isLogged: ({id, token, user}) => !!id && !!token,
-  id: ({id}) => id,
-  token: ({token}) => token,
-  user: ({user}) => user,
+  isLogged: ({id, token}) => !!id && !!token,
+<%-rootOptions.scaffoldSetup.auth.buildGetter()-%>
   unauthenticatedPath: ({unauthenticatedPath}) => unauthenticatedPath,
 }
 
@@ -48,16 +42,14 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param getters
    * @param model format => model: { account, password } (non-encrypted)
    */
-  signIn: async ({state, commit, getters}, model: <%-loginHolderModel%>) => {
-    const loginResp: <%-loginRespModel%> = new <%-loginRespModel%>()
-    model.password = encrypt(model.password)
+  signIn: async ({state, commit, getters}, model: <%-loginHolderModel.name%>) => {
+    const loginResp: <%-loginRespModel.name%> = new <%-loginRespModel.name%>()
+<%-rootOptions.scaffoldSetup.auth.buildPasswordEncrypt()-%>
 
     await model.validate()
-    await loginResp.signIn(model)
+    await loginResp.<%-signInApi.name%>(model)
 
-    if (loginResp.id) localStorage.setItem('id', loginResp.id as string)
-    if (loginResp.token) localStorage.setItem('token', loginResp.token)
-    if (loginResp.user) localStorage.setItem('user', JSON.stringify(loginResp.user))
+<%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
     commit(types.POPULATE)
 
@@ -82,9 +74,9 @@ const actions: ActionTree<AuthState, RootState> = {
     commit(types.POPULATE)
 
     if (getters.isLogged) {
-      const loginResp: <%-loginRespModel%> = new <%-loginRespModel%>()
+      const loginResp: <%-loginRespModel.name%> = new <%-loginRespModel.name%>()
 
-      await loginResp.auth()
+      await loginResp.<%-authApi.name%>()
 
       dispatch('refresh', loginResp)
       state.eventListener.auth.forEach((item) => item(loginResp))
@@ -113,7 +105,7 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param context
    * @param model
    */
-  forgotPassword: async (context, model: <%-loginHolderModel%>) => {
+  forgotPassword: async (context, model: <%-loginHolderModel.name%>) => {
     // const forgotPasswordResp = new ForgotPasswordResp(Number)
     // await forgotPasswordResp.forgotPassword(model)
     // successAndPush('system.success.forgotPasswordSuccess', '/login')
@@ -124,7 +116,7 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param context
    * @param model
    */
-  changePasswordWithHash: async (context, model: <%-loginHolderModel%>) => {
+  changePasswordWithHash: async (context, model: <%-loginHolderModel.name%>) => {
     // const changePasswordWithHashResp = new ChangePasswordWithHashResp(Number)
     // await changePasswordWithHashResp.changePasswordWithHash(model)
     // successAndPush('system.success.changePasswordSuccess', '/login')
@@ -135,9 +127,9 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param commit
    * @param data
    */
-  refresh: ({commit}, data: <%-loginRespModel%>) => {
-    if (data.id) localStorage.setItem('id', data.id as string)
-    if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+  refresh: ({commit}, data: <%-loginRespModel.name%>) => {
+<%-rootOptions.scaffoldSetup.auth.buildSetItem('data')-%>
+
     commit(types.POPULATE)
   },
 
@@ -181,23 +173,15 @@ const actions: ActionTree<AuthState, RootState> = {
 const mutations: MutationTree<AuthState> = {
   // Populate mutation
   [types.POPULATE](state) {
-    const id = localStorage.getItem('id')!
-    const token = localStorage.getItem('token')!
-    const user = JSON.parse(localStorage.getItem('user')!)
+<%-rootOptions.scaffoldSetup.auth.buildGetItem()-%>
 
-    state.id = id
-    state.token = token
-    state.user = user
+<%-rootOptions.scaffoldSetup.auth.buildPopulate()-%>
   },
   // Forget mutation
   [types.FORGET](state) {
-    state.id = undefined
-    state.token = undefined
-    state.user = new <%-userModel%>()
+<%-rootOptions.scaffoldSetup.auth.buildForget()-%>
 
-    localStorage.removeItem('id')
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+<%-rootOptions.scaffoldSetup.auth.buildRemoveItem()-%>
   },
   // Set UnauthenticatedPath mutation
   [types.SET_UNAUTHENTICATED_PATH](state, val) {

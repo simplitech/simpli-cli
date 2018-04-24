@@ -5,7 +5,7 @@ module.exports = class Dependence {
     this.module = module || null
     this.singleLine = singleLine
     this.inside = inside
-    this.onlyName = false
+    this.resolved = true
     this.children = []
   }
 
@@ -17,6 +17,17 @@ module.exports = class Dependence {
     this.children.push(str)
     this.children = (uniq(this.children) || []).sort() || []
     if (this.children.length >= 5) this.singleLine = false
+  }
+
+  /**
+   * Resolve path of a given dependence
+   */
+  resolve (models = []) {
+    const model = models.find((model) => model.name === this.module)
+    if (model) {
+      this.module = model.module
+      this.resolved = true
+    }
   }
 
   /**

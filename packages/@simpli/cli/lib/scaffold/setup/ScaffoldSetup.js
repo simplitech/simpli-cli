@@ -1,7 +1,7 @@
 const map = require('lodash.map')
 const Model = require('./Model')
 const Api = require('./Api')
-const Dependence = require('./Dependence')
+const Auth = require('./Auth')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const snakeCase = require('lodash.snakecase')
@@ -12,12 +12,10 @@ module.exports = class ScaffoldSetup {
     this.swaggerUrl = null
     this.apiUrlDev = null
     this.apiUrlProd = null
-    this.userModel = null
-    this.loginHolderModel = null
-    this.loginRespModel = null
     this.availableLanguages = null
     this.defaultLanguage = null
     this.defaultCurrency = null
+    this.auth = new Auth()
     this.apis = []
     this.models = []
   }
@@ -116,28 +114,6 @@ module.exports = class ScaffoldSetup {
     return this.models.find((model) => model.name === target.resp.origin) || null
   }
 
-  /**
-   * Inject a model into a dependence
-   */
-  injectIntoDependence (modelName) {
-    const dependence = new Dependence(modelName, true, false)
-    dependence.onlyName = true
-    dependence.addChild(modelName)
-
-    return dependence
-  }
-
-  /**
-   * Resolve path of a given dependence
-   */
-  resolvePath (dep = new Dependence()) {
-    const name = dep.module
-    const model = this.models.find((model) => model.name === name)
-    if (model) {
-      dep.module = model.modulePath
-    }
-  }
-
   // Helpers
   camelCase (prop) {
     return camelCase(prop)
@@ -152,6 +128,7 @@ module.exports = class ScaffoldSetup {
   injectSwagger (definition, path) {
     this.setApis(path)
     this.setModels(definition, path)
+    this.models.forEach((model) => model.resolveModule())
   }
 
   /**

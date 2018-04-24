@@ -11,6 +11,9 @@ module.exports = class Model {
     // Model name //e.g User
     this.name = name || ''
 
+    // Model module //e.g @/model/User
+    this.module = null
+
     // Attributes
     this.attrs = []
 
@@ -62,28 +65,28 @@ module.exports = class Model {
   }
 
   /**
-   * Filter dependence by onlyName = true
+   * Only resolved dependencies
    */
-  get onlyNameDeps () {
-    return this.dependencies.filter((dep) => dep.onlyName)
+  get resolvedDependencies () {
+    return this.dependencies.filter((dep) => dep.resolved)
   }
 
   /**
-   * Filter dependence by onlyName = false
+   * Only non-resolved dependencies
    */
-  get withPathDeps () {
-    return this.dependencies.filter((dep) => !dep.onlyName)
+  get notResolvedDependencies () {
+    return this.dependencies.filter((dep) => !dep.resolved)
   }
 
   /**
-   * Get module path
+   * Set module
    */
-  get modulePath () {
-    if (!this.isResource && !this.isResp && !this.isPagedResp) return `@/model/${this.name}`
-    if (!this.isResource && this.isResp && !this.isPagedResp) return `@/model/response/${this.name}`
-    if (this.isResource && !this.isResp && !this.isPagedResp) return `@/model/resource/${this.name}`
-    if (this.isResource && this.isResp && !this.isPagedResp) return `@/model/resource/response/${this.name}`
-    if (this.isResource && !this.isResp && this.isPagedResp) return `@/model/collection/${this.name}`
+  resolveModule () {
+    if (!this.isResource && !this.isResp && !this.isPagedResp) this.module = `@/model/${this.name}`
+    if (!this.isResource && this.isResp && !this.isPagedResp) this.module = `@/model/response/${this.name}`
+    if (this.isResource && !this.isResp && !this.isPagedResp) this.module = `@/model/resource/${this.name}`
+    if (this.isResource && this.isResp && !this.isPagedResp) this.module = `@/model/resource/response/${this.name}`
+    if (this.isResource && !this.isResp && this.isPagedResp) this.module = `@/model/collection/${this.name}`
   }
 
   /**
@@ -274,27 +277,38 @@ module.exports = class Model {
 
     this.objectAtrrs.forEach((attr) => {
       const modelResource = new Dependence(attr.type, true, false)
-      modelResource.onlyName = true
+      modelResource.resolved = false
       modelResource.addChild(attr.type)
-      list.push(modelResource)
+      if (attr.type !== this.name) list.push(modelResource)
     })
 
     this.arrayAtrrs.forEach((attr) => {
       const modelResource = new Dependence(attr.type, true, false)
-      modelResource.onlyName = true
+      modelResource.resolved = false
       modelResource.addChild(attr.type)
-      list.push(modelResource)
+      if (attr.type !== this.name) list.push(modelResource)
     })
 
     const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
     apisWithModel.forEach((api) => {
       const modelResource = new Dependence(api.bodyModel, true, false)
-      modelResource.onlyName = true
+      modelResource.resolved = false
       modelResource.addChild(api.bodyModel)
-      list.push(modelResource)
+      if (api.bodyModel !== this.name) list.push(modelResource)
     })
 
     return uniqBy(list, 'module') || []
+  }
+
+  /**
+   * Inject this model into a dependence
+   */
+  injectIntoDependence () {
+    const dependence = new Dependence(this.module || this.name, true, false)
+    if (!this.module) dependence.resolved = false
+    dependence.addChild(this.name)
+
+    return dependence
   }
 
   /**

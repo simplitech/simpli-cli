@@ -1,8 +1,8 @@
-<%_ var userModel = rootOptions.scaffoldSetup.userModel _%>
-<%_ var dependence = rootOptions.scaffoldSetup.injectIntoDependence(userModel) _%>
-<%_ rootOptions.scaffoldSetup.resolvePath(dependence) _%>
-<%-dependence.build()%>
 import {ID, Currency, Lang} from '@/simpli'
+<%_ var auth = rootOptions.scaffoldSetup.auth _%>
+<%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
+<%-dependence.build()%>
+<%_ } _%>
 /**
  * Root
  */
@@ -16,9 +16,7 @@ export interface RootState {
  * Auth Module
  */
 export interface AuthState {
-  id?: ID,
-  token?: string,
-  user: <%-userModel%>,
+<%-rootOptions.scaffoldSetup.auth.buildType()-%>
   unauthenticatedPath?: string,
   eventListener: AuthEventListener,
 }

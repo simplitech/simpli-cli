@@ -48,6 +48,7 @@ module.exports = class Scaffold {
   }
 
   async swaggerSetup () {
+    // Normalize swagger JSON
     const {
       swaggerUrl,
       swaggerJSON,
@@ -55,20 +56,25 @@ module.exports = class Scaffold {
     } = await Swagger.requestSwagger(this.scaffoldSetup)
 
     const { info } = swaggerJSON
-    const { appName } = await Swagger.requestAppName(info && info.title)
-
     // Remove last directory of the URL
     const defaultApiUrl = swaggerUrl.replace(/\/([^\/]+)\/?$/, '/')
+
+    // Config app name
+    const { appName } = await Swagger.requestAppName(info && info.title)
+
+    // Config API URL
     const { apiUrlDev, apiUrlProd } = await Swagger.requestApiUrl(defaultApiUrl)
 
+    // Select models to be added
     const { filteredModels } = await Swagger.requestModels(availableModels, this.scaffoldSetup)
 
-    const {
-      userModel,
-      loginHolderModel,
-      loginRespModel
-    } = await Swagger.requestAuthPlugin(filteredModels)
+    // Config authentication
+    const { auth } = await Swagger.requestAuthPlugin(this.scaffoldSetup.apis, availableModels, filteredModels)
 
+    // Resolve all dependencies
+    await Swagger.resolveDependencies(availableModels, filteredModels)
+
+    // Config locale
     const {
       availableLanguages,
       defaultLanguage,
@@ -78,12 +84,13 @@ module.exports = class Scaffold {
     await Swagger.confirm()
 
     this.scaffoldSetup.appName = appName
+
     this.scaffoldSetup.swaggerUrl = swaggerUrl
     this.scaffoldSetup.apiUrlDev = apiUrlDev
     this.scaffoldSetup.apiUrlProd = apiUrlProd
-    this.scaffoldSetup.userModel = userModel
-    this.scaffoldSetup.loginHolderModel = loginHolderModel
-    this.scaffoldSetup.loginRespModel = loginRespModel
+
+    this.scaffoldSetup.auth = auth
+
     this.scaffoldSetup.availableLanguages = availableLanguages
     this.scaffoldSetup.defaultLanguage = defaultLanguage
     this.scaffoldSetup.defaultCurrency = defaultCurrency
@@ -95,19 +102,37 @@ module.exports = class Scaffold {
     const { info, paths, definitions } = swaggerJSON
 
     this.scaffoldSetup.injectSwagger(definitions, paths)
+
+    const signInApi = this.scaffoldSetup.apis.find((api) => api.name === 'signIn')
+    const authApi = this.scaffoldSetup.apis.find((api) => api.name === 'auth')
+    const loginHolderModel = this.scaffoldSetup.models.find((model) => model.name === 'LoginHolder')
+    const loginRespModel = this.scaffoldSetup.models.find((model) => model.name === 'LoginResp')
+    const models = this.scaffoldSetup.models
+
+    // Resolve dependencies of each model
+    models.forEach((model) => model.notResolvedDependencies.forEach((dep) => dep.resolve(models)))
+
     this.scaffoldSetup.appName = info && info.title
+
     this.scaffoldSetup.swaggerUrl = ''
     this.scaffoldSetup.apiUrlDev = 'http://localhost/api/'
     this.scaffoldSetup.apiUrlProd = 'http://localhost/api/'
-    this.scaffoldSetup.userModel = 'User'
-    this.scaffoldSetup.loginHolderModel = 'LoginHolder'
-    this.scaffoldSetup.loginRespModel = 'LoginResp'
+
+    this.scaffoldSetup.auth.api.signIn = signInApi
+    this.scaffoldSetup.auth.api.auth = authApi
+    this.scaffoldSetup.auth.model.loginHolder = loginHolderModel
+    this.scaffoldSetup.auth.model.loginResp = loginRespModel
+    this.scaffoldSetup.auth.setDependencies()
+
+    // Resolve dependencies from auth
+    this.scaffoldSetup.auth.notResolvedDependencies.forEach((dep) => dep.resolve(models))
+
     this.scaffoldSetup.availableLanguages = ['en-US']
     this.scaffoldSetup.defaultLanguage = 'en-US'
     this.scaffoldSetup.defaultCurrency = 'USD'
   }
 
-  async create (cliOptions = {}) {
+  async create () {
     const { name, context, createCompleteCbs, scaffoldSetup } = this
 
     const run = (command, args) => {
@@ -136,7 +161,7 @@ module.exports = class Scaffold {
     const deps = Object.keys(preset.plugins)
     deps.forEach(dep => {
       pkg.devDependencies[dep] = preset.plugins[dep].version ||
-        (/^@simpli/.test(dep) ? `^${latest}` : `latest`)
+        (/^@simpli/.test(dep) ? `${latest}` : `latest`)
     })
     // write package.json
     await writeFileTree(context, {
@@ -157,7 +182,7 @@ module.exports = class Scaffold {
     stopSpinner()
     log(`⚙  Installing CLI plugins. This might take a while...`)
     log()
-    await installDeps(context, 'npm', cliOptions.registry)
+    await installDeps(context, 'npm')
 
     // run generator
     log()
@@ -175,7 +200,7 @@ module.exports = class Scaffold {
     // install additional deps (injected by generators)
     log(`📦  Installing additional dependencies...`)
     log()
-    await installDeps(context, 'npm', cliOptions.registry)
+    await installDeps(context, 'npm')
 
     // run complete cbs if any (injected by generators)
     log()
@@ -241,6 +266,7 @@ module.exports = class Scaffold {
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
       const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      // const module = resolve.sync('../../../cli-scaffold/generator')
       return {
         id,
         apply: require(module),

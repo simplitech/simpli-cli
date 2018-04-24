@@ -38,6 +38,7 @@
     "klaw-sync": "^3.0.2",
     "lodash.camelcase": "^4.1.1",
     "lodash.clonedeep": "^4.5.0",
+    "lodash.flatten": "^4.1.1",
     "lodash.kebabcase": "^4.1.1",
     "lodash.keyby": "^4.5.0",
     "lodash.map": "^4.5.0",

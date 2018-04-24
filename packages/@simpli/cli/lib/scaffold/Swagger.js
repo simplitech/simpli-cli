@@ -1,8 +1,13 @@
 const inquirer = require('inquirer')
+const chalk = require('chalk')
 const request = require('../util/request.js')
+const Auth = require('./setup/Auth')
 const {
+  log,
   error
 } = require('@vue/cli-shared-utils')
+const flatten = require('lodash.flatten')
+const uniqBy = require('lodash.uniqby')
 
 module.exports = class Swagger {
   static async requestSwagger (scaffoldSetup, swaggerUrl) {
@@ -79,61 +84,157 @@ module.exports = class Swagger {
   }
 
   static async requestModels (availableModels, scaffoldSetup) {
-    const { allModels } = await inquirer.prompt([
+    const { useAllModels } = await inquirer.prompt([
       {
-        name: 'allModels',
+        name: 'useAllModels',
         type: 'confirm',
         message: 'Add all available models?'
       }
     ])
 
-    if (allModels) return { filteredModels: availableModels }
+    let filteredModels
+    if (!useAllModels) {
+      const { filteredModelNames } = await inquirer.prompt([
+        {
+          name: 'filteredModelNames',
+          type: 'checkbox',
+          choices: availableModels.map((model) => model.name),
+          message: 'Which of these models do you want to include?'
+        }
+      ])
 
-    const { filteredModelNames } = await inquirer.prompt([
-      {
-        name: 'filteredModelNames',
-        type: 'checkbox',
-        choices: availableModels.map((model) => model.name),
-        message: 'Which of these models do you want to include?'
-      }
-    ])
+      filteredModels = scaffoldSetup.models
+        .filter((model) => filteredModelNames.find((name) => name === model.name))
+    } else filteredModels = availableModels
 
-    scaffoldSetup.models = scaffoldSetup.models
-      .filter((model) => filteredModelNames.find((name) => name === model.name))
-
-    const filteredModels = scaffoldSetup.models
+    scaffoldSetup.models = filteredModels
     return { filteredModels }
   }
 
-  static async requestAuthPlugin (models) {
-    const { userModel } = await inquirer.prompt([
+  static async resolveDependencies (availableModels, models) {
+    // Attempt to resolve all models dependencies
+    models.forEach((model) => model.notResolvedDependencies.forEach((dep) => dep.resolve(models)))
+
+    // List all dependencies which has failed during the resolve
+    let notResolvedDependencies = models.map((model) => model.notResolvedDependencies)
+    notResolvedDependencies = uniqBy(flatten(notResolvedDependencies), 'module')
+
+    // List all models from these dependencies
+    const modelsToBeResolved = availableModels
+      .filter((model) => notResolvedDependencies.find((dep) => dep.module === model.name))
+
+    if (modelsToBeResolved.length > 0) {
+      log('The models you have chosen have dependencies of the followed models:')
+
+      modelsToBeResolved.forEach((model) => {
+        log(chalk.yellow(`  - ${model.name}`))
+      })
+
+      const { decision } = await inquirer.prompt([
+        {
+          name: 'decision',
+          type: 'list',
+          message: 'Choose an alternative',
+          choices: [
+            {
+              name: 'Include these models too',
+              value: 'include'
+            },
+            {
+              name: 'Do not include any object attribute',
+              value: 'exclude'
+            },
+            {
+              name: `Force (${chalk.red('it may cause compilation error')})`,
+              value: 'force'
+            },
+            {
+              name: 'Cancel',
+              value: 'cancel'
+            }
+          ]
+        }
+      ])
+
+      if (decision === 'include') {
+        modelsToBeResolved.forEach((model) => models.push(model))
+        // Check if the new added models has dependencies too
+        await this.resolveDependencies(availableModels, models)
+      } else if (decision === 'exclude') {
+        models.forEach((model) => {
+          model.attrs = model.attrs
+            .filter((attr) => !modelsToBeResolved.find((item) => item.name === attr.type || item.name === attr.foreignType))
+        })
+      } else if (decision === 'force') {
+        models.forEach((model) => model.notResolvedDependencies.forEach((dep) => dep.resolve(availableModels)))
+      } else {
+        process.exit(1)
+      }
+    }
+  }
+
+  static async requestAuthPlugin (apis, availableModels = [], filteredModels = []) {
+    const { signInApiName } = await inquirer.prompt([
       {
-        name: 'userModel',
+        name: 'signInApiName',
         type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'User') || 0,
-        message: 'Which one of these is the user model?'
+        choices: apis.map((api) => api.name),
+        default: apis.findIndex((api) => api.name === 'signIn') || 0,
+        message: 'Which one of these is the sign-in API?'
       }
     ])
-    const { loginHolderModel } = await inquirer.prompt([
+    const { authApiName } = await inquirer.prompt([
       {
-        name: 'loginHolderModel',
+        name: 'authApiName',
         type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'LoginHolder') || 0,
-        message: 'Which one of these is the login holder model?'
+        choices: apis.map((api) => api.name),
+        default: apis.findIndex((api) => api.name === 'auth') || 0,
+        message: 'Which one of these is the authentication API?'
       }
     ])
-    const { loginRespModel } = await inquirer.prompt([
-      {
-        name: 'loginRespModel',
-        type: 'list',
-        choices: models.map((model) => model.name),
-        default: models.findIndex((model) => model.name === 'LoginResp') || 0,
-        message: 'Which one of these is the login response model?'
-      }
-    ])
-    return { userModel, loginHolderModel, loginRespModel }
+
+    const signInApi = apis.find((api) => api.name === signInApiName)
+    const authApi = apis.find((api) => api.name === authApiName)
+
+    const loginHolderModel = availableModels.find((model) => model.name === signInApi.bodyModel)
+    const loginRespModel = availableModels.find((model) => model.name === signInApi.respModel)
+
+    // Validation
+    if (!loginHolderModel) {
+      error('Sign-in API must have a body model (e.g. LoginHolder)')
+      process.exit(1)
+    }
+    if (!loginRespModel) {
+      error('Sign-in API must have a resp model (e.g. LoginResp)')
+      process.exit(1)
+    }
+
+    const auth = new Auth()
+
+    auth.api.signIn = signInApi
+    auth.api.auth = authApi
+    auth.model.loginHolder = loginHolderModel
+    auth.model.loginResp = loginRespModel
+    auth.setDependencies()
+
+    const exists = (name) => !!filteredModels.find((model) => model.name === name)
+
+    // Add models if they do not exist
+    if (!exists(loginHolderModel.name)) filteredModels.push(loginHolderModel)
+    if (!exists(loginRespModel.name)) filteredModels.push(loginRespModel)
+
+    const dependenciesModels = auth.dependencies
+      .map((dep) => availableModels.find((model) => model.name === dep.module))
+
+    // Add models from dependencies if they do not exist
+    dependenciesModels.forEach((model) => {
+      if (!exists(model.name)) filteredModels.push(model)
+    })
+
+    // Attempt to resolve all models dependencies
+    auth.notResolvedDependencies.forEach((dep) => dep.resolve(availableModels))
+
+    return { auth }
   }
 
   static async requestLocalePlugin () {
@@ -190,10 +291,12 @@ module.exports = class Swagger {
       }
     ])
 
-    scaffoldSetup.models = scaffoldSetup.models
+    const syncModels = scaffoldSetup.models
       .filter((model) => syncModelNames.find((name) => name === model.name))
 
-    const syncModels = scaffoldSetup.models
+    await this.resolveDependencies(availableModels, syncModels)
+
+    scaffoldSetup.models = syncModels
     return { syncModels }
   }
 
