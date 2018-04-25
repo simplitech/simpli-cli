@@ -1,3 +1,13 @@
+<a name="0.3.0-beta.6"></a>
+# [0.3.0-beta.6](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.5...v0.3.0-beta.6) (2018-04-25)
+
+
+### Bug Fixes
+
+* **scaffold:** Fixed APIs methods in model ([a63cf3d](https://github.com/simplitech/simpli-cli/commit/a63cf3d))
+
+
+
 <a name="0.3.0-beta.5"></a>
 # [0.3.0-beta.5](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.4...v0.3.0-beta.5) (2018-04-25)
 
