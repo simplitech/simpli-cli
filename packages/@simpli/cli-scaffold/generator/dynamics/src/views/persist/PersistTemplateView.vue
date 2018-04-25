@@ -27,7 +27,7 @@
 
   @Component
   export default class Persist<%-origin.name%>View extends Vue {
-    @Prop() id?: string
+    @Prop({type: [String, Number]}) id?: string
     model = new <%-model.name%>()
 
     async mounted() {

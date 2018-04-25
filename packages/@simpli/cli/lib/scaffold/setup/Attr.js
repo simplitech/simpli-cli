@@ -6,6 +6,8 @@ module.exports = class Attr {
     this.type = prop.type
     this.foreign = null
     this.foreignType = null
+    this.foreignIsRequired = null
+    this.fromResp = false
     this.isArray = false
     this.isObject = false
     this.isRequired = false
@@ -241,16 +243,26 @@ module.exports = class Attr {
   }
 
   get typeBuild () {
-    if (this.isID || this.isForeign) return 'ID'
-    if (this.isInteger || this.isDouble) return 'number'
-    if (this.isBoolean) return 'boolean'
-    if (this.isObjectOrigin) return `${this.type}`
+    let nullType = ''
+    if (!this.isRequired && !this.isTAG && !this.fromResp) nullType = ' | null'
+    if (this.isID || this.isForeign) return `ID`
+    if (this.isInteger || this.isDouble) return `number${nullType}`
+    if (this.isBoolean) return `boolean${nullType}`
+    if (this.isObjectOrigin) return `${this.type + nullType}`
     if (this.isArrayOrigin) return `${this.type}[]`
 
-    return 'string'
+    return `string${nullType}`
   }
 
   get valueBuild () {
+    if (
+      !this.isRequired &&
+      !this.fromResp &&
+      !this.isID &&
+      !this.isForeign &&
+      !this.isTAG &&
+      !this.isArrayOrigin
+    ) return 'null'
     if (this.isID || this.isForeign) return '0'
     if (this.isInteger || this.isDouble) return '0'
     if (this.isBoolean) return 'false'
@@ -277,9 +289,15 @@ module.exports = class Attr {
       result += `  ${this.name}: ${this.typeBuild} = ${this.valueBuild}\n`
     } else {
       result += `  get ${this.name}() {\n`
+      if (!this.foreignIsRequired) {
+        result += `    if (!this.${this.foreign}) return 0\n`
+      }
       result += `    return this.${this.foreign}.$id\n`
       result += `  }\n`
       result += `  set ${this.name}(${this.name}: ID) {\n`
+      if (!this.foreignIsRequired) {
+        result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
+      }
       result += `    this.${this.foreign}.$id = ${this.name}\n`
       result += `  }\n`
     }

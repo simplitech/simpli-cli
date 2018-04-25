@@ -115,6 +115,7 @@ module.exports = class Model {
         if (foreignAttr) {
           attr.foreign = foreignAttr.name
           attr.foreignType = foreignAttr.type
+          attr.foreignIsRequired = foreignAttr.isRequired
         }
       }
     })
@@ -156,6 +157,11 @@ module.exports = class Model {
     const attr = this.attrs.find((attr) => attr.type === (match && match[1]))
     this.resp.setOrigin(attr && attr.type)
     this.resp.setOriginAttr(attr && attr.name)
+
+    // Set fromResp
+    this.attrs.forEach((attr) => {
+      attr.fromResp = true
+    })
   }
 
   definePagedResp () {
@@ -181,8 +187,8 @@ module.exports = class Model {
       keyTAG = attrTAG && attrTAG.name
     } else {
       const attr = this.attrs.find((attr) => attr.type === this.resp.origin)
-      keyID = `${attr && attr.name}.$id`
-      keyTAG = `${attr && attr.name}.$tag`
+      keyID = `${attr && attr.name}`
+      keyTAG = `${attr && attr.name}`
     }
 
     this.resource.setKeys(keyID, keyTAG)
@@ -317,32 +323,64 @@ module.exports = class Model {
   buildResource () {
     let result = ''
     if (!this.isResource) return result
+    const attrFromID = this.attrs.find((attr) => attr.name === this.resource.keyID)
+    const attrFromTAG = this.attrs.find((attr) => attr.name === this.resource.keyTAG)
 
     result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n\n`
 
     result += `  get $id() {\n`
-    if (this.resource.keyID) {
-      result += `    return this.${this.resource.keyID}\n`
+    if (attrFromID && !attrFromID.isArrayOrigin) {
+      if (attrFromID.isObjectOrigin) {
+        if (!attrFromID.isRequired && !attrFromID.fromResp) {
+          result += `    if (!this.${attrFromID.name}) return 0\n`
+        }
+        result += `    return this.${attrFromID.name}.$id\n`
+      } else {
+        result += `    return this.${attrFromID.name}\n`
+      }
     } else {
+      result += `    /* TODO: define the ID */\n`
       result += `    return 0\n`
     }
     result += `  }\n`
 
     result += `  set $id(val: ID) {\n`
-    if (this.resource.keyID) {
-      result += `    this.${this.resource.keyID} = val\n`
+    if (attrFromID && !attrFromID.isArrayOrigin) {
+      if (attrFromID.isObjectOrigin) {
+        if (!attrFromID.isRequired && !attrFromID.fromResp) {
+          result += `    if (!this.${attrFromID.name}) this.${attrFromID.name} = new ${attrFromID.type}()\n`
+        }
+        result += `    this.${attrFromID.name}.$id = val\n`
+      } else {
+        result += `    this.${attrFromID.name} = val\n`
+      }
     } else {
-      result += `    /**/`
+      result += `    /* TODO: define the ID */\n`
     }
     result += `  }\n`
 
-    if (this.resource.keyTAG) {
-      result += `  get $tag() {\n`
-      result += `    return this.${this.resource.keyTAG}\n`
-      result += `  }\n`
-      result += `  set $tag(val: TAG) {\n`
-      result += `    this.${this.resource.keyTAG} = val\n`
-      result += `  }\n`
+    if (attrFromTAG && !attrFromTAG.isArrayOrigin) {
+      if (attrFromTAG.isObjectOrigin) {
+        result += `  get $tag() {\n`
+        if (!attrFromTAG.isRequired && !attrFromID.fromResp) {
+          result += `    if (!this.${attrFromTAG.name}) return ''\n`
+        }
+        result += `    return this.${attrFromTAG.name}.$tag\n`
+        result += `  }\n`
+        result += `  set $tag(val: TAG) {\n`
+        if (!attrFromTAG.isRequired && !attrFromID.fromResp) {
+          result += `    if (!this.${attrFromTAG.name}) this.${attrFromTAG.name} = new ${attrFromTAG.type}()\n`
+        }
+        result += `    this.${attrFromTAG.name}.$tag = val\n`
+        result += `  }\n`
+      } else {
+        result += `  get $tag() {\n`
+        result += `    return this.${this.resource.keyTAG}\n`
+        result += `  }\n`
+        result += `  set $tag(val: TAG) {\n`
+        result += `    this.${this.resource.keyTAG} = val\n`
+        result += `  }\n`
+      }
     }
 
     return result
@@ -361,8 +399,12 @@ module.exports = class Model {
     result += `  ${methodName}() {\n`
     result += `    return {\n`
     attrs.forEach((attr) => {
-      if (attr.isObject) {
-        result += `      ${attr.name}: this.${attr.name}.$id,\n`
+      if (attr.isObjectOrigin) {
+        if (attr.isRequired) {
+          result += `      ${attr.name}: this.${attr.name}.$id,\n`
+        } else {
+          result += `      ${attr.name}: this.${attr.name} && this.${attr.name}.$id,\n`
+        }
       } else if (attr.isUrl && !isCsv) {
         result += `      ${attr.name}: new AnchorRender(this.${attr.name}, this.${attr.name}, '_blank').toHtml(),\n`
       } else if (attr.isImageUrl && !isCsv) {
@@ -381,7 +423,7 @@ module.exports = class Model {
         result += `      ${attr.name}: cpf(this.${attr.name}),\n`
       } else if (attr.isCnpj) {
         result += `      ${attr.name}: cnpj(this.${attr.name}),\n`
-      } else if (!attr.isArray && !attr.isForeign) {
+      } else if (!attr.isArrayOrigin && !attr.isForeign) {
         result += `      ${attr.name}: this.${attr.name},\n`
       }
     })

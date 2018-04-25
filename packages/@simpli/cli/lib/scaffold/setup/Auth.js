@@ -119,7 +119,7 @@ module.exports = class Auth {
 
     this.model.loginHolder.attrs.forEach((attr) => {
       if (attr.isPassword) {
-        result += `    model.${attr.name} = encrypt(model.${attr.name})\n`
+        result += `    model.${attr.name} = encrypt(model.${attr.name} || '')\n`
       }
     })
 
