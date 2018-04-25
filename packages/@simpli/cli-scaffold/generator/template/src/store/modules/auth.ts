@@ -1,3 +1,4 @@
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
@@ -210,3 +211,4 @@ export const auth: Module<AuthState, RootState> = {
   actions,
   mutations,
 }
+<%_ } _%>

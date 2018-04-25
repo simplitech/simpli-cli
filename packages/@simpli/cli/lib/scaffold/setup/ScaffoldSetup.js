@@ -15,6 +15,7 @@ module.exports = class ScaffoldSetup {
     this.availableLanguages = null
     this.defaultLanguage = null
     this.defaultCurrency = null
+    this.useAuth = null
     this.auth = new Auth()
     this.apis = []
     this.models = []

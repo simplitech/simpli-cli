@@ -1,7 +1,9 @@
 import {ID, Currency, Lang} from '@/simpli'
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
 <%-dependence.build()%>
+<%_ } _%>
 <%_ } _%>
 /**
  * Root
@@ -11,6 +13,7 @@ export interface RootState {
   language: Lang
   currency: Currency
 }
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
 /**
  * Auth Module
@@ -24,3 +27,4 @@ export interface AuthState {
 export interface AuthEventListener {
   [key: string]: Array<(...params: any[]) => void>
 }
+<%_ } _%>

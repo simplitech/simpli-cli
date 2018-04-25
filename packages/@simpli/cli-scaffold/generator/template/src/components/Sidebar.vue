@@ -41,6 +41,7 @@
 <%_ } _%>
 
           <div class="weight-1"></div>
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
           <li>
             <a @click="signOut(false)">
@@ -48,6 +49,7 @@
               {{$t('app.logout')}}
             </a>
           </li>
+<%_ } _%>
         </ul>
 
       </div>
@@ -69,9 +71,11 @@
 
   @Component
   export default class Sidebar extends Vue {
-    // @Getter('auth/user') user?: User
     @Getter('version') version?: string
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
+    // @Getter('auth/user') user?: User
     @Action('auth/signOut') signOut?: Function
+<%_ } _%>
 
     menu: boolean = false
 

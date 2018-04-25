@@ -201,12 +201,15 @@ module.exports = class Model {
    * Populates all APIs (not included CRUD APIs)
    */
   setAPIs (apis = []) {
-    this.apis = apis.filter((api) => api.respModel === this.name)
-    // Remove CRUD APIs
-    this.apis = this.apis.filter((api) => {
-      const regex = new RegExp(`^\/\\w+\/(?:${this.resp.origin || this.name})(?:\/\{\\w+\})*$`, 'g')
-      return !(api.endpoint || '').match(regex)
-    })
+    const tag = this.name.toLowerCase()
+    const conditionsOr = (api) => [
+      api.respModel === this.name,
+      !api.respModel && api.body.model === this.name,
+      api.hasTag(tag)
+    ]
+    // Get APIs which have the same response model, body model or tag of this model
+    this.apis = apis
+      .filter((api) => !!conditionsOr(api).find((item) => item))
   }
 
   /**
@@ -295,12 +298,12 @@ module.exports = class Model {
       if (attr.type !== this.name) list.push(modelResource)
     })
 
-    const apisWithModel = this.apis.filter((attr) => attr.bodyModel)
+    const apisWithModel = this.apis.filter((attr) => attr.body.model)
     apisWithModel.forEach((api) => {
-      const modelResource = new Dependence(api.bodyModel, true, false)
+      const modelResource = new Dependence(api.body.model, true, false)
       modelResource.resolved = false
-      modelResource.addChild(api.bodyModel)
-      if (api.bodyModel !== this.name) list.push(modelResource)
+      modelResource.addChild(api.body.model)
+      if (api.body.model !== this.name) list.push(modelResource)
     })
 
     return uniqBy(list, 'module') || []

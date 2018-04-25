@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Vuex, {StoreOptions} from 'vuex'
 import {RootState} from '@/types/store'
 import {actions, getters, mutations, state} from '@/store/root'
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {auth} from '@/store/modules/auth'
+<%_ } _%>
 
 Vue.use(Vuex)
 
@@ -14,7 +16,9 @@ const setup: StoreOptions<RootState> = {
   actions, // root actions
   mutations, // root mutations
   modules: {
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     auth,
+<%_ } _%>
   },
   strict: debug,
 }

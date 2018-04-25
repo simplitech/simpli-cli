@@ -174,6 +174,16 @@ module.exports = class Swagger {
   }
 
   static async requestAuthPlugin (apis, availableModels = [], filteredModels = []) {
+    const { useAuth } = await inquirer.prompt([
+      {
+        name: 'useAuth',
+        type: 'confirm',
+        message: 'Use login system?'
+      }
+    ])
+
+    if (!useAuth) return { auth: null }
+
     const { signInApiName } = await inquirer.prompt([
       {
         name: 'signInApiName',
@@ -196,7 +206,7 @@ module.exports = class Swagger {
     const signInApi = apis.find((api) => api.name === signInApiName)
     const authApi = apis.find((api) => api.name === authApiName)
 
-    const loginHolderModel = availableModels.find((model) => model.name === signInApi.bodyModel)
+    const loginHolderModel = availableModels.find((model) => model.name === signInApi.body.model)
     const loginRespModel = availableModels.find((model) => model.name === signInApi.respModel)
 
     // Validation

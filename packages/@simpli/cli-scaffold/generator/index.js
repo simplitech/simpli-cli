@@ -10,26 +10,26 @@ module.exports = (api, options) => {
 
   simpleModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamics', 'src/model/Template.ts', `./${resource.name}.ts`, data)
+    api.renderFrom('./dynamic', 'src/model/Template.ts', `./${resource.name}.ts`, data)
   })
 
   simpleRespModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamics', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
+    api.renderFrom('./dynamic', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
   })
 
   resourceModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
-    api.renderFrom('./dynamics', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
+    api.renderFrom('./dynamic', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
+    api.renderFrom('./dynamic', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
   })
 
   respResourceModels.forEach((resource) => {
     const origin = options.scaffoldSetup.findOriginModel(resource)
     const data = { model: resource, origin }
-    api.renderFrom('./dynamics', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
+    api.renderFrom('./dynamic', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
     if (origin) {
-      api.renderFrom('./dynamics', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
+      api.renderFrom('./dynamic', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
     }
   })
 
@@ -64,7 +64,7 @@ module.exports = (api, options) => {
       'normalize-scss': '7.0.1',
       'register-service-worker': '1.1.1',
       'simple-line-icons': '2.4.1',
-      'simpli-ts-vue': '1.2.3',
+      'simpli-ts-vue': '1.3.0',
       'vue': '2.5.16',
       'vue-chartjs': '3.2.1',
       'vue-chartkick': '0.2.1',
@@ -81,11 +81,10 @@ module.exports = (api, options) => {
       'vuex-class': '0.3.0'
     },
     devDependencies: {
-      '@babel/preset-stage-2': '7.0.0-beta.44',
-      '@vue/cli-plugin-babel': '3.0.0-beta.6',
-      '@vue/cli-plugin-pwa': '3.0.0-beta.6',
-      '@vue/cli-plugin-typescript': '3.0.0-beta.6',
-      '@vue/cli-service': '3.0.0-beta.6',
+      '@vue/cli-plugin-babel': '3.0.0-beta.7',
+      '@vue/cli-plugin-pwa': '3.0.0-beta.7',
+      '@vue/cli-plugin-typescript': '3.0.0-beta.7',
+      '@vue/cli-service': '3.0.0-beta.7',
       'lint-staged': '7.0.0',
       'node-sass': '4.8.2',
       'sass-loader': '6.0.7',

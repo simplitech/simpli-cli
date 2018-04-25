@@ -1,6 +1,8 @@
 import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import LoginView from '@/views/LoginView.vue'
+<%_ } _%>
 
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
 <%_ var resourceModels = rootOptions.scaffoldSetup.resourceModels _%>
@@ -20,11 +22,13 @@ import Persist<%-resource.resp.origin%>View from '@/views/persist/Persist<%-reso
  */
 export const router = {
   routes: [
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     {
       path: '/login',
       name: 'login',
       component: LoginView,
     },
+<%_ } _%>
     {
       path: '/dashboard',
       component: DefaultPanelLayout,
@@ -51,7 +55,11 @@ export const router = {
 <%_ } _%>
       ],
     },
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     {path: '/', redirect: '/login'},
+<%_ } else { _%>
+    {path: '/', redirect: '/dashboard'},
+<%_ } _%>
     {path: '*', redirect: '/dashboard'},
   ],
 }

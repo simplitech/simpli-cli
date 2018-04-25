@@ -89,6 +89,7 @@ module.exports = class Scaffold {
     this.scaffoldSetup.apiUrlDev = apiUrlDev
     this.scaffoldSetup.apiUrlProd = apiUrlProd
 
+    this.scaffoldSetup.useAuth = !!auth
     this.scaffoldSetup.auth = auth
 
     this.scaffoldSetup.availableLanguages = availableLanguages
@@ -118,6 +119,7 @@ module.exports = class Scaffold {
     this.scaffoldSetup.apiUrlDev = 'http://localhost/api/'
     this.scaffoldSetup.apiUrlProd = 'http://localhost/api/'
 
+    this.scaffoldSetup.useAuth = true
     this.scaffoldSetup.auth.api.signIn = signInApi
     this.scaffoldSetup.auth.api.auth = authApi
     this.scaffoldSetup.auth.model.loginHolder = loginHolderModel
@@ -265,8 +267,8 @@ module.exports = class Scaffold {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync('../../../cli-scaffold/generator')
+      // const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      const module = resolve.sync('../../../cli-scaffold/generator')
       return {
         id,
         apply: require(module),

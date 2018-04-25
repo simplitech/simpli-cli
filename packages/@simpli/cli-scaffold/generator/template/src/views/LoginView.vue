@@ -1,3 +1,4 @@
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <template>
   <div class="verti w-window h-window items-center">
     <form @submit.prevent="signIn(model)" class="verti w-300 elevated p-30">
@@ -21,3 +22,4 @@
     model = new <%-loginHolderModel.name%>()
   }
 </script>
+<%_ } _%>

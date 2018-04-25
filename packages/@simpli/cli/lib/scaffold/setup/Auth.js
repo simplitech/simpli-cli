@@ -29,6 +29,7 @@ module.exports = class Auth {
   }
 
   setDependencies () {
+    if (!this.model.loginResp) return
     const dependencies = []
 
     this.model.loginResp.objectAtrrs.forEach((attr) => {
