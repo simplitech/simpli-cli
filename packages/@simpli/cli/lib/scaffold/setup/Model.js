@@ -201,15 +201,13 @@ module.exports = class Model {
    * Populates all APIs (not included CRUD APIs)
    */
   setAPIs (apis = []) {
-    const tag = this.name.toLowerCase()
     const conditionsOr = (api) => [
-      api.respModel === this.name,
-      !api.respModel && api.body.model === this.name,
-      api.hasTag(tag)
+      api.respModel === this.name, // or
+      !api.respModel && api.hasTag(this.name), // or
+      !api.respModel && !api.hasTag(this.name) && api.body.model === this.name
     ]
     // Get APIs which have the same response model, body model or tag of this model
-    this.apis = apis
-      .filter((api) => !!conditionsOr(api).find((item) => item))
+    this.apis = apis.filter((api) => !!conditionsOr(api).find((item) => item))
   }
 
   /**

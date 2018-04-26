@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 
-// const fs = require('fs')
-// const path = require('path')
-// const slash = require('slash')
 const chalk = require('chalk')
 const semver = require('semver')
-// const minimist = require('minimist')
 const requiredVersion = require('../package.json').engines.node
 
 if (!semver.satisfies(process.version, requiredVersion)) {
@@ -17,7 +13,6 @@ if (!semver.satisfies(process.version, requiredVersion)) {
 }
 
 const program = require('commander')
-// const loadCommand = require('../lib/util/loadCommand')
 
 program
   .version(require('../package').version)

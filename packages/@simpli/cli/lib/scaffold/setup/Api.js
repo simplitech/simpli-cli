@@ -84,8 +84,8 @@ module.exports = class Api {
     this.respModel = (schema && schema.$ref && schema.$ref.match(/[^\/]+(?=\/$|$)/)[0]) || null
   }
 
-  hasTag (name) {
-    return !!this.tags.find((tag) => tag === name)
+  hasTag (name = '') {
+    return !!this.tags.find((tag) => (tag || '').toLowerCase() === name.toLowerCase())
   }
 
   convertType (type = '') {
