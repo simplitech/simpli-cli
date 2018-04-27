@@ -48,6 +48,7 @@
     "lodash.uniqby": "^4.5.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "promise-mysql": "^3.2.1",
     "recast": "^0.13.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",

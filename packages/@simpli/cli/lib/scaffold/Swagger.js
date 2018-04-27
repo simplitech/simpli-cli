@@ -44,7 +44,7 @@ module.exports = class Swagger {
     const allModels = scaffoldSetup.models
 
     if (availableModels.length === 0) {
-      error('There is no a valid model in this swagger\nUse simpli inspect:swagger to analise your swagger')
+      error('There is no a valid model in this swagger\nRun simpli scaffold:inspect to analise your swagger')
       process.exit(1)
     }
 

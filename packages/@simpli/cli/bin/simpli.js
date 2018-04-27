@@ -41,6 +41,13 @@ program
     require('../lib/cmd/scaffoldSync')()
   })
 
+program
+  .command('server:inspect [paths...]')
+  .description('inspect the tables of a MYSQL database')
+  .action((paths) => {
+    require('../lib/cmd/serverInspect')(paths)
+  })
+
 // output help information on unknown commands
 program
   .arguments('<command>')

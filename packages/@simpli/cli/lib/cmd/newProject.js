@@ -4,6 +4,7 @@ const chalk = require('chalk')
 const rimraf = require('rimraf')
 const inquirer = require('inquirer')
 const Scaffold = require('../scaffold/Scaffold')
+const Server = require('../server/Server')
 const clearConsole = require('../util/clearConsole')
 const { error, stopSpinner } = require('@vue/cli-shared-utils')
 
@@ -67,7 +68,7 @@ async function create (projectName, options) {
   }
 
   if (type === 'webapp') return createScaffold(name, targetDir, options)
-  else if (type === 'webserver') return createApi(name, targetDir, options)
+  else if (type === 'webserver') return createServer(name, targetDir, options)
 }
 
 async function createScaffold (name, targetDir, options) {
@@ -100,9 +101,10 @@ async function createScaffold (name, targetDir, options) {
   await scaffold.create()
 }
 
-async function createApi (name, targetDir, options) {
-  console.info(`${chalk.yellowBright(`Backend generator was not done yet. Use the legacy generator instead`)}`)
-  console.info(`${chalk.bold(`https://www.npmjs.com/package/generator-martinlabs`)}`)
+async function createServer (name, targetDir, options) {
+  const server = new Server(name, targetDir, [])
+  await server.databaseSetup()
+  await server.create()
 }
 
 module.exports = (...args) => {
