@@ -10,26 +10,26 @@ module.exports = (api, options) => {
 
   simpleModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamic', 'src/model/Template.ts', `./${resource.name}.ts`, data)
+    api.renderFrom('./injected', 'src/model/Template.ts', `./${resource.name}.ts`, data)
   })
 
   simpleRespModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamic', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
+    api.renderFrom('./injected', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
   })
 
   resourceModels.forEach((resource) => {
     const data = { model: resource }
-    api.renderFrom('./dynamic', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
-    api.renderFrom('./dynamic', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
+    api.renderFrom('./injected', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
+    api.renderFrom('./injected', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
   })
 
   respResourceModels.forEach((resource) => {
     const origin = options.scaffoldSetup.findOriginModel(resource)
     const data = { model: resource, origin }
-    api.renderFrom('./dynamic', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
+    api.renderFrom('./injected', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
     if (origin) {
-      api.renderFrom('./dynamic', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
+      api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
     }
   })
 

@@ -139,13 +139,6 @@ module.exports = class Server {
     log()
     await installDeps(context, 'npm')
 
-    // run complete cbs if any (injected by generators)
-    log()
-    logWithSpinner('⚓', `Running completion hooks...`)
-    for (const cb of createCompleteCbs) {
-      await cb()
-    }
-
     // commit initial state
     if (hasGit()) {
       await run('git add -A')
