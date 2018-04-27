@@ -1,3 +1,13 @@
+<a name="0.3.0-beta.8"></a>
+# [0.3.0-beta.8](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.7...v0.3.0-beta.8) (2018-04-27)
+
+
+### Features
+
+* **server:** Added server setup prompt ([495f9c9](https://github.com/simplitech/simpli-cli/commit/495f9c9))
+
+
+
 <a name="0.3.0-beta.7"></a>
 # [0.3.0-beta.7](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.6...v0.3.0-beta.7) (2018-04-26)
 
