@@ -1,6 +1,6 @@
 const inquirer = require('inquirer')
-// const chalk = require('chalk')
 const mysql = require('promise-mysql')
+const camelCase = require('lodash.camelcase')
 const {
   error
 } = require('@vue/cli-shared-utils')
@@ -116,6 +116,126 @@ module.exports = class Database {
     const connection = { host, port, user, password, database }
 
     return { connection, dataTables, availableTables, allTables }
+  }
+
+  static async requestServerName (defaultName) {
+    const capitalizeFirstLetter = (str = '') => str.charAt(0).toUpperCase() + str.slice(1)
+
+    const { serverName } = await inquirer.prompt([
+      {
+        name: 'serverName',
+        type: 'input',
+        message: 'Enter the server name',
+        default: capitalizeFirstLetter(camelCase(defaultName))
+      }
+    ])
+    if (!serverName) {
+      error('Server name is required')
+      process.exit(1)
+    }
+
+    return { serverName }
+  }
+
+  static async requestTables (availableTables = [], serverSetup) {
+    const { useAllTables } = await inquirer.prompt([
+      {
+        name: 'useAllTables',
+        type: 'confirm',
+        message: 'Add all available tables?'
+      }
+    ])
+
+    let filteredTables
+    if (!useAllTables) {
+      const { filteredTableNames } = await inquirer.prompt([
+        {
+          name: 'filteredTableNames',
+          type: 'checkbox',
+          choices: availableTables.map((table) => table.name),
+          message: 'Which of these tables do you want to include?'
+        }
+      ])
+
+      filteredTables = serverSetup.tables
+        .filter((table) => filteredTableNames.find((name) => name === table.name))
+    } else filteredTables = availableTables
+
+    serverSetup.tables = filteredTables
+    return { filteredTables }
+  }
+
+  static async requestModuleAndPackage (defaultName) {
+    let { moduleName } = await inquirer.prompt([
+      {
+        name: 'moduleName',
+        type: 'input',
+        message: 'Enter the module name',
+        default: 'admin'
+      }
+    ])
+    if (!moduleName) {
+      error('Module name is required')
+      process.exit(1)
+    }
+    moduleName = moduleName.toLowerCase()
+
+    const { packageAddress } = await inquirer.prompt([
+      {
+        name: 'packageAddress',
+        type: 'input',
+        message: 'Enter the package address',
+        default: `org.${(camelCase(defaultName) || '').toLowerCase()}`
+      }
+    ])
+    if (!packageAddress || !packageAddress.match(/^[a-z][a-z0-9.]*[a-z0-9]$/g)) {
+      error('Wrong package format. Example of a valid package: com.simpli')
+      process.exit(1)
+    }
+
+    return { moduleName, packageAddress }
+  }
+
+  static async requestUserTable (availableTables = [], filteredTables = []) {
+    const { userTableName } = await inquirer.prompt([
+      {
+        name: 'userTableName',
+        type: 'list',
+        choices: availableTables.map((table) => table.name),
+        default: availableTables.findIndex((table) => table.name === 'user') || 0,
+        message: 'Which of these tables is the user table (for login)?'
+      }
+    ])
+    const userTable = availableTables.find((table) => table.name === userTableName)
+    const availableColumns = userTable.columns
+
+    const { accountColumnName } = await inquirer.prompt([
+      {
+        name: 'accountColumnName',
+        type: 'list',
+        choices: availableColumns.map((column) => column.name),
+        default: availableColumns.findIndex((column) => column.name === 'email') || 0,
+        message: 'Which of these columns is the account column?'
+      }
+    ])
+    const { passwordColumnName } = await inquirer.prompt([
+      {
+        name: 'passwordColumnName',
+        type: 'list',
+        choices: availableColumns.map((column) => column.name),
+        default: availableColumns.findIndex((column) => column.name === 'user') || 0,
+        message: 'Which of these columns is the password column?'
+      }
+    ])
+    const accountColumn = availableColumns.find((column) => column.name === accountColumnName)
+    const passwordColumn = availableColumns.find((column) => column.name === passwordColumnName)
+
+    const exists = (name) => !!filteredTables.find((table) => table.name === name)
+
+    // Add table if they do not exist
+    if (!exists(userTable.name)) filteredTables.push(userTable)
+
+    return { userTable, accountColumn, passwordColumn }
   }
 
   static async confirm () {

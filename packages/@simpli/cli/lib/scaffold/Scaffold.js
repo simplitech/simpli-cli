@@ -48,7 +48,7 @@ module.exports = class Scaffold {
   }
 
   async swaggerSetup () {
-    // Normalize swagger JSON
+    // Get data and normalize swagger JSON
     const {
       swaggerUrl,
       swaggerJSON,

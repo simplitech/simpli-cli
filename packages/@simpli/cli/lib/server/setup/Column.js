@@ -66,11 +66,41 @@ module.exports = class Column {
     return !!(this.keyType === 'PRI' && this.isAutoIncrement)
   }
 
+  get isPrimary () {
+    return this.keyType === 'PRI'
+  }
+
   get isForeign () {
     return !!this.foreign
   }
 
   get isRequired () {
     return this.nullable === 'NO'
+  }
+
+  get isPassword () {
+    const reservedWords = [
+      'password',
+      'senha'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isUpdatedAt () {
+    const reservedWords = [
+      'updatedAt',
+      'dateUpdated',
+      'dataAlteracao'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isCreatedAt () {
+    const reservedWords = [
+      'createdAt',
+      'dateCreated',
+      'dataCriacao'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
   }
 }

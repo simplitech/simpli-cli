@@ -57,8 +57,8 @@ async function create (projectName, options) {
       type: 'list',
       message: 'What type of project is it?',
       choices: [
-        { name: 'Web App project (frontend)', value: 'webapp' },
         { name: 'Web Server project (backend)', value: 'webserver' },
+        { name: 'Web App project (frontend)', value: 'webapp' },
         { name: 'Cancel', value: false }
       ]
     }

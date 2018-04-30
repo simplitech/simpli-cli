@@ -10,6 +10,7 @@ module.exports = class Table {
   constructor (dataTable = {}) {
     this.name = null
     this.modelName = null
+    this.instanceName = null
     this.isPivot = null
     this.columns = []
     this.relations = []
@@ -23,6 +24,32 @@ module.exports = class Table {
     return this.columns.filter((column) => column.isForeign)
   }
 
+  get primaryColumns () {
+    return this.columns.filter((column) => column.isPrimary)
+  }
+
+  get idColumn () {
+    return this.columns.find((column) => column.isID) || new Column()
+  }
+
+  get removableColumn () {
+    const reservedWords = [
+      'active',
+      'deleted',
+      'softDeleted',
+      'ativo'
+    ]
+    return this.columns.find((column) => !!reservedWords.find((word) => word === column.name)) || new Column()
+  }
+
+  get uniqueColumn () {
+    const reservedWords = [
+      'unique',
+      'unico'
+    ]
+    return this.columns.find((column) => !!reservedWords.find((word) => word === column.name)) || new Column()
+  }
+
   get validRelations () {
     return this.relations.filter((relation) => relation.isValid)
   }
@@ -32,10 +59,11 @@ module.exports = class Table {
   }
 
   setName (dataTable = {}) {
-    const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1)
+    const capitalizeFirstLetter = (str = '') => str.charAt(0).toUpperCase() + str.slice(1)
 
     this.name = dataTable.tableName || null
     this.modelName = capitalizeFirstLetter(camelCase(this.name) || '')
+    this.instanceName = camelCase(this.name)
   }
 
   setColumns (dataTable = {}) {
@@ -60,6 +88,33 @@ module.exports = class Table {
       'ativo'
     ]
     return !!this.columns.find((column) => !!reservedWords.find((word) => word === column.name))
+  }
+
+  get hasUnique () {
+    const reservedWords = [
+      'unique',
+      'unico'
+    ]
+    return !!this.columns.find((column) => !!reservedWords.find((word) => word === column.name))
+  }
+
+  primariesBySlash () {
+    const columns = this.primaryColumns
+    if (columns.length === 0) columns.push(new Column())
+    return columns.map((column) => columns.length <= 1 ? `{id}` : `{${column.name}}`).join('/')
+  }
+
+  primariesByComma (withType = false) {
+    const columns = this.primaryColumns
+    const type = withType ? `: ${columns.kotlinType}` : ''
+    if (columns.length === 0) columns.push(new Column())
+    return columns.map((column) => columns.length <= 1 ? `id` : `${column.name + type}`).join(', ')
+  }
+
+  primariesByWhere (different = false) {
+    const columns = this.primaryColumns
+    if (columns.length === 0) columns.push(new Column())
+    return columns.map((column) => `AND ${column.name} ${different ? '<>' : '='} ?`).join(' ')
   }
 
   buildModel () {

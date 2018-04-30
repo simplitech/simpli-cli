@@ -23,9 +23,10 @@ module.exports = class Relation {
   }
 
   setName () {
-    const match = (this.columnName || '').match(/[^\sid|_]([\w]+)[^_|fk\s]/gi)
+    const pattern = /^(?:id_?)([^_][\w]+[^_])(?:_?Fk)$/gi
+    const match = pattern.exec(this.columnName || '')
     if (match) {
-      this.name = camelCase(match[0])
+      this.name = camelCase(match[1])
     } else this.isValid = false
   }
 

@@ -48,25 +48,36 @@ module.exports = class Server {
   }
 
   async databaseSetup () {
-    // Normalize database
+    // Get data normalize database
+    const { connection, availableTables } = await Database.requestConnection(this.serverSetup)
+
+    // Set the server name
+    const { serverName } = await Database.requestServerName(this.name)
+
+    // Select tables to be added
+    const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
+
+    // Set module name and package address
+    const { moduleName, packageAddress } = await Database.requestModuleAndPackage(serverName)
+
+    // Set user table
     const {
-      connection,
-      dataTables,
-      availableTables,
-      allTables
-    } = await Database.requestConnection(this.serverSetup)
+      userTable,
+      accountColumn,
+      passwordColumn
+    } = await Database.requestUserTable(availableTables, filteredTables)
 
     await Database.confirm()
 
-    // this.serverSetup.serverName =
-    // this.serverSetup.packageAddress =
-    // this.serverSetup.module =
+    this.serverSetup.serverName = serverName
+    this.serverSetup.moduleName = moduleName
+    this.serverSetup.packageAddress = packageAddress
 
     this.serverSetup.connection = connection
 
-    // this.serverSetup.loginTable =
-    // this.serverSetup.accountColumn =
-    // this.serverSetup.passwordColumn =
+    this.serverSetup.userTable = userTable
+    this.serverSetup.accountColumn = accountColumn
+    this.serverSetup.passwordColumn = passwordColumn
   }
 
   async create () {
@@ -134,16 +145,15 @@ module.exports = class Server {
       extractConfigFiles: preset.useConfigFiles
     })
 
-    // install additional deps (injected by generators)
-    log(`📦  Installing additional dependencies...`)
-    log()
-    await installDeps(context, 'npm')
-
     // commit initial state
     if (hasGit()) {
       await run('git add -A')
       await run(`git commit -m init`)
     }
+
+    await run(`rm -rf ./node_modules`)
+    await run(`rm -f ./package.json`)
+    await run(`rm -f ./package-lock.json`)
 
     // log instructions
     stopSpinner()
@@ -158,8 +168,8 @@ module.exports = class Server {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync('../../../cli-server/generator')
+      // const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      const module = resolve.sync('../../../cli-server/generator')
       return {
         id,
         apply: require(module),
