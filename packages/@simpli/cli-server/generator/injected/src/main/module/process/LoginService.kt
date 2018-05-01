@@ -10,7 +10,7 @@ import com.google.gson.Gson
 import java.sql.Connection
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
 import <%-packageAddress%>.exception.HttpException
-import <%-packageAddress%>.model.User
+import <%-packageAddress%>.model.<%-userTable.modelName%>
 import com.simpli.model.LanguageHolder
 import com.simpli.model.RespException
 import com.simpli.tools.SecurityUtils

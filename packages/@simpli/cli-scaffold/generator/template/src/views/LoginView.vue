@@ -3,8 +3,8 @@
   <div class="verti w-window h-window items-center">
     <form @submit.prevent="signIn(model)" class="verti w-300 elevated p-30">
       <h2 class="mt-0">{{ $t("view.login.subtitle") }}</h2>
-      <input v-model="model.account" class="mb-10" type="text" :placeholder="$t('view.login.account')" required autofocus/>
-      <input v-model="model.password" class="mb-10" type="password" :placeholder="$t('view.login.password')" required>
+      <input v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" class="mb-10" type="text" :placeholder="$t('view.login.account')" required autofocus/>
+      <input v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" class="mb-10" type="password" :placeholder="$t('view.login.password')" required>
       <button class="accent" type="submit">{{ $t("view.login.signin") }}</button>
     </form>
   </div>

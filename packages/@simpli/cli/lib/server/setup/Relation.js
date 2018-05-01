@@ -10,6 +10,7 @@ module.exports = class Relation {
     this.columnNullable = null
     this.constraintName = dataRelation.CONSTRAINT_NAME || null
     this.referencedTableName = dataRelation.REFERENCED_TABLE_NAME || null
+    this.referencedTableInstanceName = null
     this.referencedTableModelName = null
     this.referencedColumnName = dataRelation.REFERENCED_COLUMN_NAME || null
 

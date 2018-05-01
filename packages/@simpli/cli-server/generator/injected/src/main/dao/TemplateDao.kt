@@ -177,11 +177,8 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
 <%_ if (column.isCreatedAt) { _%>
 <%_ } else if (!column.isUpdatedAt) { _%>
-            <%-table.instanceName%>.<%-column.name%>,
+            <%-table.instanceName%>.<%-column.name%><%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
-<%_ } _%>
-<%_ for (var i in table.primaryColumns) { var column = table.primaryColumns[i] _%>
-            <%-table.instanceName%>.<%-column.name%><%-i < table.primaryColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
         ).key
     }

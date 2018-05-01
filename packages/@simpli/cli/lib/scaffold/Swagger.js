@@ -219,8 +219,29 @@ module.exports = class Swagger {
       process.exit(1)
     }
 
+    const { accountAttrName } = await inquirer.prompt([
+      {
+        name: 'accountAttrName',
+        type: 'list',
+        choices: loginHolderModel.attrs.map((api) => api.name),
+        default: loginHolderModel.attrs.findIndex((api) => !!['account', 'email'].find((name) => api.name === name)) || 0,
+        message: 'Which of these attributes is the account column?'
+      }
+    ])
+    const { passwordAttrName } = await inquirer.prompt([
+      {
+        name: 'passwordAttrName',
+        type: 'list',
+        choices: loginHolderModel.attrs.map((api) => api.name),
+        default: loginHolderModel.attrs.findIndex((api) => !!['password', 'senha'].find((name) => api.name === name)) || 0,
+        message: 'Which of these attributes is the password column?'
+      }
+    ])
+
     const auth = new Auth()
 
+    auth.accountAttrName = accountAttrName
+    auth.passwordAttrName = passwordAttrName
     auth.api.signIn = signInApi
     auth.api.auth = authApi
     auth.model.loginHolder = loginHolderModel

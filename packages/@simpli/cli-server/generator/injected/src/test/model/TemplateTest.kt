@@ -13,7 +13,6 @@ import org.junit.Assert.*
  */
 class PrincipalTest {
 
-
     @Test(expected = RespException::class)
     fun testValidateNoIdGrupoDoPrincipalFk() {
         val principal = Principal() 

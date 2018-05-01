@@ -4,12 +4,8 @@ package <%-packageAddress%>.<%-moduleName%>.process
 
 import <%-packageAddress%>.model.<%-table.modelName%>
 import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
-import <%-packageAddress%>.dao.<%-table.modelName%>Dao
-<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
-import <%-packageAddress%>.dao.<%-relation.referencedTableModelName%>Dao
-<%_ if (relation.isManyToMany) { _%>
-import <%-packageAddress%>.dao.<%-relation.pivot.tableModelName%>Dao
-<%_ } _%>
+<%_ for (var i in table.daoModels) { var obj = table.daoModels[i] _%>
+import <%-packageAddress%>.dao.<%-obj.modelName%>Dao
 <%_ } _%>
 import <%-packageAddress%>.exception.HttpException
 import com.google.common.base.Strings
@@ -64,23 +60,17 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         //TODO: review generated method
         loginS.allowAccess(token)
 
-        val <%-table.instanceName%>Dao = <%-table.modelName%>Dao(con, lang)
-<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
-<%_ if (!relation.isManyToMany) { _%>
-        val <%-relation.name%>Dao = <%-relation.referencedTableModelName%>Dao(con, lang)
-<%_ } else { _%>
-        val <%-table.manyToMany.crossRelationInstanceName%>Dao = <%-table.manyToMany.crossRelationModelName%>Dao(con, lang)
-        val <%-table.manyToMany.pivotInstanceName%>Dao = <%-table.manyToMany.pivotModelName%>Dao(con, lang)
-<%_ } _%>
+<%_ for (var i in table.daoModels) { var obj = table.daoModels[i] _%>
+        val <%-obj.name%>Dao = <%-obj.modelName%>Dao(con, lang)
 <%_ } _%>
 
         val resp = <%-table.modelName%>Resp()
 
         if (<%-table.primariesByConditions()%>) {
             val <%-table.instanceName%> = <%-table.instanceName%>Dao.getOne(<%-table.primariesByComma(true)%>)
-<%_ if (table.hasPivot) { _%>
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
             if (<%-table.instanceName%> != null) {
-                <%-table.instanceName%>.<%-table.manyToMany.pivotInstanceName%> = tagPrincipalDao.list<%-table.manyToMany.crossRelationModelName%>Of<%-table.modelName%>(<%-table.idColumn.name%>)
+                <%-table.instanceName%>.<%-m2m.pivotInstanceName%> = <%-m2m.pivotInstanceName%>Dao.list<%-m2m.crossRelationModelName%>Of<%-table.modelName%>(<%-table.idColumn.name%>)
             }
 <%_ } _%>
             resp.<%-table.instanceName%> = <%-table.instanceName%>
@@ -88,14 +78,13 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
 
 <%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
 <%_ if (!relation.isManyToMany) { _%>
-        resp.all<%-relation.referencedTableModelName%> = <%-relation.name%>Dao.list()
-<%_ } else { _%>
-        resp.all<%-relation.referencedTableModelName%> = <%-table.manyToMany.crossRelationInstanceName%>Dao.list()
+        resp.all<%-relation.referencedTableModelName%> = <%-relation.referencedTableInstanceName%>Dao.list()
 <%_ } _%>
 <%_ } _%>
-<%_ if (table.validDistinctRelations.length > 0) { _%>
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+        resp.all<%-m2m.crossRelationModelName%> = <%-m2m.crossRelationInstanceName%>Dao.list()
+<%_ } _%>
 
-<%_ } _%>
         return resp
     }
 
@@ -140,14 +129,14 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         }
 <%_ } _%>
 
-<%_ if (table.hasPivot) { _%>
-        val <%-table.manyToMany.pivotInstanceName%>Dao = <%-table.manyToMany.pivotModelName%>Dao(con, lang)
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con, lang)
     
-        <%-table.manyToMany.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(id<%-table.modelName%>)
+        <%-m2m.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(id<%-table.modelName%>)
         
-        <%-table.instanceName%>.<%-table.manyToMany.pivotInstanceName%>?.let { list ->
-            for (<%-table.manyToMany.crossRelationInstanceName%> in list) {
-                <%-table.manyToMany.pivotInstanceName%>Dao.insert(<%-table.manyToMany.crossRelationInstanceName%>.<%-table.manyToMany.crossRelationColumnName%>, id<%-table.modelName%>)
+        <%-table.instanceName%>.<%-m2m.pivotInstanceName%>?.let { list ->
+            for (<%-m2m.crossRelationInstanceName%> in list) {
+                <%-m2m.pivotInstanceName%>Dao.insert(<%-options.serverSetup.insertPivotByComma(table, m2m)%>)
             }
         }
 

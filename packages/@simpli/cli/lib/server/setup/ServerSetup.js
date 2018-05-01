@@ -1,6 +1,7 @@
 const Table = require('./Table')
 const Column = require('./Column')
 const Relation = require('./Relation')
+const ManyToMany = require('./ManyToMany')
 const camelCase = require('lodash.camelcase')
 const uuid = require('uuid')
 
@@ -51,6 +52,7 @@ module.exports = class ServerSetup {
         const referencedTable = this.findTableByName(relation.referencedTableName) || {}
         const column = table.findColumnByName(relation.columnName) || {}
         relation.tableModelName = table.modelName
+        relation.referencedTableInstanceName = referencedTable.instanceName
         relation.referencedTableModelName = referencedTable.modelName
         relation.columnNullable = column.nullable
         column.foreign = relation
@@ -93,24 +95,44 @@ module.exports = class ServerSetup {
     this.tables.forEach((table) => {
       if (table.hasPivot) {
         const relation = table.relations.find((relation) => relation.isManyToMany)
-        const pivotTable = this.tables.find((table) => table.name === relation.pivot.tableName)
-        if (pivotTable) {
-          table.manyToMany.pivotTableName = pivotTable.name
-          table.manyToMany.pivotModelName = pivotTable.modelName
-          table.manyToMany.pivotInstanceName = pivotTable.instanceName
+        const pivotTables = this.tables.filter((table) => table.name === relation.pivot.tableName)
+        pivotTables.forEach((pivotTable) => {
+          const manyToMany = new ManyToMany()
+          manyToMany.pivotTableName = pivotTable.name
+          manyToMany.pivotModelName = pivotTable.modelName
+          manyToMany.pivotInstanceName = pivotTable.instanceName
 
           const column = pivotTable
             .foreignColumns.find((column) => column.foreign.referencedTableModelName !== table.modelName)
 
           if (column) {
-            table.manyToMany.crossRelationTableName = column.foreign.referencedTableName
-            table.manyToMany.crossRelationModelName = column.foreign.referencedTableModelName
-            table.manyToMany.crossRelationInstanceName = column.foreign.name
-            table.manyToMany.crossRelationColumnName = column.foreign.referencedColumnName
+            manyToMany.crossRelationTableName = column.foreign.referencedTableName
+            manyToMany.crossRelationModelName = column.foreign.referencedTableModelName
+            manyToMany.crossRelationInstanceName = column.foreign.name
+            manyToMany.crossRelationColumnName = column.foreign.referencedColumnName
           }
-        }
+
+          table.manyToMany.push(manyToMany)
+        })
       }
     })
+  }
+
+  /**
+   * Stringfy the params of pivot DAO insert
+   */
+  insertPivotByComma (refTable, m2m) {
+    const pivotTable = this.tables.find((table) => table.name === m2m.pivotTableName)
+    if (pivotTable) {
+      const columns = pivotTable.primaryColumns
+      return columns.map((column) => {
+        if (column.isForeign && m2m.crossRelationTableName === column.foreign.referencedTableName) {
+          return `${m2m.crossRelationInstanceName}.${m2m.crossRelationColumnName}`
+        }
+        return `id${refTable.modelName}`
+      }).join(', ')
+    }
+    return ''
   }
 
   // Helpers

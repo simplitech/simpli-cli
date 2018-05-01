@@ -214,7 +214,7 @@ module.exports = class Database {
         name: 'accountColumnName',
         type: 'list',
         choices: availableColumns.map((column) => column.name),
-        default: availableColumns.findIndex((column) => column.name === 'email') || 0,
+        default: availableColumns.findIndex((column) => !!['account', 'email'].find((name) => column.name === name)) || 0,
         message: 'Which of these columns is the account column?'
       }
     ])
@@ -223,7 +223,7 @@ module.exports = class Database {
         name: 'passwordColumnName',
         type: 'list',
         choices: availableColumns.map((column) => column.name),
-        default: availableColumns.findIndex((column) => column.name === 'user') || 0,
+        default: availableColumns.findIndex((column) => !!['password', 'senha'].find((name) => column.name === name)) || 0,
         message: 'Which of these columns is the password column?'
       }
     ])

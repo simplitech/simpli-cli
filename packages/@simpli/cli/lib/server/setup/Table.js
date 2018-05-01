@@ -10,17 +10,9 @@ module.exports = class Table {
     this.modelName = null
     this.instanceName = null
     this.isPivot = null
-    this.manyToMany = {
-      pivotTableName: null,
-      pivotModelName: null,
-      pivotInstanceName: null,
-      crossRelationTableName: null,
-      crossRelationModelName: null,
-      crossRelationInstanceName: null,
-      crossRelationColumnName: null
-    }
     this.columns = []
     this.relations = []
+    this.manyToMany = []
 
     this.setName(dataTable)
     this.setColumns(dataTable)
@@ -90,9 +82,9 @@ module.exports = class Table {
   }
 
   setPivot () {
-    const countNonForeignColumns = this.columns.filter((column) => !column.isForeign).length
+    const countNonForeignColumns = this.columns.filter((column) => !column.isForeign && !column.isID).length
     const countForeignColumns = this.columns.filter((column) => column.isForeign).length
-    this.isPivot = countNonForeignColumns === 0 && countForeignColumns >= 2
+    this.isPivot = countNonForeignColumns === 0 && countForeignColumns === 2
   }
 
   get isRemovable () {
@@ -145,6 +137,36 @@ module.exports = class Table {
     return columns.map((column) => `AND ${column.name} ${different ? '<>' : '='} ?`).join(' ')
   }
 
+  get daoModels () {
+    const instances = [{
+      name: this.instanceName,
+      modelName: this.modelName
+    }]
+
+    this.validRelations.forEach((relation) => {
+      if (!relation.isManyToMany) {
+        instances.push({
+          name: relation.referencedTableInstanceName,
+          modelName: relation.referencedTableModelName
+        })
+      } else {
+        instances.push({
+          name: relation.pivot.name,
+          modelName: relation.pivot.tableModelName
+        })
+      }
+    })
+
+    this.manyToMany.forEach((m2m) => {
+      instances.push({
+        name: m2m.crossRelationInstanceName,
+        modelName: m2m.crossRelationModelName
+      })
+    })
+
+    return uniqBy(instances, 'modelName')
+  }
+
   buildValidate () {
     let result = ''
 
@@ -157,9 +179,11 @@ module.exports = class Table {
         result += `\t\tif (${column.name}.isNullOrEmpty()) {\n`
         result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
         result += `\t\t}\n`
-        result += `\t\tif (${column.name}?.length ?: 0 > ${column.size}) {\n`
-        result += `\t\t\tthrow HttpException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}), Response.Status.NOT_ACCEPTABLE)\n`
-        result += `\t\t}\n`
+        if (column.size) {
+          result += `\t\tif (${column.name}?.length ?: 0 > ${column.size}) {\n`
+          result += `\t\t\tthrow HttpException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}), Response.Status.NOT_ACCEPTABLE)\n`
+          result += `\t\t}\n`
+        }
       } else if (column.isCpf) {
         result += `\t\tif (${column.name} == null && !Validator.isCPF(${column.name})) {\n`
         result += `\t\t\tthrow HttpException(lang.isNotAValidCPF("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`

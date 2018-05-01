@@ -3,6 +3,8 @@ const camelCase = require('lodash.camelcase')
 
 module.exports = class Auth {
   constructor () {
+    this.accountAttrName = null
+    this.passwordAttrName = null
     this.api = {
       signIn: null,
       auth: null

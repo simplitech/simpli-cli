@@ -5,7 +5,9 @@ package <%-packageAddress%>.<%-moduleName%>.response
 import io.swagger.annotations.ApiModelProperty
 import <%-packageAddress%>.model.<%-table.modelName%>
 <%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+<%_ if (relation.referencedTableModelName !== table.modelName) { _%>
 import <%-packageAddress%>.model.<%-relation.referencedTableModelName%>
+<%_ } _%>
 <%_ } _%>
 
 /**
