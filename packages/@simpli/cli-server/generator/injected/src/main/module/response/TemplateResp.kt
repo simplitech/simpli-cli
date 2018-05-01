@@ -1,19 +1,27 @@
-package br.com.martinlabs.usecase.crud.response
+<%_ var packageAddress = options.serverSetup.packageAddress _%>
+<%_ var moduleName = options.serverSetup.moduleName _%>
+package <%-packageAddress%>.<%-moduleName%>.response
 
-import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import br.com.martinlabs.usecase.model.Principal
-import br.com.martinlabs.usecase.model.GrupoDoPrincipal
-import br.com.martinlabs.usecase.model.Tag
+import <%-packageAddress%>.model.<%-table.modelName%>
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+import <%-packageAddress%>.model.<%-relation.referencedTableModelName%>
+<%_ } _%>
 
-@ApiModel(value = "PrincipalResp")
-class PrincipalResp {
+/**
+ * Response of model <%-table.modelName%>
+ * @author Simpli© CLI generator
+ */
+class <%-table.modelName%>Resp {
+    var <%-table.instanceName%>: <%-table.modelName%>? = null
+<%_ if (table.validDistinctRelations.length !== 0) { _%>
 
-    var principal: Principal? = null
+<%_ } _%>
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+    @ApiModelProperty(value = "Possible <%-relation.referencedTableModelName%> values")
+    var all<%-relation.referencedTableModelName%>: MutableList<<%-relation.referencedTableModelName%>>? = null
+<%_ if (i < table.validDistinctRelations.length - 1) { _%>
 
-    @ApiModelProperty(value = "Possible GrupoDoPrincipal values")
-    var allGrupoDoPrincipal: MutableList<GrupoDoPrincipal>? = null
-
-    @ApiModelProperty(value = "Possible Tag values")
-    var allTag: MutableList<Tag>? = null
+<%_ } _%>
+<%_ } _%>
 }

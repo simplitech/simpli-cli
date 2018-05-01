@@ -1,4 +1,5 @@
-package br.com.martinlabs.usecase.exception
+<%_ var packageAddress = options.serverSetup.packageAddress _%>
+package <%-packageAddress%>.exception
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.MediaType

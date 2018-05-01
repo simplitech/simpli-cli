@@ -15,6 +15,7 @@ module.exports = class Relation {
 
     this.isManyToMany = false
     this.pivot = {
+      name: null,
       tableName: null,
       tableModelName: null
     }

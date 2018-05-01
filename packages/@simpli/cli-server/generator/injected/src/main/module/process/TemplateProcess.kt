@@ -1,26 +1,28 @@
-package br.com.martinlabs.usecase.crud.process
+<%_ var packageAddress = options.serverSetup.packageAddress _%>
+<%_ var moduleName = options.serverSetup.moduleName _%>
+package <%-packageAddress%>.<%-moduleName%>.process
 
-import br.com.martinlabs.usecase.model.Principal
-import br.com.martinlabs.usecase.model.Tag
-import br.com.martinlabs.usecase.crud.response.PrincipalResp
-import br.com.martinlabs.usecase.dao.PrincipalDao
-import br.com.martinlabs.usecase.dao.GrupoDoPrincipalDao
-import br.com.martinlabs.usecase.dao.TagPrincipalDao
-import br.com.martinlabs.usecase.dao.TagDao
-import br.com.martinlabs.usecase.exception.HttpException
+import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
+import <%-packageAddress%>.dao.<%-table.modelName%>Dao
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+import <%-packageAddress%>.dao.<%-relation.referencedTableModelName%>Dao
+<%_ if (relation.isManyToMany) { _%>
+import <%-packageAddress%>.dao.<%-relation.pivot.tableModelName%>Dao
+<%_ } _%>
+<%_ } _%>
+import <%-packageAddress%>.exception.HttpException
 import com.google.common.base.Strings
 import com.simpli.model.LanguageHolder
 import com.simpli.model.PagedResp
-import com.simpli.model.RespException
 import java.sql.Connection
 import javax.ws.rs.core.Response
 
 /**
- * Principal business logic
- * @author martinlabs CRUD generator
+ * <%-table.modelName%> business logic
+ * @author Simpli© CLI generator
  */
-class PrincipalProcess(private val con: Connection, private val lang: LanguageHolder, private val clientVersion: String) {
-
+class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder, private val clientVersion: String) {
     private val loginS = LoginService(con, lang, clientVersion)
 
     fun list(
@@ -29,7 +31,7 @@ class PrincipalProcess(private val con: Connection, private val lang: LanguageHo
         page: Int?,
         limit: Int?,
         orderRequest: String?,
-        asc: Boolean?): PagedResp<Principal> {
+        asc: Boolean?): PagedResp<<%-table.modelName%>> {
         //TODO: review generated method
         var query = queryP
         
@@ -39,11 +41,11 @@ class PrincipalProcess(private val con: Connection, private val lang: LanguageHo
 
         loginS.allowAccess(token)
 
-        val dao = PrincipalDao(con, lang)
+        val dao = <%-table.modelName%>Dao(con, lang)
 
-        val listPrincipal = dao.list(query, page, limit, orderRequest, asc)
+        val list<%-table.modelName%> = dao.list(query, page, limit, orderRequest, asc)
 
-        val resp = PagedResp(listPrincipal)
+        val resp = PagedResp(list<%-table.modelName%>)
 
         if (!Strings.isNullOrEmpty(query)) {
             dao.count(query)?.let {
@@ -58,80 +60,113 @@ class PrincipalProcess(private val con: Connection, private val lang: LanguageHo
         return resp
     }
 
-    fun getOne(idPrincipalPk: Long?, token: String?): PrincipalResp {
+    fun getOne(<%-table.primariesByParam(true)%>, token: String?): <%-table.modelName%>Resp {
         //TODO: review generated method
         loginS.allowAccess(token)
 
-        val principalDao = PrincipalDao(con, lang)
-        val grupoDoPrincipalDao = GrupoDoPrincipalDao(con, lang)
-        val tagPrincipalDao = TagPrincipalDao(con, lang)
-        val tagDao = TagDao(con, lang)
-        val resp = PrincipalResp()
+        val <%-table.instanceName%>Dao = <%-table.modelName%>Dao(con, lang)
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+<%_ if (!relation.isManyToMany) { _%>
+        val <%-relation.name%>Dao = <%-relation.referencedTableModelName%>Dao(con, lang)
+<%_ } else { _%>
+        val <%-table.manyToMany.crossRelationInstanceName%>Dao = <%-table.manyToMany.crossRelationModelName%>Dao(con, lang)
+        val <%-table.manyToMany.pivotInstanceName%>Dao = <%-table.manyToMany.pivotModelName%>Dao(con, lang)
+<%_ } _%>
+<%_ } _%>
 
-        if (idPrincipalPk != null && idPrincipalPk > 0) {
-            val principal = principalDao.getOne(idPrincipalPk)
-            if (principal != null) {
-                principal.tagPrincipal = tagPrincipalDao.listTagOfPrincipal(idPrincipalPk)
+        val resp = <%-table.modelName%>Resp()
+
+        if (<%-table.primariesByConditions()%>) {
+            val <%-table.instanceName%> = <%-table.instanceName%>Dao.getOne(<%-table.primariesByComma(true)%>)
+<%_ if (table.hasPivot) { _%>
+            if (<%-table.instanceName%> != null) {
+                <%-table.instanceName%>.<%-table.manyToMany.pivotInstanceName%> = tagPrincipalDao.list<%-table.manyToMany.crossRelationModelName%>Of<%-table.modelName%>(<%-table.idColumn.name%>)
             }
-
-            resp.principal = principal
+<%_ } _%>
+            resp.<%-table.instanceName%> = <%-table.instanceName%>
         }
-        resp.allGrupoDoPrincipal = grupoDoPrincipalDao.list()
 
-        resp.allTag = tagDao.list()
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+<%_ if (!relation.isManyToMany) { _%>
+        resp.all<%-relation.referencedTableModelName%> = <%-relation.name%>Dao.list()
+<%_ } else { _%>
+        resp.all<%-relation.referencedTableModelName%> = <%-table.manyToMany.crossRelationInstanceName%>Dao.list()
+<%_ } _%>
+<%_ } _%>
+<%_ if (table.validDistinctRelations.length > 0) { _%>
 
-
+<%_ } _%>
         return resp
     }
 
-    fun persist(principal: Principal, token: String?): Long {
+<%_ if (table.hasID || table.foreignColumns.length) { _%>
+    fun persist(<%-table.instanceName%>: <%-table.modelName%>, token: String?): Long {
         //TODO: review generated method
         loginS.allowAccess(token)
 
-        val dao = PrincipalDao(con, lang)
+        val dao = <%-table.modelName%>Dao(con, lang)
 
-        if (dao.existUnico(principal.unico, principal.idPrincipalPk)) {
-            throw HttpException(lang.alreadyExist("Unico"), Response.Status.NOT_ACCEPTABLE)
+<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
+        if (dao.exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-table.idColumn.name%>)) {
+            throw HttpException(lang.alreadyExist("<%-column.name%>"), Response.Status.NOT_ACCEPTABLE)
         }
 
-        val idPrincipal: Long
-        if (principal.idPrincipalPk > 0) {
-            principal.validate(true, lang)
-            idPrincipal = principal.idPrincipalPk
+<%_ } _%>
+<%_ if (table.hasID) { _%>
+        val id<%-table.modelName%>: <%-table.idColumn.kotlinType%>
+        if (<%-table.instanceName%>.<%-table.idColumn.name%> > 0) {
+            <%-table.instanceName%>.validate(true, lang)
+            id<%-table.modelName%> = <%-table.instanceName%>.<%-table.idColumn.name%>
             
-            dao.updatePrincipal(principal)
+            dao.update<%-table.modelName%>(<%-table.instanceName%>)
         } else {
-            principal.validate(false, lang)
-            idPrincipal = dao.insert(principal)
-            principal.idPrincipalPk = idPrincipal
+            <%-table.instanceName%>.validate(false, lang)
+            id<%-table.modelName%> = dao.insert(<%-table.instanceName%>)
+            <%-table.instanceName%>.<%-table.idColumn.name%> = id<%-table.modelName%>
         }
+<%_ } else { _%>
+        val id<%-table.modelName%> = <%-table.instanceName%>.<%-table.foreignColumns[0].name%>
+<%_ if (table.foreignColumns.length <= 1) { _%>
+        val exist = dao.exist<%-table.modelName%>(<%-table.instanceName%>.<%-table.foreignColumns[0].name%>)
+<%_ } else { _%>
+        val exist = dao.exist<%-table.modelName%>(<%-table.instanceName%>.<%-table.foreignColumns[0].name%>, <%-table.instanceName%>.<%-table.foreignColumns[1].name%>)
+<%_ } _%>
+        if (exist) {
+            <%-table.instanceName%>.validate(true, lang)
+            dao.update<%-table.modelName%>(<%-table.instanceName%>)
+        } else {
+            <%-table.instanceName%>.validate(false, lang)
+            dao.insert(<%-table.instanceName%>)
+        }
+<%_ } _%>
 
-        val tagPrincipalDao = TagPrincipalDao(con, lang)
+<%_ if (table.hasPivot) { _%>
+        val <%-table.manyToMany.pivotInstanceName%>Dao = <%-table.manyToMany.pivotModelName%>Dao(con, lang)
     
-        tagPrincipalDao.removeAllFromPrincipal(idPrincipal)
+        <%-table.manyToMany.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(id<%-table.modelName%>)
         
-        principal.tagPrincipal?.let { list ->
-            for (tag in list) {
-                tagPrincipalDao.insert(tag.idTagPk, idPrincipal)
+        <%-table.instanceName%>.<%-table.manyToMany.pivotInstanceName%>?.let { list ->
+            for (<%-table.manyToMany.crossRelationInstanceName%> in list) {
+                <%-table.manyToMany.pivotInstanceName%>Dao.insert(<%-table.manyToMany.crossRelationInstanceName%>.<%-table.manyToMany.crossRelationColumnName%>, id<%-table.modelName%>)
             }
         }
 
-        return idPrincipal
+<%_ } _%>
+        return id<%-table.modelName%>
     }
+<%_ } _%>
+<%_ if (table.isRemovable) { _%>
 
-    fun remove(
-        idPrincipalPk: Long?,
-        token: String?) {
+    fun remove(<%-table.primariesByParam(true)%>, token: String?) {
         //TODO: review generated method
         loginS.allowAccess(token)
-        val principalDao = PrincipalDao(con, lang)
+        val <%-table.instanceName%>Dao = <%-table.modelName%>Dao(con, lang)
 
-        if (idPrincipalPk == null) {
+        if (<%-table.primariesByConditions(true)%>) {
             throw HttpException(lang.cannotBeNull("id"), Response.Status.NOT_ACCEPTABLE)
         }
 
-            
-        principalDao.softDelete(idPrincipalPk)
+        <%-table.instanceName%>Dao.softDelete(<%-table.primariesByComma(true)%>)
     }
-
+<%_ } _%>
 }

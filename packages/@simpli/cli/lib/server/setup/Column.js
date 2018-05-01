@@ -26,10 +26,29 @@ module.exports = class Column {
     return 'String'
   }
 
+  get qMark () {
+    if (!this.isRequired) return '?'
+    if (this.isID) return ''
+    if (this.isLong) return ''
+    if (this.isDouble) return ''
+    if (this.isBoolean) return ''
+    return '?'
+  }
+
+  get defaultValue () {
+    if (!this.isRequired) return 'null'
+    if (this.isID) return '0'
+    if (this.isLong) return '0'
+    if (this.isDouble) return '0.0'
+    if (this.isBoolean) return 'false'
+    return 'null'
+  }
+
   get size () {
     const type = this.type || ''
-    const match = type.match(/^\w+(?:\((\d+)\))*$/gi)
-    if (match) return Number(match[0])
+    const pattern = /^\w+(?:\((\d+)\))*$/gi
+    const match = pattern.exec(type)
+    if (match) return match[1]
     return null
   }
 
@@ -74,6 +93,10 @@ module.exports = class Column {
     return !!this.foreign
   }
 
+  get isUnique () {
+    return this.keyType === 'UNI'
+  }
+
   get isRequired () {
     return this.nullable === 'NO'
   }
@@ -83,6 +106,16 @@ module.exports = class Column {
       'password',
       'senha'
     ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isCpf () {
+    const reservedWords = ['cpf']
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isCnpj () {
+    const reservedWords = ['cnpj']
     return !!reservedWords.find((word) => word === this.name)
   }
 
