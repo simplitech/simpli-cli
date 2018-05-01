@@ -1,3 +1,19 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.8...v0.3.0) (2018-05-01)
+
+
+### Bug Fixes
+
+* **server:** Bugs fixed ([cc4b9fe](https://github.com/simplitech/simpli-cli/commit/cc4b9fe))
+* **server:** Improved the template ([9799b92](https://github.com/simplitech/simpli-cli/commit/9799b92))
+
+
+### Features
+
+* **server:** Added server template files ([84f67e0](https://github.com/simplitech/simpli-cli/commit/84f67e0))
+
+
+
 <a name="0.3.0-beta.8"></a>
 # [0.3.0-beta.8](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.7...v0.3.0-beta.8) (2018-04-27)
 
