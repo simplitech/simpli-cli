@@ -145,15 +145,15 @@ module.exports = class Server {
       extractConfigFiles: preset.useConfigFiles
     })
 
+    await run(`rm -rf ./node_modules`)
+    await run(`rm -f ./package.json`)
+    await run(`rm -f ./package-lock.json`)
+
     // commit initial state
     if (hasGit()) {
       await run('git add -A')
       await run(`git commit -m init`)
     }
-
-    await run(`rm -rf ./node_modules`)
-    await run(`rm -f ./package.json`)
-    await run(`rm -f ./package-lock.json`)
 
     // log instructions
     stopSpinner()
@@ -164,12 +164,82 @@ module.exports = class Server {
     generator.printExitLogs()
   }
 
+  async syncModels (defaultConnection, serverConfig) {
+    const run = (command, args) => {
+      if (!args) { [command, ...args] = command.split(/\s+/) }
+      return execa(command, args, { cwd: context })
+    }
+
+    let config = serverConfig
+    if (!config) {
+      const { serverName } = await Database.requestServerName()
+      const { moduleName, packageAddress } = await Database.requestModuleAndPackage(serverName)
+      config = { serverName, moduleName, packageAddress }
+    }
+    const { availableTables } = await Database.requestConnection(this.serverSetup, defaultConnection)
+    const { syncTables } = await Database.requestSync(availableTables, this.serverSetup)
+    await Database.confirm()
+
+    this.serverSetup.serverName = config.serverName
+    this.serverSetup.moduleName = config.moduleName
+    this.serverSetup.packageAddress = config.packageAddress
+
+    const { context, createCompleteCbs } = this
+
+    const preset = {
+      plugins: {
+        '@simpli/cli-server': {
+          serverSetup: this.serverSetup,
+          sync: true
+        }
+      }
+    }
+
+    // get latest CLI version
+    const { latest } = await getVersions()
+    // generate package.json with plugin dependencies
+    const pkg = {
+      name: 'sync-server',
+      version: '0.1.0',
+      private: true,
+      devDependencies: {}
+    }
+    const deps = Object.keys(preset.plugins)
+    deps.forEach(dep => {
+      pkg.devDependencies[dep] = preset.plugins[dep].version ||
+        (/^@simpli/.test(dep) ? `${latest}` : `latest`)
+    })
+    // write package.json
+    await writeFileTree(context, {
+      'package.json': JSON.stringify(pkg, null, 2)
+    })
+
+    log()
+    log(`⚙️  Synchronizing tables...`)
+    const plugins = this.resolvePlugins(preset.plugins)
+    const generator = new Generator(context, {
+      pkg: { _ignore: true },
+      plugins,
+      completeCbs: createCompleteCbs
+    })
+    await generator.generate()
+
+    await run(`rm -rf ./node_modules`)
+    await run(`rm -f ./package.json`)
+    await run(`rm -f ./package-lock.json`)
+
+    log()
+    log(`🎉  Successfully synchronized tables ${chalk.yellow(syncTables.map((tables) => tables.name).join(', '))}.`)
+    log(`👉  Run ${chalk.cyan('git status')} to see which files has changed.`)
+    log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
+  }
+
   resolvePlugins (rawPlugins) {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync('../../../cli-server/generator')
+      // const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      const module = resolve.sync('../../../cli-server/generator')
       return {
         id,
         apply: require(module),

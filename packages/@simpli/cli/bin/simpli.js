@@ -36,7 +36,7 @@ program
 
 program
   .command('scaffold:sync')
-  .description('sync the current frontend project based in its webserver swagger')
+  .description('sync the current frontend project based on its webserver swagger')
   .action(() => {
     require('../lib/cmd/scaffoldSync')()
   })
@@ -46,6 +46,13 @@ program
   .description('inspect the tables of a MYSQL database')
   .action((paths) => {
     require('../lib/cmd/serverInspect')(paths)
+  })
+
+program
+  .command('server:sync')
+  .description('sync the current backend project based on its database')
+  .action(() => {
+    require('../lib/cmd/serverSync')()
   })
 
 // output help information on unknown commands

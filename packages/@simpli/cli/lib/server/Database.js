@@ -126,7 +126,7 @@ module.exports = class Database {
         name: 'serverName',
         type: 'input',
         message: 'Enter the server name',
-        default: capitalizeFirstLetter(camelCase(defaultName))
+        default: defaultName ? capitalizeFirstLetter(camelCase(defaultName)) : undefined
       }
     ])
     if (!serverName) {
@@ -236,6 +236,23 @@ module.exports = class Database {
     if (!exists(userTable.name)) filteredTables.push(userTable)
 
     return { userTable, accountColumn, passwordColumn }
+  }
+
+  static async requestSync (availableTables = [], serverSetup) {
+    const { syncTableNames } = await inquirer.prompt([
+      {
+        name: 'syncTableNames',
+        type: 'checkbox',
+        choices: availableTables.map((table) => table.name),
+        message: 'Which of these tables do you want to sync?'
+      }
+    ])
+
+    const syncTables = serverSetup.tables
+      .filter((table) => syncTableNames.find((name) => name === table.name))
+
+    serverSetup.tables = syncTables
+    return { syncTables }
   }
 
   static async confirm () {

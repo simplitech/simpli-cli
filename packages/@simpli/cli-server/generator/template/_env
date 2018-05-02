@@ -1,0 +1,4 @@
+<%_ var config = options.serverSetup _%>
+SERVER_NAME=<%-config.serverName%>
+MODULE_NAME=<%-config.moduleName%>
+PACKAGE_ADDRESS=<%-config.packageAddress%>
