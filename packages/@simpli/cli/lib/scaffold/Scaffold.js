@@ -268,7 +268,6 @@ module.exports = class Scaffold {
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
       const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync('../../../cli-scaffold/generator')
       return {
         id,
         apply: require(module),

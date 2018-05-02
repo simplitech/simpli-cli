@@ -239,7 +239,6 @@ module.exports = class Server {
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
       const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync('../../../cli-server/generator')
       return {
         id,
         apply: require(module),
