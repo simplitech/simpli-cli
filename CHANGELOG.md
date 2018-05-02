@@ -1,3 +1,13 @@
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/simplitech/simpli-cli/compare/v0.3.0...v0.3.1) (2018-05-02)
+
+
+### Features
+
+* **server:** Added command server:sync ([52fd609](https://github.com/simplitech/simpli-cli/commit/52fd609))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/simplitech/simpli-cli/compare/v0.3.0-beta.8...v0.3.0) (2018-05-01)
 
