@@ -11,6 +11,7 @@ import com.simpli.model.RespException
 import com.simpli.sql.DaoTest
 import com.simpli.tools.SecurityUtils
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
+import <%-packageAddress%>.exception.HttpException
 import java.sql.Connection
 import java.sql.SQLException
 import javax.naming.NamingException
@@ -35,17 +36,17 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         token = subject.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
     }
 
-    @Test(expected = RespException::class)
+    @Test(expected = HttpException::class)
     fun testAuthFail() {
         subject.auth(null)
     }
 
-    @Test(expected = RespException::class)
+    @Test(expected = HttpException::class)
     fun testSignInNull() {
         subject.signIn(null, null)
     }
 
-    @Test(expected = RespException::class)
+    @Test(expected = HttpException::class)
     fun testSignInFail() {
         subject.signIn("user@gmail.com", SecurityUtils.sha256("wrongpassword"))
     }
@@ -57,7 +58,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
                 result.token)
     }
 
-    @Test(expected = RespException::class)
+    @Test(expected = HttpException::class)
     fun testAllowAccessFail() {
         subject.allowAccess("Hey")
     }

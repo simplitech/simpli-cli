@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Context antiJARLocking="true" path="/GeneratorUseCase">
+<Context antiJARLocking="true" path="/<%-options.serverSetup.serverName%>">
     <Resource
         name="jdbc/<%-options.serverSetup.connection.database%>DS"
         url="jdbc:mysql://<%-options.serverSetup.connection.host%>:<%-options.serverSetup.connection.port%>/<%-options.serverSetup.connection.database%>"

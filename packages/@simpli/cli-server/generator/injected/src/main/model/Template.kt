@@ -73,6 +73,10 @@ class <%-table.modelName%> {
     }
 
     fun validate(updating: Boolean, lang: LanguageHolder) {
+        if (updating) {
+            //TODO: Specify updating validation
+        }
+
 <%-table.buildValidate()-%>
     }
 

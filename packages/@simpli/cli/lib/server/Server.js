@@ -164,25 +164,19 @@ module.exports = class Server {
     generator.printExitLogs()
   }
 
-  async syncModels (defaultConnection, serverConfig) {
+  async syncModels (defaultConnection) {
     const run = (command, args) => {
       if (!args) { [command, ...args] = command.split(/\s+/) }
       return execa(command, args, { cwd: context })
     }
 
-    let config = serverConfig
-    if (!config) {
-      const { serverName } = await Database.requestServerName()
-      const { moduleName, packageAddress } = await Database.requestModuleAndPackage(serverName)
-      config = { serverName, moduleName, packageAddress }
-    }
+    const { moduleName, packageAddress } = await Database.requestModuleAndPackage()
     const { availableTables } = await Database.requestConnection(this.serverSetup, defaultConnection)
     const { syncTables } = await Database.requestSync(availableTables, this.serverSetup)
     await Database.confirm()
 
-    this.serverSetup.serverName = config.serverName
-    this.serverSetup.moduleName = config.moduleName
-    this.serverSetup.packageAddress = config.packageAddress
+    this.serverSetup.moduleName = moduleName
+    this.serverSetup.packageAddress = packageAddress
 
     const { context, createCompleteCbs } = this
 
@@ -238,7 +232,8 @@ module.exports = class Server {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      // const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      const module = resolve.sync(`../../../cli-server/generator`)
       return {
         id,
         apply: require(module),

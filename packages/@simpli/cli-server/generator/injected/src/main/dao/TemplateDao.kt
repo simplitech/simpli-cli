@@ -75,7 +75,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 AND LOWER(CONCAT(
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isPassword) { _%>
+<%_ if (table.columns[table.columns.length - 1].isPassword) { _%>
+                IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
+<%_ } else { _%>
                 IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
+<%_ } _%>
 <%_ } _%>
 <%_ } _%>
                 )) LIKE LOWER(?)
@@ -118,7 +122,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             WHERE LOWER(CONCAT(
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isPassword) { _%>
+<%_ if (table.columns[table.columns.length - 1].isPassword) { _%>
+                IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
+<%_ } else { _%>
             IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
+<%_ } _%>
 <%_ } _%>
 <%_ } _%>
             )) LIKE LOWER(?)
@@ -131,19 +139,19 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         return update("""
             UPDATE <%-table.name%>
             SET
-<%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
+<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isPassword) { _%>
-            <%-column.name%> = IF(? IS NOT NULL, SHA2(?, 256), <%-column.name%>)<%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
+            <%-column.name%> = IF(? IS NOT NULL, SHA2(?, 256), <%-column.name%>)<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } else if (column.isUpdatedAt) { _%>
-            <%-column.name%> = NOW()<%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
+            <%-column.name%> = NOW()<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } else if (!column.isCreatedAt) { _%>
-            <%-column.name%> = ?<%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
+            <%-column.name%> = ?<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
 <%_ } _%>
             WHERE 1 = 1
             <%-table.primariesByWhere()%>
             """,
-<%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
+<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isPassword) { _%>
             <%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-column.name%>,
 <%_ } else if (column.isUpdatedAt) { _%>
@@ -161,23 +169,23 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         //TODO: review generated method
         return update("""
             INSERT INTO <%-table.name%> (
-<%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
-            <%-column.name%><%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
+<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
+            <%-column.name%><%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
-            ) VALUES (<%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
+            ) VALUES (<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isPassword) { _%>
-<%- 'SHA2(?, 256)' + (i < table.exceptPrimaryColumns.length - 1 ? ',' : '') -%>
+<%- 'SHA2(?, 256)' + (i < table.exceptIDColumns.length - 1 ? ',' : '') -%>
 <%_ } else if (column.isCreatedAt) { _%>
-<%- 'NOW()' + (i < table.exceptPrimaryColumns.length - 1 ? ',' : '') -%>
+<%- 'NOW()' + (i < table.exceptIDColumns.length - 1 ? ',' : '') -%>
 <%_ } else if (!column.isUpdatedAt) { _%>
-<%- '?' + (i < table.exceptPrimaryColumns.length - 1 ? ',' : '') -%>
+<%- '?' + (i < table.exceptIDColumns.length - 1 ? ',' : '') -%>
 <%_ } _%>
 <%_ } _%>)
             """,
-<%_ for (var i in table.exceptPrimaryColumns) { var column = table.exceptPrimaryColumns[i] _%>
+<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isCreatedAt) { _%>
 <%_ } else if (!column.isUpdatedAt) { _%>
-            <%-table.instanceName%>.<%-column.name%><%-i < table.exceptPrimaryColumns.length - 1 ? ',' : ''%>
+            <%-table.instanceName%>.<%-column.name%><%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
 <%_ } _%>
         ).key

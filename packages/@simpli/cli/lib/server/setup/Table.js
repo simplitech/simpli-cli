@@ -27,6 +27,10 @@ module.exports = class Table {
     return this.columns.filter((column) => column.isPrimary)
   }
 
+  get requiredColumns () {
+    return this.columns.filter((column) => column.isRequired)
+  }
+
   get uniqueColumns () {
     return this.columns.filter((column) => column.isUnique)
   }
@@ -35,10 +39,14 @@ module.exports = class Table {
     return this.columns.filter((column) => !column.isPrimary)
   }
 
+  get exceptIDColumns () {
+    return this.columns.filter((column) => !column.isID)
+  }
+
   get idColumn () {
     let column = this.columns.find((column) => column.isID)
     if (!column) {
-      column = this.columns.find((column) => column.foreignColumns) || new Column()
+      column = this.columns.find((column) => column.isForeign) || new Column()
     }
     return column
   }
@@ -65,6 +73,10 @@ module.exports = class Table {
     return this.columns.find((table) => table.name === name)
   }
 
+  findManyToManyByPivotTableName (tableName) {
+    return this.manyToMany.find((m2m) => m2m.pivotTableName === tableName)
+  }
+
   setName (dataTable = {}) {
     const capitalizeFirstLetter = (str = '') => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -78,7 +90,8 @@ module.exports = class Table {
   }
 
   setRelations (dataTable = {}) {
-    this.relations = (dataTable.tableRelations || []).map((dataRelation) => new Relation(dataRelation))
+    const relations = (dataTable.tableRelations || []).map((dataRelation) => new Relation(dataRelation))
+    this.relations = uniqBy(relations, 'constraintName')
   }
 
   setPivot () {
@@ -97,12 +110,20 @@ module.exports = class Table {
     return !!this.columns.find((column) => !!reservedWords.find((word) => word === column.name))
   }
 
+  get hasPersist () {
+    return !!(this.hasID || this.foreignColumns.length)
+  }
+
   get hasID () {
     return !!this.columns.find((column) => column.isID)
   }
 
   get hasPivot () {
     return !!this.relations.find((relation) => relation.isManyToMany)
+  }
+
+  get hasUnique () {
+    return !!this.columns.find((column) => column.isUnique)
   }
 
   primariesBySlash () {
@@ -125,6 +146,13 @@ module.exports = class Table {
     return columns.map((column) => `${column.name}: ${column.kotlinType + qMark(column)}`).join(', ')
   }
 
+  primariesByParamCall (prefix = '') {
+    const columns = this.primaryColumns
+    const dot = prefix ? '.' : ''
+    if (columns.length === 0) columns.push(new Column())
+    return columns.map((column) => `${prefix + dot + column.name}`).join(', ')
+  }
+
   primariesByConditions (opposite = false) {
     const columns = this.primaryColumns
     if (columns.length === 0) columns.push(new Column())
@@ -135,6 +163,12 @@ module.exports = class Table {
     const columns = this.primaryColumns
     if (columns.length === 0) columns.push(new Column())
     return columns.map((column) => `AND ${column.name} ${different ? '<>' : '='} ?`).join(' ')
+  }
+
+  primariesTestValuesByParam () {
+    const columns = this.primaryColumns
+    if (columns.length === 0) columns.push(new Column())
+    return columns.map((column) => `1L`).join(', ')
   }
 
   get daoModels () {
@@ -170,29 +204,43 @@ module.exports = class Table {
   buildValidate () {
     let result = ''
 
+    if (!this.hasID) {
+      this.foreignColumns.forEach((column) => {
+        result += `\t\tif (${column.name} == 0L) {\n`
+        result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
+        result += `\t\t}\n`
+      })
+    }
     this.exceptPrimaryColumns.forEach((column) => {
       if (column.isLong && column.isRequired) {
         result += `\t\tif (${column.name} == 0L) {\n`
         result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
         result += `\t\t}\n`
-      } else if (column.isString && column.isRequired) {
-        result += `\t\tif (${column.name}.isNullOrEmpty()) {\n`
-        result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
-        result += `\t\t}\n`
+      } else if (column.isString) {
+        if (column.isRequired) {
+          result += `\t\tif (${column.name}.isNullOrEmpty()) {\n`
+          result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
+          result += `\t\t}\n`
+        }
         if (column.size) {
           result += `\t\tif (${column.name}?.length ?: 0 > ${column.size}) {\n`
           result += `\t\t\tthrow HttpException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}), Response.Status.NOT_ACCEPTABLE)\n`
           result += `\t\t}\n`
         }
-      } else if (column.isCpf) {
-        result += `\t\tif (${column.name} == null && !Validator.isCPF(${column.name})) {\n`
-        result += `\t\t\tthrow HttpException(lang.isNotAValidCPF("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
-        result += `\t\t}\n`
-      } else if (column.isCnpj) {
-        result += `\t\tif (${column.name} == null && !Validator.isCNPJ(${column.name} ?: "")) {\n`
-        result += `\t\t\tthrow HttpException(lang.isNotAValidCNPJ("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
-        result += `\t\t}\n`
-      } else if (column.isRequired) {
+        if (column.isEmail) {
+          result += `\t\tif (${column.name} != null && !Validator.isEmail(${column.name})) {\n`
+          result += `\t\t\tthrow HttpException(lang.isNotAValidEmail("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
+          result += `\t\t}\n`
+        } else if (column.isCpf) {
+          result += `\t\tif (${column.name} != null && !Validator.isCPF(${column.name})) {\n`
+          result += `\t\t\tthrow HttpException(lang.isNotAValidCPF("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
+          result += `\t\t}\n`
+        } else if (column.isCnpj) {
+          result += `\t\tif (${column.name} != null && !Validator.isCNPJ(${column.name} ?: "")) {\n`
+          result += `\t\t\tthrow HttpException(lang.isNotAValidCNPJ("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
+          result += `\t\t}\n`
+        }
+      } else if (column.isRequired && !column.isBoolean && !column.isDouble) {
         result += `\t\tif (${column.name} == null) {\n`
         result += `\t\t\tthrow HttpException(lang.cannotBeNull("${startCase(column.name)}"), Response.Status.NOT_ACCEPTABLE)\n`
         result += `\t\t}\n`

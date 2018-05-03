@@ -88,7 +88,7 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         return resp
     }
 
-<%_ if (table.hasID || table.foreignColumns.length) { _%>
+<%_ if (table.hasPersist) { _%>
     fun persist(<%-table.instanceName%>: <%-table.modelName%>, token: String?): Long {
         //TODO: review generated method
         loginS.allowAccess(token)
@@ -96,7 +96,7 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         val dao = <%-table.modelName%>Dao(con, lang)
 
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-        if (dao.exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-table.idColumn.name%>)) {
+        if (dao.exist<%-column.capitalizedName%>(<%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-table.idColumn.name%>)) {
             throw HttpException(lang.alreadyExist("<%-column.name%>"), Response.Status.NOT_ACCEPTABLE)
         }
 
@@ -115,11 +115,7 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         }
 <%_ } else { _%>
         val id<%-table.modelName%> = <%-table.instanceName%>.<%-table.foreignColumns[0].name%>
-<%_ if (table.foreignColumns.length <= 1) { _%>
-        val exist = dao.exist<%-table.modelName%>(<%-table.instanceName%>.<%-table.foreignColumns[0].name%>)
-<%_ } else { _%>
-        val exist = dao.exist<%-table.modelName%>(<%-table.instanceName%>.<%-table.foreignColumns[0].name%>, <%-table.instanceName%>.<%-table.foreignColumns[1].name%>)
-<%_ } _%>
+        val exist = dao.exist<%-table.modelName%>(<%-table.primariesByParamCall(table.instanceName)%>)
         if (exist) {
             <%-table.instanceName%>.validate(true, lang)
             dao.update<%-table.modelName%>(<%-table.instanceName%>)

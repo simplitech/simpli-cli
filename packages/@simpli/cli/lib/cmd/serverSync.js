@@ -2,19 +2,12 @@
 const fs = require('fs')
 const path = require('path')
 const clearConsole = require('../util/clearConsole')
-const inquirer = require('inquirer')
 const { error, stopSpinner } = require('@vue/cli-shared-utils')
 const Server = require('../server/Server')
 const execa = require('execa')
 const xml2js = require('xml2js')
 
 async function sync () {
-  require('dotenv').config()
-
-  const serverName = process.env.SERVER_NAME
-  const moduleName = process.env.MODULE_NAME
-  const packageAddress = process.env.PACKAGE_ADDRESS
-
   const targetDir = path.resolve('./')
   const pom = path.resolve('./pom.xml')
   const context = path.resolve('./src/main/webapp/META-INF/context.xml')
@@ -39,23 +32,6 @@ async function sync () {
   if (!fs.existsSync(pom)) {
     error('The current directory is not the root of a simpli backend project')
     process.exit(1)
-  }
-
-  let serverConfig = { serverName, moduleName, packageAddress }
-  if (!serverName || !moduleName || !packageAddress) {
-    const { confirm } = await inquirer.prompt([
-      {
-        name: 'confirm',
-        type: 'confirm',
-        message: 'Can\'t find the server config. Do you want to define the configuration?'
-      }
-    ])
-
-    if (!confirm) {
-      process.exit(1)
-    }
-
-    serverConfig = null
   }
 
   const injectData = (data, connection) => {
@@ -90,7 +66,7 @@ async function sync () {
       injectData(dataContext, connection)
 
       const server = new Server(null, targetDir, [])
-      await server.syncModels(connection, serverConfig)
+      await server.syncModels(connection)
     })
   })
 }

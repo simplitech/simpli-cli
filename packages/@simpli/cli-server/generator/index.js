@@ -36,6 +36,9 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/module/response/TemplateResp.kt', `../../java/${dir}/${moduleName}/response/${table.modelName}Resp.kt`, data)
     api.renderFrom('./injected', 'src/main/model/Template.kt', `../java/${dir}/model/${table.modelName}.kt`, data)
     api.renderFrom('./injected', 'src/main/module/process/TemplateProcess.kt', `../../java/${dir}/${moduleName}/process/${table.modelName}Process.kt`, data)
+    // Test
+    api.renderFrom('./injected', 'src/test/model/TemplateTest.kt', `../java/${dir}/model/${table.modelName}Test.kt`, data)
+    api.renderFrom('./injected', 'src/test/module/process/TemplateProcessTest.kt', `../../java/${dir}/${moduleName}/process/${table.modelName}ProcessTest.kt`, data)
   })
   pivotTables.forEach((table) => {
     const data = { table }

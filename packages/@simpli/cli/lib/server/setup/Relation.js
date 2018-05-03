@@ -32,6 +32,13 @@ module.exports = class Relation {
     } else this.isValid = false
   }
 
+  get capitalizedName () {
+    const capitalizeFirstLetter = (str = '') => {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    }
+    return capitalizeFirstLetter(this.name)
+  }
+
   get isRequired () {
     return this.columnNullable === 'NO'
   }

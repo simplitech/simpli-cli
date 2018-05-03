@@ -9,17 +9,21 @@ module.exports = class Column {
     this.foreign = null // Relation class
   }
 
-  defineAsObject (foreignName) {
-  }
-
   get name () {
     return this.field
+  }
+
+  get capitalizedName () {
+    const capitalizeFirstLetter = (str = '') => {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    }
+    return capitalizeFirstLetter(this.name)
   }
 
   get kotlinType () {
     const type = this.type || ''
     if ((type.match(/^VARCHAR|TEXT(?:\(\d+\))*$/gi))) return 'String'
-    if ((type.match(/^INT(?:\(\d+\))*$/gi))) return 'Long'
+    if ((type.match(/^INT|BIGINT(?:\(\d+\))*$/gi))) return 'Long'
     if ((type.match(/^DOUBLE(?:\(\d+\))*$/gi))) return 'Double'
     if ((type.match(/^TINYINT(?:\(\d+\))*$/gi))) return 'Boolean'
     if ((type.match(/^DATE|DATETIME(?:\(\d+\))*$/gi))) return 'Date'
@@ -41,6 +45,18 @@ module.exports = class Column {
     if (this.isLong) return '0'
     if (this.isDouble) return '0.0'
     if (this.isBoolean) return 'false'
+    return 'null'
+  }
+
+  get testValue () {
+    if (!this.isRequired) return 'null'
+    if (this.isID) return '1'
+    if (this.isLong) return '1'
+    if (this.isDouble) return '1.0'
+    if (this.isBoolean) return 'true'
+    if (this.isEmail) return '\"any@email.com\"'
+    if (this.isString) return '\"X\"'
+    if (this.isDate) return 'Date()'
     return 'null'
   }
 
@@ -105,6 +121,15 @@ module.exports = class Column {
     const reservedWords = [
       'password',
       'senha'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isEmail () {
+    const reservedWords = [
+      'email',
+      'e-mail',
+      'mail'
     ]
     return !!reservedWords.find((word) => word === this.name)
   }

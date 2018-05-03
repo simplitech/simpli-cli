@@ -131,6 +131,7 @@ class Router : RouterWrapper() {
         }
     }
 
+<%_ if (table.hasPersist) { _%>
     @POST
     @Path("/<%-table.modelName%>")
     @ApiOperation(value = "Persist a new or existing <%-table.modelName%>", notes = "1 - Informed <%-table.modelName%> have an ID editing the existing <%-table.modelName%>; 2 - Informed <%-table.modelName%> don't have an ID creating a new <%-table.modelName%>")
@@ -152,6 +153,7 @@ class Router : RouterWrapper() {
         }
     }
 
+<%_ } _%>
 <%_ if (table.isRemovable) { _%>
     @DELETE
     @Path("/<%-table.modelName%>/<%-table.primariesBySlash()%>")

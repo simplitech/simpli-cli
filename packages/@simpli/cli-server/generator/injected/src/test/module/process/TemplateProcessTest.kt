@@ -1,8 +1,14 @@
-package br.com.martinlabs.usecase.crud.process
+<%_ var packageAddress = options.serverSetup.packageAddress _%>
+<%_ var moduleName = options.serverSetup.moduleName _%>
+<%_ var database = options.serverSetup.connection.database _%>
+package <%-packageAddress%>.<%-moduleName%>.process
 
-import br.com.martinlabs.usecase.model.Principal
-import br.com.martinlabs.usecase.model.Tag
-import br.com.martinlabs.usecase.crud.response.PrincipalResp
+import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+import <%-packageAddress%>.model.<%-m2m.crossRelationModelName%>
+<%_ } _%>
+import <%-packageAddress%>.exception.HttpException
 import com.simpli.model.EnglishLanguage
 import com.simpli.model.RespException
 import com.simpli.sql.Dao
@@ -18,21 +24,21 @@ import org.junit.Test
 import org.junit.Before
 
 /**
- * Tests Principal business logic
- * @author martinlabs CRUD generator
+ * Tests <%-table.modelName%> business logic
+ * @author Simpli© CLI generator
  */
-class PrincipalProcessTest @Throws(NamingException::class, SQLException::class)
-constructor() : DaoTest("jdbc/usecaseDS", "usecase") {
+class <%-table.modelName%>ProcessTest @Throws(NamingException::class, SQLException::class)
+constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     private val con: Connection
     private val loginS: LoginService
-    private val subject: PrincipalProcess
+    private val subject: <%-table.modelName%>Process
 
     init {
         con = getConnection()
         val lang = EnglishLanguage()
         val clientVersion = "w1.0.0"
-        subject = PrincipalProcess(con, lang, clientVersion)
+        subject = <%-table.modelName%>Process(con, lang, clientVersion)
         loginS = LoginService(con, lang, clientVersion)
     }
 
@@ -56,7 +62,7 @@ constructor() : DaoTest("jdbc/usecaseDS", "usecase") {
     @Test
     fun testListWithQuery() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
-        val query = "lorem"
+        val query: String? = "1"
         val page = 0
         val limit = 20
         val orderRequest: String? = null
@@ -74,90 +80,81 @@ constructor() : DaoTest("jdbc/usecaseDS", "usecase") {
     fun testGetOne() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
 
-        val result = subject.getOne(1L, token)
+        val result = subject.getOne(<%-table.primariesTestValuesByParam()%>, token)
         assertNotNull(result)
-        assertNotNull(result.principal)
-        assertFalse(result.allGrupoDoPrincipal!!.isEmpty())
-        assertNotNull(result.allGrupoDoPrincipal!![0])
-        assertFalse(result.allTag!!.isEmpty())
-        assertNotNull(result.allTag!![0])
-
+        assertNotNull(result.<%-table.instanceName%>)
+<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
+        assertFalse(result.all<%-relation.referencedTableModelName%>!!.isEmpty())
+        assertNotNull(result.all<%-relation.referencedTableModelName%>!![0])
+<%_ } _%>
     }
+<%_ if (table.hasUnique) { _%>
 
-    @Test(expected = RespException::class)
-    fun testPersistWithRepeatedUnico() {
+<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
+    @Test(expected = HttpException::class)
+    fun testPersistWithRepeated<%-column.capitalizedName%>() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
-        val principal = Principal() 
-        principal.idGrupoDoPrincipalFk = 1
-        principal.textoObrigatorio = "X"
-        principal.decimalObrigatorio = 1.0
-        principal.inteiroObrigatorio = 1
-        principal.dataObrigatoria = Date()
-        principal.datahoraObrigatoria = Date()
-        principal.dataCriacao = Date()
-        principal.unico = "lorem"
-        
-        subject.persist(principal, token)
+        val <%-table.instanceName%> = <%-table.modelName%>()
+<%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
+<%_ if (column.name !== col.name && !col.isID) { _%>
+        <%-table.instanceName%>.<%-col.name%> = <%-col.testValue%>
+<%_ } _%>
+<%_ } _%>
+
+        <%-table.instanceName%>.<%-column.name%> = "lorem"
+
+        subject.persist(<%-table.instanceName%>, token)
     }
+<%_ } _%>
+<%_ } _%>
+<%_ if (table.hasPersist) { _%>
 
     @Test
     fun testPersist() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
-        val principal = Principal() 
-        principal.idGrupoDoPrincipalFk = 1
-        principal.textoObrigatorio = "X"
-        principal.decimalObrigatorio = 1.0
-        principal.inteiroObrigatorio = 1
-        principal.dataObrigatoria = Date()
-        principal.datahoraObrigatoria = Date()
-        principal.unico = "X"
-        principal.dataCriacao = Date()
-        
-        val result = subject.persist(principal, token)
+        val <%-table.instanceName%> = <%-table.modelName%>()
+<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
+        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
+<%_ } _%>
+
+        val result = subject.persist(<%-table.instanceName%>, token)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 
     @Test
-    fun testPersistWithTagPrincipal() {
+    fun testPersistWith<%-m2m.pivotModelName%>() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
-        val principal = Principal() 
-        principal.idGrupoDoPrincipalFk = 1
-        principal.textoObrigatorio = "X"
-        principal.decimalObrigatorio = 1.0
-        principal.inteiroObrigatorio = 1
-        principal.dataObrigatoria = Date()
-        principal.datahoraObrigatoria = Date()
-        principal.unico = "X"
-        principal.dataCriacao = Date()
-        principal.tagPrincipal = ArrayList()
-        val tag = Tag()
-        tag.idTagPk = 1
-        principal.tagPrincipal!!.add(tag)
+        val <%-table.instanceName%> = <%-table.modelName%>()
+<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
+        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
+<%_ } _%>
+        <%-table.instanceName%>.<%-m2m.pivotInstanceName%> = ArrayList()
+        val <%-m2m.crossRelationInstanceName%> = <%-m2m.crossRelationModelName%>()
+        <%-m2m.crossRelationInstanceName%>.<%-m2m.crossRelationColumnName%> = 1
+        <%-table.instanceName%>.<%-m2m.pivotInstanceName%>!!.add(<%-m2m.crossRelationInstanceName%>)
         
-        val result = subject.persist(principal, token)
+        val result = subject.persist(<%-table.instanceName%>, token)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
+<%_ } _%>
 
     @Test
     fun testPersistUpdating() {
         val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
-        val principal = Principal() 
-        principal.idPrincipalPk = 1
-        principal.idGrupoDoPrincipalFk = 1
-        principal.textoObrigatorio = "X"
-        principal.decimalObrigatorio = 1.0
-        principal.inteiroObrigatorio = 1
-        principal.dataObrigatoria = Date()
-        principal.datahoraObrigatoria = Date()
-        principal.unico = "X"
-        principal.dataCriacao = Date()
-        
-        val result = subject.persist(principal, token)
+        val <%-table.instanceName%> = <%-table.modelName%>()
+<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
+        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
+<%_ } _%>
+
+        val result = subject.persist(<%-table.instanceName%>, token)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
+<%_ } _%>
+<%_ if (table.isRemovable) { _%>
 
     @Test
     fun testRemove() {
@@ -165,5 +162,5 @@ constructor() : DaoTest("jdbc/usecaseDS", "usecase") {
         
         subject.remove(1L, token)
     }
-
+<%_ } _%>
 }
