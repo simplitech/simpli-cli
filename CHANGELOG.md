@@ -1,3 +1,8 @@
+<a name="0.3.4"></a>
+## [0.3.4](https://github.com/simplitech/simpli-cli/compare/v0.3.3...v0.3.4) (2018-05-03)
+
+
+
 <a name="0.3.3"></a>
 ## [0.3.3](https://github.com/simplitech/simpli-cli/compare/v0.3.1...v0.3.3) (2018-05-02)
 
