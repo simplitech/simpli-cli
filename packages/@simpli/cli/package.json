@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli",
-  "version": "0.3.6",
+  "version": "1.0.0-0",
   "description": "Simpli CLI commands",
   "bin": {
     "simpli": "bin/simpli.js"
@@ -11,7 +11,13 @@
   ],
   "keywords": [
     "simpli",
-    "cli"
+    "cli",
+    "generator",
+    "boilerplate",
+    "typescript",
+    "vue",
+    "kotlin",
+    "mysql"
   ],
   "author": "Felipe Gibran Eleuterio Toledo",
   "license": "MIT",

@@ -64,7 +64,7 @@ project-root/
 
 ### Client Project
 
-> Client projects are generated based on `swagger.json` which can be found in server projects. It provides an interface with `CRUDs`, including `Login System`. Also, `SimpliPack` classes support you to easily develop your platform system. Access the [simpli-ts-vue documentation](#) to further information.
+> Client projects are generated based on `swagger.json` which can be found in server projects. It provides an interface with `CRUDs`, including `Login System`. Also, `SimpliPack` classes support you to easily develop your platform system. Access the [simpli-ts-vue documentation](https://github.com/simplitech/simpli-ts-vue) to further information.
 
 #### Requirements
 ```
