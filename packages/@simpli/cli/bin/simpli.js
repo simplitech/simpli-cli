@@ -21,8 +21,8 @@ program
 program
   .command('new:project <project-name>')
   .description('create a new simpli project')
-  .option('-d, --default', 'Skip prompts and use default preset')
-  .option('-f, --force', 'Overwrite target directory if it exists')
+  .option('-d, --default', 'skip prompts and use default preset')
+  .option('-f, --force', 'overwrite target directory if it exists')
   .action((name, cmd) => {
     require('../lib/cmd/newProject')(name, cleanArgs(cmd))
   })
@@ -36,21 +36,21 @@ program
 
 program
   .command('scaffold:sync')
-  .description('sync the current frontend project based on its webserver swagger')
+  .description('synchronize the models of the current frontend project based on its web server swagger')
   .action(() => {
     require('../lib/cmd/scaffoldSync')()
   })
 
 program
   .command('server:inspect [paths...]')
-  .description('inspect the tables of a MYSQL database')
+  .description('inspect the tables of a MySQL database')
   .action((paths) => {
     require('../lib/cmd/serverInspect')(paths)
   })
 
 program
   .command('server:sync')
-  .description('sync the current backend project based on its database')
+  .description('synchronize the tables of the current backend project based on its MySQL database')
   .action(() => {
     require('../lib/cmd/serverSync')()
   })

@@ -159,6 +159,7 @@ module.exports = class Server {
     stopSpinner()
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
+    log(`👉  Start the server by running your ${chalk.cyan('tomcat server')} and ${chalk.cyan('catalina')}`)
     log()
 
     generator.printExitLogs()
