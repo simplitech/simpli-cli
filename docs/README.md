@@ -129,7 +129,7 @@ Once you have installed, simply go to your workspace directory and run the follo
 $ simpli new:project [project-name]
 ```
 
-You may now choice between `Server Project` and `Client Project`.
+You may now choose between `Server Project` and `Client Project`.
 
 ---
 
@@ -222,7 +222,7 @@ $ simpli new:project [options] <project-name>
 #### Usage
 
 ```sh
-$ scaffold:inspect [options] [paths...]
+$ simpli scaffold:inspect [options] [paths...]
 ```
 
 > inspect the models and APIs based on swagger
@@ -252,7 +252,7 @@ $ simpli scaffold:inspect api.signIn
 #### Usage
 
 ```sh
-$ scaffold:sync [options]
+$ simpli scaffold:sync [options]
 ```
 
 > synchronize the models of the current frontend project based on its web server swagger
@@ -271,7 +271,7 @@ $ scaffold:sync [options]
 #### Usage
 
 ```sh
-$ server:inspect [options] [paths...]
+$ simpli server:inspect [options] [paths...]
 ```
 
 > inspect the tables of a MySQL database
@@ -301,7 +301,7 @@ $ simpli server:inspect table.user.columns
 #### Usage
 
 ```sh
-$ server:sync [options]
+$ simpli server:sync [options]
 ```
 
 > synchronize the tables of the current backend project based on its MySQL database
