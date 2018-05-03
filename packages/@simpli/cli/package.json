@@ -1,7 +1,12 @@
 {
   "name": "@simpli/cli",
-  "version": "1.0.0",
-  "description": "Simpli CLI commands",
+  "version": "1.0.1-0",
+  "description": "Tools to generate either web-server or web-client projects based on a MySQL database scheme",
+  "homepage": "https://github.com/simplitech/simpli-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simplitech/simpli-cli.git"
+  },
   "bin": {
     "simpli": "bin/simpli.js"
   },
@@ -19,6 +24,9 @@
     "kotlin",
     "mysql"
   ],
+  "bugs": {
+    "url": "https://github.com/simplitech/simpli-cli/issues"
+  },
   "author": "Felipe Gibran Eleuterio Toledo",
   "license": "MIT",
   "publishConfig": {
