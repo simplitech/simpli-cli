@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256">
+</p>
+
 # Simpli CLI
 
 * [About](#about)
@@ -33,23 +37,23 @@ Simpli CLI provides tools to generate either web-server or web-client projects b
 #### Structure
 ```
 project-root/
-	src/
-    	resource/
-    	main/
+    src/
+        resource/
+        main/
             java/
-            	crud/
-            	    process/
-            	    response/
-            	dao/
-            	model/
+                crud/
+                    process/
+                    response/
+                dao/
+                model/
             webapp/
-            	META-INF/
-            	WEB-INF/
+                META-INF/
+                WEB-INF/
         test/
-        	java/
-        		crud/
-              		process/
-        		model/
+            java/
+                crud/
+                    process/
+                model/
 ```
 
 ---
@@ -79,28 +83,28 @@ project-root/
 #### Structure
 ```
 project-root/
-	public/
-    	img/
-	src/
-    	assets/
-        	img/
+    public/
+        img/
+    src/
+        assets/
+            img/
         bootstrap/
         components/
-        	modals/
+            modals/
         config/
         helpers/
-        	vuex/
+            vuex/
         locale/
         model/
-        	collection/
+            collection/
             resource/
             response/
         scss/
         store/
-        	modules/
+            modules/
         types/
         views/
-        	layouts/
+            layouts/
             list/
             persist/
 ```
@@ -129,15 +133,15 @@ You may now choice between `Server Project` and `Client Project`.
 
 When you choose the `Server Project`, you have to provide your MySQL access with the chosen database:
 
-![Server Prompt MySQL Access](http://imgur.com/myimage.jpg "An optional title")
+![Server Prompt MySQL Access](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img1.png)
 
 Then, fill the rest of the prompt and confirm. Follow this example:
 
-![Server Prompt Example](http://imgur.com/myimage.jpg "An optional title")
+![Server Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img2.png)
 
 Once you have run your generated server, you may access `localhost:8080` (it can vary depending on your Tomcat configuration):
 
-![Server Running](http://imgur.com/myimage.jpg "An optional title")
+![Server Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img3.png)
 
 Copy the swagger URL in order to generate the `Client Project`.
 
@@ -147,11 +151,11 @@ Copy the swagger URL in order to generate the `Client Project`.
 
 When you choose the `Client Project`, you have to provide the swagger URL found in your `Server Project`:
 
-![Client Prompt Swagger Request](http://imgur.com/myimage.jpg "An optional title")
+![Client Prompt Swagger Request](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img1.png)
 
 Then, fill the rest of the prompt and confirm. Follow this example:
 
-![Client Prompt Example](http://imgur.com/myimage.jpg "An optional title")
+![Client Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img2.png)
 
 Once you have generated the client, go to your project directory and run:
 
@@ -166,7 +170,7 @@ to build for `production mode`.
 
 When you enter on `dev`, you may see this screen at `localhost:8181`:
 
-![Client Running](http://imgur.com/myimage.jpg "An optional title")
+![Client Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img3.png)
 
 #### _Important_
 > The password column of your login table must be encrypted by `double SHA-256`. E.g.: The password `123456` should be `49dc52e6bf2abe5ef6e2bb5b0f1ee2d765b922ae6cc8b95d39dc06c21c848f8c` in the password column.
@@ -228,7 +232,7 @@ $ scaffold:inspect [options] [paths...]
 $ simpli scaffold:inspect api.signIn
 ```
 
-![Scaffold Inspect Example](http://imgur.com/myimage.jpg "An optional title")
+![Scaffold Inspect Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-inspect-example.png)
 
 ---
 
@@ -277,7 +281,7 @@ $ server:inspect [options] [paths...]
 $ simpli server:inspect table.user.columns
 ```
 
-![Server Inspect Example](http://imgur.com/myimage.jpg "An optional title")
+![Server Inspect Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-inspect-example.png)
 
 ---
 
@@ -300,4 +304,3 @@ $ server:sync [options]
 ```
 
 ---
-
