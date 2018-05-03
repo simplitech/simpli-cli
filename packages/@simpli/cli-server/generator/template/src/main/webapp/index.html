@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="shortcut icon" href="./favicon.png">
+  <link rel="stylesheet" type="text/css" href="./bootstrap.min.css">
+  <title><%-options.serverSetup.serverName || 'Webserver'%></title>
+  <style>
+    html, body, main {
+      min-height: 100vh;
+    }
+
+    main {
+      background: url(./bg.jpg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1em 0;
+    }
+
+    .jumbotron {
+      margin: 0;
+      background: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="container">
+    <div class="jumbotron">
+      <h1 class="display-4">
+        <img src="./simpli.png" alt="simpli" height="80">
+        The server is running!
+      </h1>
+      <p class="lead">
+        Run <mark><code>simpli server:sync</code></mark> to syncronize new tables
+        or <mark><code>simpli server:inspect</code></mark> to inspect your MYSQL database.
+        <br>
+        You can use the server APIs either on the <strong>Web Client</strong> or <strong>Mobile Client</strong>.
+      </p>
+      <hr class="my-4">
+      <p class="lead">
+        Don't you have Web Client yet? Go to your workspace directory and run this following:
+      </p>
+      <p class="text-center lead">
+        <mark>
+          <code>simpli new:project [project-name]</code>
+        </mark>
+        <br>
+      </p>
+      <p class="text-center lead">
+        Access the <a href="https://github.com/simplitech/simpli-cli" target="_blank">documentation</a>
+        to further information
+      </p>
+      <hr class="my-4">
+      <p class="lead">
+        By running this command you should copy this URL swagger:
+      </p>
+      <p class="text-center lead">
+        <mark>
+          <code id="swagger"></code>
+        </mark>
+      </p>
+      <div class="blockquote-footer text-right">
+        Developed with ♥ by <a href="https://www.simpli.com.br" target="_blank">Simpli</a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+<script>
+  var url = location.href + 'api/swagger.json'
+  var swagger = document.getElementById('swagger')
+  swagger.innerHTML = url
+</script>
+</html>
