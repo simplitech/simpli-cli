@@ -1,5 +1,9 @@
 <p align="center">
-  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256">
+  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256" height="256">
+  <br>
+  <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/v/@simpli/cli.svg"></a>
+  <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/dt/@simpli/cli.svg"></a>
+  <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/l/@simpli/cli.svg"></a>
 </p>
 
 # Simpli CLI
@@ -180,6 +184,12 @@ When you enter on `dev`, you may see this screen at `localhost:8181`:
 ## Commands
 
 > Check it out the Simpli CLI commands
+
+* [New Project](#new-project)
+* [Scaffold Inspect](#scaffold-inspect)
+* [Scaffold Sync](#scaffold-sync)
+* [Server Inspect](#server-inspect)
+* [Server Sync](#server-sync)
 
 ---
 
