@@ -54,11 +54,11 @@ module.exports = class Server {
     // Set the server name
     const { serverName } = await Database.requestServerName(this.name)
 
-    // Select tables to be added
-    const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
-
     // Set module name and package address
     const { moduleName, packageAddress } = await Database.requestModuleAndPackage(serverName)
+
+    // Select tables to be added
+    const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
 
     // Set user table
     const {
@@ -66,6 +66,9 @@ module.exports = class Server {
       accountColumn,
       passwordColumn
     } = await Database.requestUserTable(availableTables, filteredTables)
+
+    // Add data.sql
+    const { seedSamples } = await Database.requestSeed()
 
     await Database.confirm()
 
@@ -78,6 +81,8 @@ module.exports = class Server {
     this.serverSetup.userTable = userTable
     this.serverSetup.accountColumn = accountColumn
     this.serverSetup.passwordColumn = passwordColumn
+
+    this.serverSetup.seedSamples = seedSamples
   }
 
   async create () {
@@ -209,6 +214,12 @@ module.exports = class Server {
       'package.json': JSON.stringify(pkg, null, 2)
     })
 
+    // install plugins
+    await clearConsole()
+    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log()
+    await installDeps(context, 'npm')
+
     log()
     log(`⚙️  Synchronizing tables...`)
     const plugins = this.resolvePlugins(preset.plugins)
@@ -229,12 +240,84 @@ module.exports = class Server {
     log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
   }
 
+  async newSeed (defaultConnection) {
+    const run = (command, args) => {
+      if (!args) { [command, ...args] = command.split(/\s+/) }
+      return execa(command, args, { cwd: context })
+    }
+
+    // Get data normalize database
+    const { connection, availableTables } = await Database.requestConnection(this.serverSetup, defaultConnection)
+    // Select tables to be added
+    await Database.requestTables(availableTables, this.serverSetup)
+    // Define number of seed samples
+    const { seedSamples } = await Database.requestSeedSamples()
+
+    await Database.confirm()
+
+    this.serverSetup.connection = connection
+    this.serverSetup.seedSamples = seedSamples
+
+    const { context, createCompleteCbs } = this
+
+    const preset = {
+      plugins: {
+        '@simpli/cli-server': {
+          serverSetup: this.serverSetup,
+          seed: true
+        }
+      }
+    }
+
+    // get latest CLI version
+    const { latest } = await getVersions()
+    // generate package.json with plugin dependencies
+    const pkg = {
+      name: 'sync-server',
+      version: '0.1.0',
+      private: true,
+      devDependencies: {}
+    }
+    const deps = Object.keys(preset.plugins)
+    deps.forEach(dep => {
+      pkg.devDependencies[dep] = preset.plugins[dep].version ||
+        (/^@simpli/.test(dep) ? `${latest}` : `latest`)
+    })
+    // write package.json
+    await writeFileTree(context, {
+      'package.json': JSON.stringify(pkg, null, 2)
+    })
+
+    // install plugins
+    await clearConsole()
+    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log()
+    await installDeps(context, 'npm')
+
+    log()
+    log(`⚙️  Creating data.sql...`)
+    const plugins = this.resolvePlugins(preset.plugins)
+    const generator = new Generator(context, {
+      pkg: { _ignore: true },
+      plugins,
+      completeCbs: createCompleteCbs
+    })
+    await generator.generate()
+
+    await run(`rm -rf ./node_modules`)
+    await run(`rm -f ./package.json`)
+    await run(`rm -f ./package-lock.json`)
+
+    log()
+    log(`🎉  Successfully created data.sql`)
+  }
+
   resolvePlugins (rawPlugins) {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync(`../../../cli-server/generator`)
+      // const module = resolve.sync(`${id}/generator`, { basedir: this.context })
+      const module = resolve.sync(`../../../cli-server/generator`)
       return {
         id,
         apply: require(module),

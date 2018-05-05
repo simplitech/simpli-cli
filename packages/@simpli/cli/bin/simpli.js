@@ -28,6 +28,13 @@ program
   })
 
 program
+  .command('new:seed')
+  .description('create test data from a backend project into data.sql')
+  .action(() => {
+    require('../lib/cmd/newSeed')()
+  })
+
+program
   .command('scaffold:inspect [paths...]')
   .description('inspect the models and APIs based on swagger')
   .action((paths) => {
@@ -53,6 +60,13 @@ program
   .description('synchronize the tables of the current backend project based on its MySQL database')
   .action(() => {
     require('../lib/cmd/serverSync')()
+  })
+
+program
+  .command('server:seed')
+  .description('seed the database with test data from the current backend project')
+  .action(() => {
+    require('../lib/cmd/serverSeed')()
   })
 
 // output help information on unknown commands

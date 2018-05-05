@@ -1,6 +1,12 @@
 module.exports = (api, options) => {
+  if (options.seed) {
+    api.renderFrom('./injected', 'data.sql', `./src/test/resources/database/data.sql`)
+    return
+  }
+
   if (!options.sync) {
     api.render('./template')
+    api.renderFrom('./injected', 'data.sql', `./src/test/resources/database/data.sql`)
   }
 
   const commonTables = options.serverSetup.commonTables

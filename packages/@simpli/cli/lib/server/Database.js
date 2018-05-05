@@ -1,8 +1,14 @@
+/* eslint-disable handle-callback-err */
+const fs = require('fs')
 const inquirer = require('inquirer')
+const chalk = require('chalk')
 const mysql = require('promise-mysql')
 const camelCase = require('lodash.camelcase')
 const {
-  error
+  log,
+  error,
+  logWithSpinner,
+  stopSpinner
 } = require('@vue/cli-shared-utils')
 
 module.exports = class Database {
@@ -137,34 +143,6 @@ module.exports = class Database {
     return { serverName }
   }
 
-  static async requestTables (availableTables = [], serverSetup) {
-    const { useAllTables } = await inquirer.prompt([
-      {
-        name: 'useAllTables',
-        type: 'confirm',
-        message: 'Add all available tables?'
-      }
-    ])
-
-    let filteredTables
-    if (!useAllTables) {
-      const { filteredTableNames } = await inquirer.prompt([
-        {
-          name: 'filteredTableNames',
-          type: 'checkbox',
-          choices: availableTables.map((table) => table.name),
-          message: 'Which of these tables do you want to include?'
-        }
-      ])
-
-      filteredTables = serverSetup.tables
-        .filter((table) => filteredTableNames.find((name) => name === table.name))
-    } else filteredTables = availableTables
-
-    serverSetup.tables = filteredTables
-    return { filteredTables }
-  }
-
   static async requestModuleAndPackage (defaultName) {
     let { moduleName } = await inquirer.prompt([
       {
@@ -196,6 +174,34 @@ module.exports = class Database {
     return { moduleName, packageAddress }
   }
 
+  static async requestTables (availableTables = [], serverSetup) {
+    const { useAllTables } = await inquirer.prompt([
+      {
+        name: 'useAllTables',
+        type: 'confirm',
+        message: 'Include all available tables?'
+      }
+    ])
+
+    let filteredTables
+    if (!useAllTables) {
+      const { filteredTableNames } = await inquirer.prompt([
+        {
+          name: 'filteredTableNames',
+          type: 'checkbox',
+          choices: availableTables.map((table) => table.name),
+          message: 'Which tables do you want to include?'
+        }
+      ])
+
+      filteredTables = serverSetup.tables
+        .filter((table) => filteredTableNames.find((name) => name === table.name))
+    } else filteredTables = availableTables
+
+    serverSetup.tables = filteredTables
+    return { filteredTables }
+  }
+
   static async requestUserTable (availableTables = [], filteredTables = []) {
     const { userTableName } = await inquirer.prompt([
       {
@@ -203,7 +209,7 @@ module.exports = class Database {
         type: 'list',
         choices: availableTables.map((table) => table.name),
         default: availableTables.findIndex((table) => table.name === 'user') || 0,
-        message: 'Which of these tables is the user table (for login)?'
+        message: 'Which table is the user?'
       }
     ])
     const userTable = availableTables.find((table) => table.name === userTableName)
@@ -215,7 +221,7 @@ module.exports = class Database {
         type: 'list',
         choices: availableColumns.map((column) => column.name),
         default: availableColumns.findIndex((column) => !!['account', 'email'].find((name) => column.name === name)) || 0,
-        message: 'Which of these columns is the account column?'
+        message: 'Which column is the account (for login)?'
       }
     ])
     const { passwordColumnName } = await inquirer.prompt([
@@ -224,7 +230,7 @@ module.exports = class Database {
         type: 'list',
         choices: availableColumns.map((column) => column.name),
         default: availableColumns.findIndex((column) => !!['password', 'senha'].find((name) => column.name === name)) || 0,
-        message: 'Which of these columns is the password column?'
+        message: 'Which column is the password?'
       }
     ])
     const accountColumn = availableColumns.find((column) => column.name === accountColumnName)
@@ -238,13 +244,51 @@ module.exports = class Database {
     return { userTable, accountColumn, passwordColumn }
   }
 
+  static async requestSeed () {
+    const { confirm } = await inquirer.prompt([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        message: 'Do you want to add data.sql for seeding?'
+      }
+    ])
+
+    if (confirm) {
+      return await this.requestSeedSamples()
+    }
+
+    return { seedSamples: null }
+  }
+
+  static async requestSeedSamples () {
+    const { seedSamples } = await inquirer.prompt([
+      {
+        name: 'seedSamples',
+        type: 'input',
+        message: 'How many samples in data.sql?',
+        default: '50',
+        validate: (value) => {
+          const valid = !isNaN(parseFloat(value))
+          if (valid) {
+            const val = Number(value)
+            if (val < 1 || val > 1000) return 'Enter a value between 1 and 1000'
+            return true
+          }
+          return 'Please enter a number'
+        }
+      }
+    ])
+
+    return { seedSamples: Number(seedSamples) }
+  }
+
   static async requestSync (availableTables = [], serverSetup) {
     const { syncTableNames } = await inquirer.prompt([
       {
         name: 'syncTableNames',
         type: 'checkbox',
         choices: availableTables.map((table) => table.name),
-        message: 'Which of these tables do you want to sync?'
+        message: 'Which tables do you want to sync?'
       }
     ])
 
@@ -265,6 +309,55 @@ module.exports = class Database {
     ])
 
     if (!confirm) {
+      process.exit(1)
+    }
+  }
+
+  static async seedDatabase (dataPath, connection) {
+    if (connection.host !== 'localhost') {
+      error('For security reasons, this operation only allows MySQL host from localhost')
+      process.exit(1)
+    }
+
+    log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)}`)
+    try {
+      const { confirm } = await inquirer.prompt([
+        {
+          name: 'confirm',
+          type: 'confirm',
+          message: `Do you want to proceed?`,
+          default: false
+        }
+      ])
+      if (!confirm) {
+        process.exit(1)
+      }
+
+      const { databaseConfirm } = await inquirer.prompt([
+        {
+          name: 'databaseConfirm',
+          type: 'input',
+          message: 'Enter the name of database to confirm'
+        }
+      ])
+      if (databaseConfirm !== connection.database) {
+        error('Wrong database name')
+        process.exit(1)
+      }
+
+      await fs.readFile(dataPath, 'utf8', async (err, data) => {
+        logWithSpinner(`✨`, `Seeding ${chalk.yellow(connection.database)}.`)
+
+        connection.multipleStatements = true
+
+        const conn = await mysql.createConnection(connection)
+        conn.query(data)
+        conn.end()
+
+        stopSpinner()
+      })
+    } catch (e) {
+      error(e.sqlMessage || e)
       process.exit(1)
     }
   }

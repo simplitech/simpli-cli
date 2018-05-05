@@ -88,7 +88,7 @@ module.exports = class Swagger {
       {
         name: 'useAllModels',
         type: 'confirm',
-        message: 'Add all available models?'
+        message: 'Include all available models?'
       }
     ])
 
@@ -99,7 +99,7 @@ module.exports = class Swagger {
           name: 'filteredModelNames',
           type: 'checkbox',
           choices: availableModels.map((model) => model.name),
-          message: 'Which of these models do you want to include?'
+          message: 'Which models do you want to include?'
         }
       ])
 
@@ -190,7 +190,7 @@ module.exports = class Swagger {
         type: 'list',
         choices: apis.map((api) => api.name),
         default: apis.findIndex((api) => api.name === 'signIn') || 0,
-        message: 'Which one of these is the sign-in API?'
+        message: 'Which API is the sign-in?'
       }
     ])
     const { authApiName } = await inquirer.prompt([
@@ -199,7 +199,7 @@ module.exports = class Swagger {
         type: 'list',
         choices: apis.map((api) => api.name),
         default: apis.findIndex((api) => api.name === 'auth') || 0,
-        message: 'Which one of these is the authentication API?'
+        message: 'Which API is the authentication?'
       }
     ])
 
@@ -225,7 +225,7 @@ module.exports = class Swagger {
         type: 'list',
         choices: loginHolderModel.attrs.map((api) => api.name),
         default: loginHolderModel.attrs.findIndex((api) => !!['account', 'email'].find((name) => api.name === name)) || 0,
-        message: 'Which of these attributes is the account column?'
+        message: 'Which attribute is the account (for login)?'
       }
     ])
     const { passwordAttrName } = await inquirer.prompt([
@@ -234,7 +234,7 @@ module.exports = class Swagger {
         type: 'list',
         choices: loginHolderModel.attrs.map((api) => api.name),
         default: loginHolderModel.attrs.findIndex((api) => !!['password', 'senha'].find((name) => api.name === name)) || 0,
-        message: 'Which of these attributes is the password column?'
+        message: 'Which attribute is the password?'
       }
     ])
 

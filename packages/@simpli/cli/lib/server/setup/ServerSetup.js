@@ -5,6 +5,7 @@ const ManyToMany = require('./ManyToMany')
 const camelCase = require('lodash.camelcase')
 const uniqBy = require('lodash.uniqby')
 const uuid = require('uuid')
+const faker = require('faker')
 
 module.exports = class ServerSetup {
   constructor () {
@@ -21,6 +22,7 @@ module.exports = class ServerSetup {
     this.userTable = new Table()
     this.accountColumn = new Column()
     this.passwordColumn = new Column()
+    this.seedSamples = null
     this.tables = []
   }
 
@@ -159,18 +161,91 @@ module.exports = class ServerSetup {
   uuid () {
     return uuid.v4()
   }
+
   capitalizeFirstLetter (str = '') {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-  randomString (len, an) {
-    an = an && an.toLowerCase()
-    let str = ''
-    const min = an === 'a' ? 10 : 0
-    const max = an === 'n' ? 10 : 62
-    for (let i = 0; i < len; i++) {
-      let r = Math.random() * (max - min) + min << 0
-      str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48)
-    }
-    return str
+
+  randomString (length) {
+    return faker.random.alphaNumeric(length)
+  }
+
+  dataFactory () {
+    let result = ''
+    const samples = this.seedSamples || 1
+
+    result += `SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;\n`
+    result += `SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;\n`
+    result += `SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';\n\n`
+
+    result += `USE ${this.connection.database};\n\n`
+
+    this.tables.forEach((table) => {
+      result += `TRUNCATE TABLE \`${table.name}\`;\n`
+    })
+
+    result += `\n`
+
+    this.tables.forEach((table) => {
+      const isUserTable = table.name === this.userTable.name
+
+      result += `LOCK TABLES \`${table.name}\` WRITE;\n\n`
+
+      result += `INSERT INTO \`${table.name}\`\n`
+      result += `(`
+      table.columns.forEach((column) => {
+        result += `${column.name},`
+      })
+      result = result.slice(0, -1) // remove last comma
+      result += `)\n`
+      result += `VALUES\n`
+
+      for (let i = 0; i < samples; i++) {
+        result += `(`
+        table.columns.forEach((column) => {
+          if (column.isID) {
+            result += `${i + 1}`
+          } else if (column.isForeign) {
+            if (i === 0 || !table.hasID) result += `${i + 1}`
+            else result += `${faker.random.number({ min: 1, max: samples })}`
+          } else if (column.isString) {
+            if (column.isEmail) {
+              const accountColumn = column.name === this.accountColumn.name
+              if (isUserTable && accountColumn && i === 0) result += `'test@test.com'`
+              else result += `'${faker.internet.email()}'`
+            } else if (column.isPassword) result += `SHA2(SHA2('tester', 256), 256)`
+            else if (column.isUrl) result += `'${faker.internet.url()}'`
+            else if (column.isImageUrl) result += `'${faker.image.imageUrl()}'`
+            else if (column.isUnique) result += `'${faker.random.uuid()}'`
+            else {
+              if (column.size && column.size > 128) result += `'${faker.lorem.sentence()}'`
+              else if (column.size && column.size > 32) result += `'${faker.lorem.words()}'`
+              else result += `'${faker.lorem.word()}'`
+            }
+          } else if (column.isLong) {
+            result += `${faker.random.number({ max: 999 })}`
+          } else if (column.isDouble) {
+            result += `${faker.random.number({ max: 999 })}.${faker.random.number({ max: 999 })}`
+          } else if (column.isBoolean) {
+            result += `${faker.random.number({ max: 1 })}`
+          } else if (column.isDate) {
+            result += `'${(faker.date.past() || new Date()).toISOString().substring(0, 23).replace('T', ' ')}'`
+          }
+          result += `,`
+        })
+        result = result.slice(0, -1) // remove last comma
+        result += `),\n`
+      }
+      result = result.slice(0, -2) // remove last comma
+      result += `;\n\n`
+
+      result += `UNLOCK TABLES;\n\n`
+    })
+
+    result += `SET SQL_MODE=@OLD_SQL_MODE;\n`
+    result += `SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;\n`
+    result += `SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;\n`
+
+    return result
   }
 }

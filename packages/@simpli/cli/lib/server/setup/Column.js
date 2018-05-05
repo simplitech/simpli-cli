@@ -134,6 +134,58 @@ module.exports = class Column {
     return !!reservedWords.find((word) => word === this.name)
   }
 
+  get isUrl () {
+    const reservedWords = [
+      'url',
+      'link'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isImageUrl () {
+    const reservedWords = [
+      'imageUrl',
+      'photoUrl',
+      'avatar',
+      'fotoUrl',
+      'urlImagem'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isMoney () {
+    const reservedWords = [
+      'price',
+      'value',
+      'preco',
+      'valor'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isPhone () {
+    const reservedWords = [
+      'phone',
+      'cellphone',
+      'cellPhone',
+      'mobile',
+      'telephone',
+      'phoneNumber',
+      'telefone',
+      'celular'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isZipcode () {
+    const reservedWords = [
+      'zipcode',
+      'zipCode',
+      'cep'
+    ]
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
   get isCpf () {
     const reservedWords = ['cpf']
     return !!reservedWords.find((word) => word === this.name)
@@ -141,6 +193,11 @@ module.exports = class Column {
 
   get isCnpj () {
     const reservedWords = ['cnpj']
+    return !!reservedWords.find((word) => word === this.name)
+  }
+
+  get isRg () {
+    const reservedWords = ['rg']
     return !!reservedWords.find((word) => word === this.name)
   }
 

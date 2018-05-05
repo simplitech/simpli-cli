@@ -40,7 +40,7 @@ class <%-table.modelName%>Test {
 <%_ } _%>
 <%_ } _%>
 
-        <%-table.instanceName%>.<%-column.name%> = "<%-options.serverSetup.randomString(column.size + 1, 'a')%>"
+        <%-table.instanceName%>.<%-column.name%> = "<%-options.serverSetup.randomString(column.size + 1)%>"
 
         <%-table.instanceName%>.validate(false, EnglishLanguage())
     }
