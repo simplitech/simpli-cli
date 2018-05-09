@@ -41,7 +41,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             SELECT *
             FROM <%-table.name%>
 <%_ if (table.isRemovable) { _%>
-            WHERE <%-table.removableColumn.name%> = 1
+            WHERE <%-table.removableColumn.field%> = 1
 <%_ } _%>
             """, { rs -> <%-table.modelName%>.buildAll(rs) })
     }
@@ -57,7 +57,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isPassword) { _%>
-        orderRequestAndColumn.put("<%-column.name%>", "<%-table.name%>.<%-column.name%>")
+        orderRequestAndColumn.put("<%-column.name%>", "<%-table.name%>.<%-column.field%>")
 <%_ } _%>
 <%_ } _%>
 
@@ -65,7 +65,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 
         val params = ArrayList<Any>()
 <%_ if (table.isRemovable) { _%>
-        var where = "WHERE <%-table.removableColumn.name%> = 1 "
+        var where = "WHERE <%-table.removableColumn.field%> = 1 "
 <%_ } else { _%>
         var where = "WHERE 1 = 1 "
 <%_ } _%>
@@ -76,9 +76,9 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isPassword) { _%>
 <%_ if (table.columns[table.columns.length - 1].isPassword) { _%>
-                IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
+                IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
 <%_ } else { _%>
-                IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
+                IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
 <%_ } _%>
 <%_ } _%>
 <%_ } _%>
@@ -106,10 +106,10 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
     fun count(): Int? {
         //TODO: review generated method
         return selectFirstInt("""
-            SELECT COUNT(<%-table.idColumn.name%>)
+            SELECT COUNT(<%-table.idColumn.field%>)
             FROM <%-table.name%>
 <%_ if (table.isRemovable) { _%>
-            WHERE <%-table.removableColumn.name%> = 1
+            WHERE <%-table.removableColumn.field%> = 1
 <%_ } _%>
             """)
     }
@@ -117,15 +117,15 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
     fun count(search: String?): Int? {
         //TODO: review generated method
         return selectFirstInt("""
-            SELECT COUNT(<%-table.idColumn.name%>)
+            SELECT COUNT(<%-table.idColumn.field%>)
             FROM <%-table.name%>
             WHERE LOWER(CONCAT(
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isPassword) { _%>
 <%_ if (table.columns[table.columns.length - 1].isPassword) { _%>
-                IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
+                IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.columns.length - 2 ? ',' : ''%>
 <%_ } else { _%>
-            IFNULL(<%-table.name%>.<%-column.name%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
+            IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.columns.length - 1 ? ',' : ''%>
 <%_ } _%>
 <%_ } _%>
 <%_ } _%>
@@ -141,11 +141,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             SET
 <%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isPassword) { _%>
-            <%-column.name%> = IF(? IS NOT NULL, SHA2(?, 256), <%-column.name%>)<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
+            <%-column.field%> = IF(? IS NOT NULL, SHA2(?, 256), <%-column.field%>)<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } else if (column.isUpdatedAt) { _%>
-            <%-column.name%> = NOW()<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
+            <%-column.field%> = NOW()<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } else if (!column.isCreatedAt) { _%>
-            <%-column.name%> = ?<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
+            <%-column.field%> = ?<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
 <%_ } _%>
             WHERE 1 = 1
@@ -170,7 +170,9 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         return update("""
             INSERT INTO <%-table.name%> (
 <%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
-            <%-column.name%><%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
+<%_ if (!column.isUpdatedAt) { _%>
+            <%-column.field%><%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
+<%_ } _%>
 <%_ } _%>
             ) VALUES (<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
 <%_ if (column.isPassword) { _%>
@@ -194,7 +196,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
     fun exist<%-table.modelName%>(<%-table.primariesByParam()%>): Boolean {
         //TODO: review generated method
         return exist("""
-            SELECT <%-table.idColumn.name%>
+            SELECT <%-table.idColumn.field%>
             FROM <%-table.name%>
             WHERE 1 = 1
             <%-table.primariesByWhere()%>
@@ -205,9 +207,9 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
     fun exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-column.name%>: <%-column.kotlinType%>?, <%-table.primariesByParam()%>): Boolean {
         //TODO: review generated method
         return exist("""
-            SELECT <%-column.name%>
+            SELECT <%-column.field%>
             FROM <%-table.name%>
-            WHERE <%-column.name%> = ?
+            WHERE <%-column.field%> = ?
             <%-table.primariesByWhere(true)%>
             """, <%-column.name%>, <%-table.primariesByComma(true)%>)
     }
@@ -218,7 +220,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         //TODO: review generated method
         return update("""
             UPDATE <%-table.name%>
-            SET <%-table.removableColumn.name%> = 0
+            SET <%-table.removableColumn.field%> = 0
             WHERE 1 = 1
             <%-table.primariesByWhere()%>
             """, <%-table.primariesByComma(true)%>).affectedRows
@@ -233,7 +235,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         return update("""
             INSERT INTO <%-table.name%> (
 <%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
-            <%-column.name%><%-i < foreignColumns.length - 1 ? ',' : ''%>
+            <%-column.field%><%-i < foreignColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
             ) VALUES (<%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
 <%- '?' + (i < foreignColumns.length - 1 ? ',' : '') -%>
@@ -250,7 +252,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ var columnCross = column.name === columnRef2.name ? columnRef2 : columnRef1 _%>
     fun removeAllFrom<%-columnRef.foreign.referencedTableModelName%>(<%-columnRef.name%>: <%-columnRef.kotlinType%>): Int {
         //TODO: review generated method
-        return update("DELETE FROM <%-table.name%> WHERE <%-columnRef.name%> = ? ",
+        return update("DELETE FROM <%-table.name%> WHERE <%-columnRef.field%> = ? ",
             <%-columnRef.name%>).affectedRows
     }
 
@@ -259,8 +261,8 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         return selectList("""
             SELECT *
             FROM <%-columnRef.foreign.referencedTableName%>
-            INNER JOIN <%-table.name%> ON <%-columnRef.foreign.referencedTableName%>.<%-columnRef.foreign.referencedColumnName%> = <%-table.name%>.<%-columnRef.name%>
-            WHERE <%-table.name%>.<%-columnCross.name%> = ?
+            INNER JOIN <%-table.name%> ON <%-columnRef.foreign.referencedTableName%>.<%-columnRef.foreign.referencedColumnName%> = <%-table.name%>.<%-columnRef.field%>
+            WHERE <%-table.name%>.<%-columnCross.field%> = ?
             """, { rs -> <%-columnRef.foreign.referencedTableModelName%>.buildAll(rs) }, <%-columnCross.name%>)
     }
 

@@ -2,6 +2,7 @@ const Table = require('./Table')
 const Column = require('./Column')
 const Relation = require('./Relation')
 const ManyToMany = require('./ManyToMany')
+const lorem = require('../util/lorem')
 const camelCase = require('lodash.camelcase')
 const uniqBy = require('lodash.uniqby')
 const uuid = require('uuid')
@@ -35,7 +36,7 @@ module.exports = class ServerSetup {
   }
 
   get packageDir () {
-    return (this.packageAddress || '').replace('.', '\/')
+    return (this.packageAddress || '').replace(/\./g, '\/')
   }
 
   findTableByName (name) {
@@ -194,7 +195,7 @@ module.exports = class ServerSetup {
       result += `INSERT INTO \`${table.name}\`\n`
       result += `(`
       table.columns.forEach((column) => {
-        result += `${column.name},`
+        result += `${column.field},`
       })
       result = result.slice(0, -1) // remove last comma
       result += `)\n`
@@ -213,11 +214,27 @@ module.exports = class ServerSetup {
               const accountColumn = column.name === this.accountColumn.name
               if (isUserTable && accountColumn && i === 0) result += `'test@test.com'`
               else result += `'${faker.internet.email()}'`
-            } else if (column.isPassword) result += `SHA2(SHA2('tester', 256), 256)`
+            } else if (column.isTag || column.isNickname) result += `'${faker.name.title()}'`
+            else if (column.isName || column.isFullName) result += `'${faker.name.firstName() + faker.name.lastName()}'`
+            else if (column.isFirstName) result += `'${faker.name.firstName()}'`
+            else if (column.isLastName) result += `'${faker.name.lastName()}'`
+            else if (column.isPassword) result += `SHA2(SHA2('tester', 256), 256)`
             else if (column.isUrl) result += `'${faker.internet.url()}'`
-            else if (column.isImageUrl) result += `'${faker.image.imageUrl()}'`
-            else if (column.isUnique) result += `'${faker.random.uuid()}'`
-            else {
+            else if (column.isImageUrl) result += `'${faker.image.avatar()}'`
+            else if (column.isPhone) result += `'${lorem.phone()}'`
+            else if (column.isStreet) result += `'${faker.address.streetAddress().replace(/'/g, '')}'`
+            else if (column.isZipcode) result += `'${faker.address.zipCode()}'`
+            else if (column.isNeighborhood) result += `'${faker.lorem.word()}'`
+            else if (column.isCity) result += `'${faker.address.city().replace(/'/g, '')}'`
+            else if (column.isState) result += `'${faker.address.stateAbbr()}'`
+            else if (column.isCountry) result += `'United States'`
+            else if (column.isCpf) result += `'${lorem.cpf()}'`
+            else if (column.isCnpj) result += `'${lorem.cnpj()}'`
+            else if (column.isRg) result += `'${lorem.rg()}'`
+            else if (column.isUnique) {
+              if (i === 0 || !table.hasID) result += `'lorem'`
+              else result += `'${faker.random.uuid()}'`
+            } else {
               if (column.size && column.size > 128) result += `'${faker.lorem.sentence()}'`
               else if (column.size && column.size > 32) result += `'${faker.lorem.words()}'`
               else result += `'${faker.lorem.word()}'`
@@ -225,9 +242,13 @@ module.exports = class ServerSetup {
           } else if (column.isLong) {
             result += `${faker.random.number({ max: 999 })}`
           } else if (column.isDouble) {
-            result += `${faker.random.number({ max: 999 })}.${faker.random.number({ max: 999 })}`
+            if (column.isLatitude) result += `${faker.address.latitude()}`
+            else if (column.isLongitude) result += `${faker.address.longitude()}`
+            else if (column.isMoney) result += `${faker.random.number({ max: 9999 })}.${faker.random.number({ max: 99 })}`
+            else result += `${faker.random.number({ max: 999 })}.${faker.random.number({ max: 999 })}`
           } else if (column.isBoolean) {
-            result += `${faker.random.number({ max: 1 })}`
+            if (column.isSoftDelete) result += `1`
+            else result += `${faker.random.number({ max: 1 })}`
           } else if (column.isDate) {
             result += `'${(faker.date.past() || new Date()).toISOString().substring(0, 23).replace('T', ' ')}'`
           }

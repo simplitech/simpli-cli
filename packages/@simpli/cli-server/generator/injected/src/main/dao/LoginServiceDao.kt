@@ -19,8 +19,8 @@ class LoginServiceDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
         return nullToZero(selectFirstLong("""
                 SELECT <%-userTable.idColumn.name%>
                 FROM <%-userTable.name%>
-                WHERE <%-accountColumn.name%> = ?
-                AND <%-passwordColumn.name%> = sha2(?, 256)
+                WHERE <%-accountColumn.field%> = ?
+                AND <%-passwordColumn.field%> = sha2(?, 256)
                 """,
                 <%-accountColumn.name%>, <%-passwordColumn.name%>))
     }
@@ -30,7 +30,7 @@ class LoginServiceDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
         return selectOne("""
             SELECT *
             FROM <%-userTable.name%>
-            WHERE <%-userTable.idColumn.name%> = ?
+            WHERE <%-userTable.idColumn.field%> = ?
             """, { rs -> <%-userTable.modelName%>.buildAll(rs) }, <%-userTable.idColumn.name%>)
     }
 }

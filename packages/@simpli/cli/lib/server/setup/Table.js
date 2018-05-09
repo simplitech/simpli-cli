@@ -162,7 +162,7 @@ module.exports = class Table {
   primariesByWhere (different = false) {
     const columns = this.primaryColumns
     if (columns.length === 0) columns.push(new Column())
-    return columns.map((column) => `AND ${column.name} ${different ? '<>' : '='} ?`).join(' ')
+    return columns.map((column) => `AND ${column.field} ${different ? '<>' : '='} ?`).join(' ')
   }
 
   primariesTestValuesByParam () {
@@ -259,15 +259,15 @@ module.exports = class Table {
     result += `\t\t\tval ${this.instanceName} = ${this.modelName}()\n\n`
     this.columns.forEach((column) => {
       if (column.isLong) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.name}")\n`
+        result += `\t\t\t${this.instanceName}.${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDouble) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.name}")\n`
+        result += `\t\t\t${this.instanceName}.${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isString) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getString(alias, "${column.name}")\n`
+        result += `\t\t\t${this.instanceName}.${column.name} = rs.getString(alias, "${column.field}")\n`
       } else if (column.isBoolean) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.name}")\n`
+        result += `\t\t\t${this.instanceName}.${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDate) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getTimestamp(alias, "${column.name}")\n`
+        result += `\t\t\t${this.instanceName}.${column.name} = rs.getTimestamp(alias, "${column.field}")\n`
       }
     })
     result += `\n\t\t\treturn ${this.instanceName}\n`

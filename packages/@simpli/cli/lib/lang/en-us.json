@@ -1,0 +1,116 @@
+{
+  "reservedWords": {
+    "tag": [
+      "tag",
+      "label",
+      "title",
+      "name"
+    ],
+    "nickname": [
+      "nickname"
+    ],
+    "name": [
+      "name",
+      "first_name"
+    ],
+    "lastName": [
+      "sir_name",
+      "last_name"
+    ],
+    "fullName": [
+      "full_name"
+    ],
+    "password": [
+      "password",
+      "secret"
+    ],
+    "email": [
+      "email",
+      "e_mail",
+      "electronic_mail",
+      "mail"
+    ],
+    "url": [
+      "url",
+      "link"
+    ],
+    "imageUrl": [
+      "image_url",
+      "url_image",
+      "photo_url",
+      "url_photo",
+      "avatar_url",
+      "url_avatar"
+    ],
+    "money": [
+      "price",
+      "value"
+    ],
+    "phone": [
+      "phone",
+      "telephone",
+      "cell_phone",
+      "cellphone",
+      "mobile_phone",
+      "phone_number",
+      "cell_phone_number",
+      "cellphone_number",
+      "mobile_phone_number"
+    ],
+    "street": [
+      "street",
+      "address"
+    ],
+    "zipcode": [
+      "zipcode",
+      "zip_code"
+    ],
+    "neighborhood": [
+      "neighborhood"
+    ],
+    "city": [
+      "city"
+    ],
+    "state": [
+      "state"
+    ],
+    "country": [
+      "country"
+    ],
+    "latitude": [
+      "latitude"
+    ],
+    "longitude": [
+      "longitude"
+    ],
+    "coordinate": [
+      "longitude",
+      "latitude"
+    ],
+    "updatedAt": [
+      "updated_at",
+      "date_updated",
+      "updated_date",
+      "changed_at",
+      "date_changed",
+      "changed_date"
+    ],
+    "createdAt": [
+      "created_at",
+      "date_created",
+      "created_date"
+    ],
+    "deletedAt": [
+      "deleted_at",
+      "date_deleted",
+      "deleted_date",
+      "removed_at",
+      "date_removed",
+      "removed_date"
+    ],
+    "softDelete": [
+      "active",
+      "deleted"
+    ]
+  }
+}

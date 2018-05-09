@@ -249,7 +249,7 @@ module.exports = class Database {
       {
         name: 'confirm',
         type: 'confirm',
-        message: 'Do you want to add data.sql for seeding?'
+        message: 'Do you want to create data.sql for seeding?'
       }
     ])
 
@@ -265,7 +265,7 @@ module.exports = class Database {
       {
         name: 'seedSamples',
         type: 'input',
-        message: 'How many samples in data.sql?',
+        message: 'How many samples per table in data.sql?',
         default: '50',
         validate: (value) => {
           const valid = !isNaN(parseFloat(value))
@@ -319,7 +319,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)}`)
+    log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)} at ${chalk.yellow(connection.host)}`)
     try {
       const { confirm } = await inquirer.prompt([
         {

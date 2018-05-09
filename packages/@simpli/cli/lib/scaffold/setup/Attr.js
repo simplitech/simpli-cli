@@ -1,3 +1,21 @@
+const enUs = require('../../lang/en-us.json')
+const ptBr = require('../../lang/pt-br.json')
+const camelCase = require('lodash.camelcase')
+const mergeWith = require('lodash.mergewith')
+const uniq = require('lodash.uniq')
+
+const reservedWords = mergeWith(
+  {},
+  ptBr.reservedWords,
+  enUs.reservedWords,
+  (obj, src) => {
+    if (obj && Array.isArray(obj)) {
+      // Merge all reserved words, remove duplications then transform into camelCase
+      return uniq(obj.concat(src).map((item) => camelCase(item))) || []
+    }
+  }
+)
+
 module.exports = class Attr {
   constructor (name, belongsTo, prop) {
     this.name = name || ''
@@ -52,116 +70,47 @@ module.exports = class Attr {
   get isDate () { return this.isPrimaryOrigin && this.type === 'date' }
   get isDatetime () { return this.isPrimaryOrigin && this.type === 'datetime' }
 
-  get isSoftDelete () {
-    const reservedWords = [
-      'active',
-      'deleted',
-      'softDeleted',
-      'ativo'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
   get isTextarea () {
     // TODO: add textarea type
     return false
   }
 
-  get isTAG () {
-    const reservedWords = [
-      'tag',
-      'label',
-      'title',
-      'name',
-      'titulo',
-      'nome'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
+  is (entity) {
+    if (reservedWords[entity]) {
+      return !!reservedWords[entity].find((word) => word === this.name)
+    }
+    return false
   }
 
-  get isEmail () {
-    const reservedWords = [
-      'email',
-      'e-mail',
-      'mail'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
+  get isTAG () { return this.is('tag') }
 
-  get isPassword () {
-    const reservedWords = [
-      'password',
-      'senha'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isUrl () {
-    const reservedWords = [
-      'url',
-      'link'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isImageUrl () {
-    const reservedWords = [
-      'imageUrl',
-      'photoUrl',
-      'avatar',
-      'fotoUrl',
-      'urlImagem'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isMoney () {
-    const reservedWords = [
-      'price',
-      'value',
-      'preco',
-      'valor'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isPhone () {
-    const reservedWords = [
-      'phone',
-      'cellphone',
-      'cellPhone',
-      'mobile',
-      'telephone',
-      'phoneNumber',
-      'telefone',
-      'celular'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isZipcode () {
-    const reservedWords = [
-      'zipcode',
-      'zipCode',
-      'cep'
-    ]
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isCpf () {
-    const reservedWords = ['cpf']
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isCnpj () {
-    const reservedWords = ['cnpj']
-    return !!reservedWords.find((word) => word === this.name)
-  }
-
-  get isRg () {
-    const reservedWords = ['rg']
-    return !!reservedWords.find((word) => word === this.name)
-  }
+  get isNickname () { return this.is('nickname') }
+  get isName () { return this.is('name') }
+  get isFirstName () { return this.is('firstName') }
+  get isLastName () { return this.is('lastName') }
+  get isFullName () { return this.is('fullName') }
+  get isPassword () { return this.is('password') }
+  get isEmail () { return this.is('email') }
+  get isUrl () { return this.is('url') }
+  get isImageUrl () { return this.is('imageUrl') }
+  get isMoney () { return this.is('money') }
+  get isPhone () { return this.is('phone') }
+  get isStreet () { return this.is('street') }
+  get isZipcode () { return this.is('zipcode') }
+  get isNeighborhood () { return this.is('neighborhood') }
+  get isCity () { return this.is('city') }
+  get isState () { return this.is('state') }
+  get isCountry () { return this.is('country') }
+  get isLatitude () { return this.is('latitude') }
+  get isLongitude () { return this.is('longitude') }
+  get isCoordinate () { return this.is('coordinate') }
+  get isCpf () { return this.is('cpf') }
+  get isCnpj () { return this.is('cnpj') }
+  get isRg () { return this.is('rg') }
+  get isUpdatedAt () { return this.is('updatedAt') }
+  get isCreatedAt () { return this.is('createdAt') }
+  get isDeletedAt () { return this.is('deletedAt') }
+  get isSoftDelete () { return this.is('softDelete') }
 
   // Type Origin
   get isPrimaryOrigin () { return this.typeOrigin === 'primary' }

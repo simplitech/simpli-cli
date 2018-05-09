@@ -33,7 +33,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         val lang = EnglishLanguage()
         val clientVersion = "w1.0.0"
         subject = LoginService(con, lang, clientVersion)
-        token = subject.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        token = subject.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
     }
 
     @Test(expected = HttpException::class)
@@ -48,12 +48,12 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test(expected = HttpException::class)
     fun testSignInFail() {
-        subject.signIn("user@gmail.com", SecurityUtils.sha256("wrongpassword"))
+        subject.signIn("test@test.com", SecurityUtils.sha256("wrongpassword"))
     }
 
     @Test
     fun testSignInAdmin() {
-        val result = subject.signIn("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val result = subject.signIn("test@test.com", SecurityUtils.sha256("tester"))
         assertEquals(token,
                 result.token)
     }
@@ -76,7 +76,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testGetId() {
-        val result = subject.getId("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val result = subject.getId("test@test.com", SecurityUtils.sha256("tester"))
         assertNotEquals(result, 0)
     }
 
@@ -98,7 +98,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testLoginToToken() {
-        val result = subject.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val result = subject.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         assertEquals(token,
                 result)
     }

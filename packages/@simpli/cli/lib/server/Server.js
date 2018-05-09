@@ -133,7 +133,7 @@ module.exports = class Server {
 
     // install plugins
     stopSpinner()
-    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log(`⚙  Preparing the package...`)
     log()
     await installDeps(context, 'npm')
 
@@ -164,6 +164,8 @@ module.exports = class Server {
     stopSpinner()
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
+    log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
+    log(`👉  Seed your database by running ${chalk.cyan(`simpli server:seed`)}`)
     log(`👉  Start the server by running your ${chalk.cyan('tomcat server')} and ${chalk.cyan('catalina')}`)
     log()
 
@@ -216,7 +218,7 @@ module.exports = class Server {
 
     // install plugins
     await clearConsole()
-    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log(`⚙  Preparing the package...`)
     log()
     await installDeps(context, 'npm')
 
@@ -249,7 +251,15 @@ module.exports = class Server {
     // Get data normalize database
     const { connection, availableTables } = await Database.requestConnection(this.serverSetup, defaultConnection)
     // Select tables to be added
-    await Database.requestTables(availableTables, this.serverSetup)
+    const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
+
+    // Set user table
+    const {
+      userTable,
+      accountColumn,
+      passwordColumn
+    } = await Database.requestUserTable(availableTables, filteredTables)
+
     // Define number of seed samples
     const { seedSamples } = await Database.requestSeedSamples()
 
@@ -257,6 +267,10 @@ module.exports = class Server {
 
     this.serverSetup.connection = connection
     this.serverSetup.seedSamples = seedSamples
+
+    this.serverSetup.userTable = userTable
+    this.serverSetup.accountColumn = accountColumn
+    this.serverSetup.passwordColumn = passwordColumn
 
     const { context, createCompleteCbs } = this
 
@@ -290,7 +304,7 @@ module.exports = class Server {
 
     // install plugins
     await clearConsole()
-    log(`⚙  Installing CLI plugins. This might take a while...`)
+    log(`⚙  Preparing the package...`)
     log()
     await installDeps(context, 'npm')
 

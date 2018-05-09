@@ -1,0 +1,125 @@
+{
+  "reservedWords": {
+    "tag": [
+      "tag",
+      "rotulo",
+      "titulo",
+      "nome"
+    ],
+    "nickname": [
+      "apelido"
+    ],
+    "name": [
+      "nome",
+      "primeiro_nome"
+    ],
+    "lastName": [
+      "sobrenome",
+      "ultimo_nome"
+    ],
+    "fullName": [
+      "nome_completo"
+    ],
+    "password": [
+      "senha",
+      "secreto"
+    ],
+    "email": [
+      "email",
+      "e_mail",
+      "mail",
+      "endereco_eletronico"
+    ],
+    "url": [
+      "url",
+      "link"
+    ],
+    "imageUrl": [
+      "imagem_url",
+      "url_imagem",
+      "foto_url",
+      "url_foto",
+      "avatar_url",
+      "url_avatar"
+    ],
+    "money": [
+      "preco",
+      "valor"
+    ],
+    "phone": [
+      "fone",
+      "telefone",
+      "celular",
+      "telefone_celular",
+      "numero_celular",
+      "numero_telefone",
+      "numero_telefone_celular"
+    ],
+    "street": [
+      "rua",
+      "endereco",
+      "logradouro"
+    ],
+    "zipcode": [
+      "cep"
+    ],
+    "neighborhood": [
+      "bairro"
+    ],
+    "city": [
+      "cidade"
+    ],
+    "state": [
+      "estado",
+      "uf"
+    ],
+    "country": [
+      "pais"
+    ],
+    "latitude": [
+      "latitude"
+    ],
+    "longitude": [
+      "longitude"
+    ],
+    "coordinate": [
+      "longitude",
+      "latitude"
+    ],
+    "cpf": [
+      "cpf"
+    ],
+    "cnpj": [
+      "cnpj"
+    ],
+    "rg": [
+      "rg",
+      "documento"
+    ],
+    "updatedAt": [
+      "atualizado_em",
+      "data_atualizacao",
+      "atualizacao_data",
+      "alterado_em",
+      "data_alteracao",
+      "alteracao_data"
+    ],
+    "createdAt": [
+      "criado_em",
+      "data_criacao",
+      "criacao_data"
+    ],
+    "deletedAt": [
+      "deletado_em",
+      "data_deletado",
+      "deletado_data",
+      "removido_em",
+      "data_removido",
+      "removido_data"
+    ],
+    "softDelete": [
+      "ativo",
+      "deletado"
+    ]
+  }
+}

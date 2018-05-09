@@ -44,7 +44,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testListNoQuery() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val query: String? = null
         val page = 0
         val limit = 20
@@ -61,7 +61,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testListWithQuery() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val query: String? = "1"
         val page = 0
         val limit = 20
@@ -78,7 +78,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testGetOne() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
 
         val result = subject.getOne(<%-table.primariesTestValuesByParam()%>, token)
         assertNotNull(result)
@@ -93,7 +93,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
     @Test(expected = HttpException::class)
     fun testPersistWithRepeated<%-column.capitalizedName%>() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
 <%_ if (column.name !== col.name && !col.isID) { _%>
@@ -111,7 +111,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersist() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
@@ -125,7 +125,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersistWith<%-m2m.pivotModelName%>() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
@@ -143,7 +143,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersistUpdating() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
@@ -158,7 +158,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testRemove() {
-        val token = loginS.loginToToken("user@gmail.com", SecurityUtils.sha256("abcabc"))
+        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         
         subject.remove(1L, token)
     }
