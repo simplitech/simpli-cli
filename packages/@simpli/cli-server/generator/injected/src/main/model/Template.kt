@@ -59,18 +59,7 @@ class <%-table.modelName%> {
 
 <%_ } _%>
 <%_ } _%>
-
     constructor() {}
-
-    constructor(other: <%-table.modelName%>) {
-<%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>
-        this.<%-relation.name%> = other.<%-relation.name%>
-<%_ } _%>
-
-<%_ for (var i in table.columns) { var column = table.columns[i] _%>
-        this.<%-column.name%> = other.<%-column.name%>
-<%_ } _%>
-    }
 
     fun validate(updating: Boolean, lang: LanguageHolder) {
         if (updating) {

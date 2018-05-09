@@ -84,38 +84,4 @@ class <%-table.modelName%>Test {
 
         <%-table.instanceName%>.validate(false, EnglishLanguage())
     }
-
-    @Test
-    fun testCloneConstructor() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-
-<%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>
-<%_ if (!relation.isManyToMany) { _%>
-        <%-table.instanceName%>.<%-relation.name%> = <%-relation.referencedTableModelName%>()
-<%_ } else { _%>
-        <%-table.instanceName%>.<%-relation.name%> = ArrayList()
-<%_ var m2m = table.findManyToManyByPivotTableName(relation.tableName) _%>
-<%_ if (m2m) { _%>
-        val <%-m2m.crossRelationInstanceName%> = <%-m2m.crossRelationModelName%>()
-        <%-m2m.crossRelationInstanceName%>.<%-m2m.crossRelationColumnName%> = 1
-        <%-table.instanceName%>.<%-relation.name%>!!.add(<%-m2m.crossRelationInstanceName%>)
-<%_ } _%>
-<%_ } _%>
-<%_ } _%>
-<%_ for (var i in table.columns) { var column = table.columns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
-<%_ } _%>
-
-        val clone = <%-table.ModelName%>(<%-table.instanceName%>)
-<%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>
-        assertEquals(<%-table.instanceName%>.<%-relation.name%>, clone.<%-relation.name%>)
-<%_ } _%>
-<%_ for (var i in table.columns) { var column = table.columns[i] _%>
-<%_ if (column.isDouble && column.isRequired) { _%>
-        assertEquals(<%-table.instanceName%>.<%-column.name%>, clone.<%-column.name%>, 0.0)
-<%_ } else { _%>
-        assertEquals(<%-table.instanceName%>.<%-column.name%>, clone.<%-column.name%>)
-<%_ } _%>
-<%_ } _%>
-    }
 }
