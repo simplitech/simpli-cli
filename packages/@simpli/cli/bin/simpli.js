@@ -29,7 +29,7 @@ program
 
 program
   .command('new:seed')
-  .description('create test data from a backend project into data.sql')
+  .description('create test data from a backend project and store it into data.sql')
   .action(() => {
     require('../lib/cmd/newSeed')()
   })

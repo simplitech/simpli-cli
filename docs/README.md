@@ -143,6 +143,17 @@ Then, fill the rest of the prompt and confirm. Follow this example:
 
 ![Server Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img2.png)
 
+### Generating Fake Data
+
+Another useful feature of Simpli CLI is `Fake Data`. This data can be found in `root-project/src/test/resources/database/data.sql`.
+If you could not find it, go to the root of project and generate the `data.sql` by running `simpli new:seed`. Then run `simpli server:seed` to populate the fake data into your database.
+
+#### _Important_
+
+Make sure your database is used for testing because the command `simpli server:seed` will TRUNCATE your tables.
+
+#### Running the Server
+
 Once you have run your generated server, you may access `localhost:8080` (it can vary depending on your Tomcat configuration):
 
 ![Server Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img3.png)
@@ -186,22 +197,24 @@ When you enter on `dev`, you may see this screen at `localhost:8181`:
 > Check it out the Simpli CLI commands
 
 * [New Project](#new-project)
+* [New Seed](#new-seed)
 * [Scaffold Inspect](#scaffold-inspect)
 * [Scaffold Sync](#scaffold-sync)
 * [Server Inspect](#server-inspect)
 * [Server Sync](#server-sync)
+* [Server Seed](#server-seed)
 
 ---
 
 ### New Project
+
+> Create a new simpli project
 
 #### Usage
 
 ```sh
 $ simpli new:project [options] <project-name>
 ```
-
-> Create a new simpli project
 
 ```
 <project-name> : The name of your root project directory
@@ -217,15 +230,33 @@ $ simpli new:project [options] <project-name>
 
 ---
 
+### New Seed
+
+> Create test data from a backend project and store it into data.sql
+
+#### Usage
+
+```sh
+$ simpli new:seed
+```
+
+#### Options
+
+```
+-h, --help		output usage information
+```
+
+---
+
 ### Scaffold Inspect
+
+> inspect the models and APIs based on swagger
 
 #### Usage
 
 ```sh
 $ simpli scaffold:inspect [options] [paths...]
 ```
-
-> inspect the models and APIs based on swagger
 
 ```
 [paths...] : The path of a model or API
@@ -246,17 +277,15 @@ $ simpli scaffold:inspect api.signIn
 
 ---
 
-
 ### Scaffold Sync
+
+> synchronize the models of the current frontend project based on its web server swagger
 
 #### Usage
 
 ```sh
 $ simpli scaffold:sync [options]
 ```
-
-> synchronize the models of the current frontend project based on its web server swagger
-
 
 #### Options
 
@@ -268,13 +297,13 @@ $ simpli scaffold:sync [options]
 
 ### Server Inspect
 
+> inspect the tables of a MySQL database
+
 #### Usage
 
 ```sh
 $ simpli server:inspect [options] [paths...]
 ```
-
-> inspect the tables of a MySQL database
 
 ```
 [paths...] : The path of a table
@@ -295,8 +324,9 @@ $ simpli server:inspect table.user.columns
 
 ---
 
-
 ### Server Sync
+
+> synchronize the tables of the current backend project based on its MySQL database
 
 #### Usage
 
@@ -304,8 +334,26 @@ $ simpli server:inspect table.user.columns
 $ simpli server:sync [options]
 ```
 
-> synchronize the tables of the current backend project based on its MySQL database
+#### Options
 
+```
+-h, --help		output usage information
+```
+
+---
+
+### Server Seed
+
+> Seed the database with test data from the current backend project
+
+Make sure your database is used for testing because the command `simpli server:seed` will TRUNCATE your tables.
+Note: For security reasons, this command only allows MySQL host from `localhost`.
+
+#### Usage
+
+```sh
+$ simpli server:seed
+```
 
 #### Options
 
