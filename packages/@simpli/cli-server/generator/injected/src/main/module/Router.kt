@@ -35,13 +35,13 @@ import <%-packageAddress%>.model.<%-table.modelName%>
  * @author Simpli© CLI generator
  */
 @Path("/<%-moduleNameCapitalized%>")
-@Api(tags = arrayOf("<%-moduleNameCapitalized%>"))
+@Api()
 @Produces(MediaType.APPLICATION_JSON)
 class Router : RouterWrapper() {
 
     @GET
     @Path("/Auth")
-    @ApiOperation(value = "Get user authentication")
+    @ApiOperation(tags=["LoginResp"], value = "Get user authentication")
     fun auth(
         @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en-US, pt-BR")
             lang: String,
@@ -59,7 +59,7 @@ class Router : RouterWrapper() {
 
     @POST
     @Path("/SignIn")
-    @ApiOperation(value = "Submit user authentication")
+    @ApiOperation(tags=["LoginResp"], value = "Submit user authentication")
     fun signIn(
         @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en-US, pt-BR")
             lang: String,
@@ -80,7 +80,7 @@ class Router : RouterWrapper() {
 <%_ var columns = table.primaryColumns _%>
     @GET
     @Path("/<%-table.modelName%>/<%-table.primariesBySlash()%>")
-    @ApiOperation(value = "Gets <%-table.modelName%> of informed id")
+    @ApiOperation(tags=["<%-table.modelName%>"], value = "Gets <%-table.modelName%> of informed id")
     fun get<%-table.modelName%>(
 <%_ for (var j in columns) { var column = columns[j] _%>
 <%_ var id = columns.length <= 1 ? 'id' : column.name _%>
@@ -134,7 +134,7 @@ class Router : RouterWrapper() {
 <%_ if (table.hasPersist) { _%>
     @POST
     @Path("/<%-table.modelName%>")
-    @ApiOperation(value = "Persist a new or existing <%-table.modelName%>", notes = "1 - Informed <%-table.modelName%> have an ID editing the existing <%-table.modelName%>; 2 - Informed <%-table.modelName%> don't have an ID creating a new <%-table.modelName%>")
+    @ApiOperation(tags=["<%-table.modelName%>Resp"], value = "Persist a new or existing <%-table.modelName%>", notes = "1 - Informed <%-table.modelName%> have an ID editing the existing <%-table.modelName%>; 2 - Informed <%-table.modelName%> don't have an ID creating a new <%-table.modelName%>")
     fun persist<%-table.modelName%>(
         @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en, pt")
             lang: String,
@@ -157,7 +157,7 @@ class Router : RouterWrapper() {
 <%_ if (table.isRemovable) { _%>
     @DELETE
     @Path("/<%-table.modelName%>/<%-table.primariesBySlash()%>")
-    @ApiOperation(value = "Deletes the <%-table.modelName%> of informed id")
+    @ApiOperation(tags=["<%-table.modelName%>Resp"], value = "Deletes the <%-table.modelName%> of informed id")
     fun remove<%-table.modelName%>(
 <%_ for (var j in columns) { var column = columns[j] _%>
 <%_ var id = columns.length <= 1 ? 'id' : column.name _%>

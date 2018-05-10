@@ -1,3 +1,14 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/simplitech/simpli-cli/compare/v1.0.1...v1.0.2) (2018-05-10)
+
+
+### Features
+
+* added commands new:seed & server:seed ([16d0754](https://github.com/simplitech/simpli-cli/commit/16d0754))
+* **server:** Introduced seeding (fake data) ([62a8541](https://github.com/simplitech/simpli-cli/commit/62a8541))
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/simplitech/simpli-cli/compare/v1.0.0...v1.0.1) (2018-05-03)
 
