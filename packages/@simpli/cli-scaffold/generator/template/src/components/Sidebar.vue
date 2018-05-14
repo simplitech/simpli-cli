@@ -15,11 +15,11 @@
           </span>
         </h1>
       </div>
-      <div class="horiz items-center">
-        <h3 class="truncate">
-          <!--{{user.email}}-->
-        </h3>
-      </div>
+      <!--<div class="horiz items-center">-->
+      <!--<h3 class="truncate">-->
+      <!--{{user.email}}-->
+      <!--</h3>-->
+      <!--</div>-->
       <div class="weight-1" :class="{ 'desktop-tablet': !menu }">
         <ul class="verti h-full p-0 py-10">
 

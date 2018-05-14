@@ -3,6 +3,7 @@ import App from './App.vue'
 
 import '@/bootstrap/app'
 import '@/bootstrap/vendor'
+import '@/bootstrap/await'
 
 import {$} from '@/simpli'
 import {store} from '@/store'

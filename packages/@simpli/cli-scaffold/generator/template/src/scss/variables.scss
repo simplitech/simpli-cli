@@ -1,0 +1,8 @@
+$accent-color: #21AEB6 !default;
+$light-percentage: 55% !default;
+$dark-accent: darken($accent-color, 10) !default;
+$light-accent-bg: desaturate(lighten($accent-color, $light-percentage), 30%) !default;
+$light-accent-text: desaturate(lighten($accent-color, $light-percentage - 25%), 40%) !default;
+$light-bg: white;
+
+$body-bg: whitesmoke;

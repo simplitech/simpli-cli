@@ -43,10 +43,6 @@
     toRemove = new <%-model.name%>()
 <%_ } _%>
 
-    async mounted() {
-      await this.collection.search()
-    }
-
     openPersist(item: <%-model.name%>) {
       pushByName('edit<%-model.name%>', item.$id)
     }

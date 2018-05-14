@@ -68,6 +68,12 @@ export default {
       invalidAlpha: 'Campo \'{0}\' deve conter apenas letras',
       invalidAlphanumeric: 'Campo \'{0}\' deve conter apenas letras e números',
       invalidCreditCard: 'Número de cartão de crédito inválido',
+      format: 'Campo \'{0}\' está com a formatação errada',
+      phoneFormat: 'O número de telefone está com a formatação errada',
+      zipcodeFormat: 'O CEP está com a formatação errada',
+      rgFormat: 'O RG está com a formatação errada',
+      cpfFormat: 'O CPF está com a formatação errada',
+      cnpjFormat: 'O CNPJ está com a formatação errada',
     },
   },
 

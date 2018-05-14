@@ -1,11 +1,9 @@
 $simple-line-font-path: "~simple-line-icons/fonts/";
-$light-bg: white;
-$body-bg: #fbfbfb;
+@import "variables";
 
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600');
 @import "~normalize-scss/sass/normalize";
 @import "~simple-line-icons/scss/simple-line-icons.scss";
-@import "~animate.css";
 @import "base.scss";
 @import "~linelay/build.scss";
 
@@ -29,6 +27,18 @@ body {
   @import "~vue-snotify/styles/dark.scss";
 }
 
+.fade-enter-active, .fade-leave-active,
+.fade-y-enter-active, .fade-y-leave-active {
+  transition: opacity ease-out .4s, transform ease-out .4s;
+}
+.fade-enter, .fade-leave-to,
+.fade-y-enter, .fade-y-leave-to {
+  opacity: 0;
+}
+.fade-y-enter, .fade-y-leave-to {
+  transform: translateY(-20px);
+}
+
 td .icon {
   display: block;
   margin: 5px;
@@ -41,20 +51,26 @@ td .icon {
 aside.menu {
   background: white;
   border-right: 1px solid #dfdfdf;
+  padding: 0;
   z-index: 2;
 
   li {
     list-style-type: none;
     padding: 0;
+    margin-left: 4px;
 
     a {
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      font-size: 11px;
       text-decoration: none;
-      color: black;
+      text-transform: uppercase;
+      margin: 2px 0;
+      color: rgba(0, 0, 0, 0.6);
       width: 100%;
-      display: block;
       padding: 10px;
-      font-size: 13px;
+      transition: color ease-out 0.4s, background ease-out 0.4s, border-left ease-out 0.3s;
+      border-radius: 10px 0 0 10px;
       @extend .transition;
 
       &:hover, &.router-link-active {

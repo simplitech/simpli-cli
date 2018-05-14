@@ -165,8 +165,11 @@ module.exports = class Server {
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
     log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
-    log(`👉  Seed your database by running ${chalk.cyan(`simpli server:seed`)}`)
-    log(`👉  Start the server by running your ${chalk.cyan('tomcat server')} and ${chalk.cyan('catalina')}`)
+    log(`👉  Seed your database: ${chalk.cyan(`simpli server:seed`)}`)
+    log(`👉  Generate the WAR file: ${chalk.cyan('mvn package')}`)
+    log(`👉  Initialize Tomcat: ${chalk.cyan('tomcat start')}`)
+    log(`👉  Move the WAR file to tomcat folder to deploy it: ${chalk.cyan('mv <warfile> <tomcat-webapps-location>')}`)
+    log(`👉  Go to ${chalk.cyan('localhost:8080/[WAR-file-name]')}`)
     log()
 
     generator.printExitLogs()

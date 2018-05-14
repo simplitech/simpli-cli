@@ -2,7 +2,7 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import {$, encrypt, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+import {$, encrypt, sleep, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
@@ -47,8 +47,16 @@ const actions: ActionTree<AuthState, RootState> = {
     const loginResp: <%-loginRespModel.name%> = new <%-loginRespModel.name%>()
 <%-rootOptions.scaffoldSetup.auth.buildPasswordEncrypt()-%>
 
-    await model.validate()
-    await loginResp.<%-signInApi.name%>(model)
+    try {
+      $.await.init('login')
+      await sleep(1000)
+      await model.validate()
+      await loginResp.<%-signInApi.name%>(model)
+      $.await.done('login')
+    } catch (e) {
+      $.await.error('login')
+      throw e
+    }
 
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 

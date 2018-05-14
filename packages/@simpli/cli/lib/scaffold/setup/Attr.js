@@ -188,6 +188,41 @@ module.exports = class Attr {
       })
     }
 
+    if (this.isPhone) {
+      result.push({
+        title: 'ValidationPhone',
+        attr: ``
+      })
+    }
+
+    if (this.isZipcode) {
+      result.push({
+        title: 'ValidationCEP',
+        attr: ``
+      })
+    }
+
+    if (this.isRg) {
+      result.push({
+        title: 'ValidationRG',
+        attr: ``
+      })
+    }
+
+    if (this.isCpf) {
+      result.push({
+        title: 'ValidationCPF',
+        attr: ``
+      })
+    }
+
+    if (this.isCnpj) {
+      result.push({
+        title: 'ValidationCNPJ',
+        attr: ``
+      })
+    }
+
     return result
   }
 

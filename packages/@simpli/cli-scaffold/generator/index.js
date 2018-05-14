@@ -51,7 +51,6 @@ module.exports = (api, options) => {
     dependencies: {
       '@types/lodash': '4.14.104',
       '@types/papaparse': '4.1.33',
-      'animate.css': '3.6.1',
       'chart.js': '2.7.2',
       'chartkick': '2.3.3',
       'class-transformer': '0.1.9',
@@ -64,7 +63,7 @@ module.exports = (api, options) => {
       'normalize-scss': '7.0.1',
       'register-service-worker': '1.1.1',
       'simple-line-icons': '2.4.1',
-      'simpli-ts-vue': '1.3.1',
+      'simpli-ts-vue': '1.6.1',
       'vue': '2.5.16',
       'vue-chartjs': '3.2.1',
       'vue-chartkick': '0.2.1',
@@ -77,6 +76,7 @@ module.exports = (api, options) => {
       'vue-resource': '1.5.0',
       'vue-router': '3.0.1',
       'vue-snotify': '3.0.4',
+      'vue-spinner': '1.0.3',
       'vuex': '3.0.1',
       'vuex-class': '0.3.0'
     },

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <router-view/>
+    <transition name="fade-y" mode="out-in">
+      <router-view/>
+    </transition>
     <vue-snotify :class="toastStyle"/>
   </div>
 </template>
@@ -21,10 +23,6 @@ export default class App extends Vue {
   @Action('auth/onSignOut') onSignOut?: Function
 
   toastStyle: ToastStyle = ToastDefaultStyle
-
-  constructor() {
-    super()
-  }
 
   // When the user or system signs in
   signInEvent() {

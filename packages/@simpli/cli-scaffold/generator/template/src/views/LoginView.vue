@@ -1,14 +1,32 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <template>
-  <div class="verti w-window h-window items-center">
-    <form @submit.prevent="signIn(model)" class="verti w-300 elevated p-30">
-      <h2 class="mt-0">{{ $t("view.login.subtitle") }}</h2>
-      <input v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" class="mb-10" type="text" :placeholder="$t('view.login.account')" required autofocus/>
-      <input v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" class="mb-10" type="password" :placeholder="$t('view.login.password')" required>
-      <button class="accent" type="submit">{{ $t("view.login.signin") }}</button>
+  <div class="login-view verti w-window h-window items-center p-10">
+    <form @submit.prevent="signIn(model)" class="des-w-300 tab-w-400 mob-w-full elevated p-20">
+      <await name="login" :spinnerScale="1.5">
+        <h2 class="text-center accent mt-0">{{ $t("view.login.subtitle") }}</h2>
+
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" :placeholder="$t('view.login.account')" autofocus/>
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" :placeholder="$t('view.login.password')"/>
+
+        <button class="accent w-full" type="submit">{{ $t("view.login.signin") }}</button>
+      </await>
     </form>
   </div>
 </template>
+
+<style lang="scss" scoped>
+  @import "../scss/variables";
+
+  .login-view {
+    background: url(../assets/img/bg.jpg);
+    >form {
+      border: 3px solid $accent-color;
+      h2 {
+        text-transform: uppercase;
+      }
+    }
+  }
+</style>
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'

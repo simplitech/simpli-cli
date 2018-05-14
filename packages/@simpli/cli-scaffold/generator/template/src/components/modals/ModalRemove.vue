@@ -1,5 +1,5 @@
 <template>
-  <modal v-if="active" class="animated fadeIn">
+  <modal v-if="active">
     <div class="verti">
       <div class="horiz">
         <h4 class="weight-1 mt-0 mr-10">

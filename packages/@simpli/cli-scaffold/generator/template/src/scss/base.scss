@@ -1,9 +1,4 @@
-$accent-color: #21AEB6 !default;
-$light-percentage: 55% !default;
-$dark-accent: darken($accent-color, 10) !default;
-$light-accent-bg: desaturate(lighten($accent-color, $light-percentage), 30%) !default;
-$light-accent-text: desaturate(lighten($accent-color, $light-percentage - 25%), 40%) !default;
-$light-bg: #f5f5f5 !default;
+@import "variables";
 
 * {
   box-sizing: border-box;
@@ -42,13 +37,13 @@ section {
   /* Track */
   ::-webkit-scrollbar-track {
     background: lighten($accent-color, 40%);
-    border-radius: 5px;
+    border-radius: 0 0 5px 5px;
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
     background: $accent-color;
-    border-radius: 5px;
+    border-radius: 0 0 5px 5px;
   }
 
   /* Handle on hover */
@@ -237,6 +232,16 @@ div.accent-bg {
   -moz-transition-timing-function: ease-in;
   -o-transition-timing-function: ease-in;
   transition-timing-function: ease-in;
+}
+
+.await-spinner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .v-spinner {
+    display: flex;
+  }
 }
 
 .multiselect {
