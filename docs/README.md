@@ -148,13 +148,34 @@ Then, fill the rest of the prompt and confirm. Follow this example:
 Another useful feature of Simpli CLI is `Fake Data`. This data can be found in `root-project/src/test/resources/database/data.sql`.
 If you could not find it, go to the root of project and generate the `data.sql` by running `simpli new:seed`. Then run `simpli server:seed` to populate the fake data into your database.
 
+> The default login is `test@test.com` and the password is `tester`
+
 #### _Important_
 
 Make sure your database is used for testing because the command `simpli server:seed` will TRUNCATE your tables.
 
 #### Running the Server
 
-Once you have run your generated server, you may access `localhost:8080` (it can vary depending on your Tomcat configuration):
+Go to your project directory root and seed your database:
+
+```sh
+$ simpli server:seed
+```
+
+Then, generate the War file:
+
+```sh
+$ mvn package
+```
+
+Then, initialize the Tomcat and move the WAR file to tomcat folder to deploy it:
+
+```sh
+$ tomcat start
+$ mv <warfile> <tomcat-webapps-location>
+```
+
+Once you have run your generated server, you may access `localhost:8080/[WAR-file-name]` (it can vary depending on your Tomcat configuration):
 
 ![Server Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img3.png)
 
@@ -172,7 +193,7 @@ Then, fill the rest of the prompt and confirm. Follow this example:
 
 ![Client Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img2.png)
 
-Once you have generated the client, go to your project directory and run:
+Once you have generated the client, go to your project directory root and run:
 
 ```sh
 $ npm run serve
