@@ -1,3 +1,13 @@
+<a name="1.0.4"></a>
+## [1.0.4](https://github.com/simplitech/simpli-cli/compare/v1.0.3...v1.0.4) (2018-05-14)
+
+
+### Features
+
+* **scaffold:** Improved SCSS ([8bd9090](https://github.com/simplitech/simpli-cli/commit/8bd9090))
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/simplitech/simpli-cli/compare/v1.0.1...v1.0.3) (2018-05-10)
 
