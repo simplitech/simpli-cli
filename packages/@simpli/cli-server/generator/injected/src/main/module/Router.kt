@@ -15,8 +15,8 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
-import javax.ws.rs.core.MediaType
 import javax.ws.rs.HeaderParam
+import javax.ws.rs.core.MediaType
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -51,9 +51,9 @@ class Router : RouterWrapper() {
             authorization: String
     ): LoginResp {
         //TODO: review generated method
-        return pipe.handle { con ->
+        return transacPipe.handle { con ->
             LoginService(con, getLang(lang), clientVersion)
-                    .auth(extractToken(authorization))
+                .auth(AuthPipe.extractToken(authorization))
         }
     }
 
@@ -70,9 +70,43 @@ class Router : RouterWrapper() {
             body: LoginHolder
     ): LoginResp {
         //TODO: review generated method
-        return pipe.handle { con ->
+        return transacPipe.handle { con ->
             LoginService(con, getLang(lang), clientVersion)
-                    .signIn(body.<%-accountColumn.name%>, body.<%-passwordColumn.name%>)
+                .signIn(body.<%-accountColumn.name%>, body.<%-passwordColumn.name%>)
+        }
+    }
+
+    @POST
+    @Path("/ResetPassword")
+    @ApiOperation(tags=["LoginResp"], value = "Reset password of a given account")
+    fun resetPassword(
+        @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en-US, pt-BR")
+            lang: String,
+        @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
+            clientVersion: String,
+
+        body: LoginHolder
+    ): Long {
+        return transacPipe.handle { con ->
+            LoginService(con, getLang(lang), clientVersion)
+                .resetPassword(body.<%-accountColumn.name%>)
+        }
+    }
+
+    @POST
+    @Path("/RecoverPassword")
+    @ApiOperation(tags=["LoginResp"], value = "Recover password of a given hash")
+    fun recoverPassword(
+        @HeaderParam("Accept-Language") @ApiParam(required = true, allowableValues = "en-US, pt-BR")
+        lang: String,
+        @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
+        clientVersion: String,
+
+        body: LoginHolder
+    ): String? {
+        return transacPipe.handle { con ->
+            LoginService(con, getLang(lang), clientVersion)
+                .recoverPassword(body.<%-passwordColumn.name%>, body.hash)
         }
     }
 
@@ -96,10 +130,10 @@ class Router : RouterWrapper() {
             authorization: String
     ): <%-table.modelName%>Resp {
         //TODO: review generated method
-        return pipe.handle {
-            con -> <%-table.modelName%>Process(con, getLang(lang), clientVersion)
-                .getOne(<%-table.primariesByComma()%>, extractToken(authorization))
-        }
+        return authPipe.handle(authorization, getLang(lang), clientVersion, {
+            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+                .getOne(<%-table.primariesByComma()%>)
+        })
     }
 
     @GET
@@ -125,10 +159,10 @@ class Router : RouterWrapper() {
             asc: Boolean?
     ): PagedResp<<%-table.modelName%>> {
         //TODO: review generated method
-        return pipe.handle {
-            con -> <%-table.modelName%>Process(con, getLang(lang), clientVersion)
-                .list(extractToken(authorization), query, page, limit, orderRequest, asc != null && asc)
-        }
+        return authPipe.handle(authorization, getLang(lang), clientVersion, {
+            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+                .list(query, page, limit, orderRequest, asc != null && asc)
+        })
     }
 
 <%_ if (table.hasPersist) { _%>
@@ -147,10 +181,10 @@ class Router : RouterWrapper() {
             <%-table.instanceName%>: <%-table.modelName%>
     ): Long {
         //TODO: review generated method
-        return pipe.handle<Long> {
-            con -> <%-table.modelName%>Process(con, getLang(lang), clientVersion)
-                .persist(<%-table.instanceName%>, extractToken(authorization))
-        }
+        return authPipe.handle(authorization, getLang(lang), clientVersion, {
+            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+                .persist(<%-table.instanceName%>)
+        })
     }
 
 <%_ } _%>
@@ -173,10 +207,10 @@ class Router : RouterWrapper() {
             authorization: String
     ): Any? {
         //TODO: review generated method
-        return pipe.handle<Any?> {
-            con -> <%-table.modelName%>Process(con, getLang(lang), clientVersion)
-                .remove(<%-table.primariesByComma()%>, extractToken(authorization))
-        }
+        return authPipe.handle(authorization, getLang(lang), clientVersion, {
+            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+                .remove(<%-table.primariesByComma()%>)
+        })
     }
 
 <%_ } _%>

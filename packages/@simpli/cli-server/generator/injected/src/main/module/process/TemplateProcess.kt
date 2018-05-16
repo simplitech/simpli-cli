@@ -18,11 +18,9 @@ import javax.ws.rs.core.Response
  * <%-table.modelName%> business logic
  * @author Simpli© CLI generator
  */
-class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder, private val clientVersion: String) {
-    private val loginS = LoginService(con, lang, clientVersion)
+class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder, private val loginHolder: LoginService.LoginHolderWithId?) {
 
     fun list(
-        token: String?, 
         queryP: String?,
         page: Int?,
         limit: Int?,
@@ -34,8 +32,6 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         if (query != null) {
             query = query.replace("[.,:\\-\\/]".toRegex(), "")
         }
-
-        loginS.allowAccess(token)
 
         val dao = <%-table.modelName%>Dao(con, lang)
 
@@ -56,10 +52,8 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         return resp
     }
 
-    fun getOne(<%-table.primariesByParam(true)%>, token: String?): <%-table.modelName%>Resp {
+    fun getOne(<%-table.primariesByParam(true)%>): <%-table.modelName%>Resp {
         //TODO: review generated method
-        loginS.allowAccess(token)
-
 <%_ for (var i in table.daoModels) { var obj = table.daoModels[i] _%>
         val <%-obj.name%>Dao = <%-obj.modelName%>Dao(con, lang)
 <%_ } _%>
@@ -89,10 +83,8 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
     }
 
 <%_ if (table.hasPersist) { _%>
-    fun persist(<%-table.instanceName%>: <%-table.modelName%>, token: String?): Long {
+    fun persist(<%-table.instanceName%>: <%-table.modelName%>): Long {
         //TODO: review generated method
-        loginS.allowAccess(token)
-
         val dao = <%-table.modelName%>Dao(con, lang)
 
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
@@ -142,9 +134,8 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
 
-    fun remove(<%-table.primariesByParam(true)%>, token: String?) {
+    fun remove(<%-table.primariesByParam(true)%>) {
         //TODO: review generated method
-        loginS.allowAccess(token)
         val <%-table.instanceName%>Dao = <%-table.modelName%>Dao(con, lang)
 
         if (<%-table.primariesByConditions(true)%>) {

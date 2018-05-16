@@ -2,7 +2,7 @@
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import {$, encrypt, sleep, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
@@ -13,8 +13,6 @@ import {$, encrypt, sleep, push, successAndPush, errorAndPush, infoAndPush} from
 <%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
 <%-dependence.build()%>
 <%_ } _%>
-// import ForgotPasswordResp from '@/model/response/ForgotPasswordResp'
-// import ChangePasswordWithHashResp from '@/model/response/ChangePasswordWithHashResp'
 
 // initial state
 const state: AuthState = {
@@ -44,19 +42,9 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param model format => model: { account, password } (non-encrypted)
    */
   signIn: async ({state, commit, getters}, model: <%-loginHolderModel.name%>) => {
-    const loginResp: <%-loginRespModel.name%> = new <%-loginRespModel.name%>()
-<%-rootOptions.scaffoldSetup.auth.buildPasswordEncrypt()-%>
+    const loginResp = new <%-loginRespModel.name%>()
 
-    try {
-      $.await.init('login')
-      await sleep(1000)
-      await model.validate()
-      await loginResp.<%-signInApi.name%>(model)
-      $.await.done('login')
-    } catch (e) {
-      $.await.error('login')
-      throw e
-    }
+    await loginResp.<%-signInApi.name%>(model)
 
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
@@ -83,7 +71,7 @@ const actions: ActionTree<AuthState, RootState> = {
     commit(types.POPULATE)
 
     if (getters.isLogged) {
-      const loginResp: <%-loginRespModel.name%> = new <%-loginRespModel.name%>()
+      const loginResp = new <%-loginRespModel.name%>()
 
       await loginResp.<%-authApi.name%>()
 
@@ -110,25 +98,31 @@ const actions: ActionTree<AuthState, RootState> = {
   },
 
   /**
-   * Forgot password
+   * Reset password
    * @param context
    * @param model
    */
-  forgotPassword: async (context, model: <%-loginHolderModel.name%>) => {
-    // const forgotPasswordResp = new ForgotPasswordResp(Number)
-    // await forgotPasswordResp.forgotPassword(model)
-    // successAndPush('system.success.forgotPasswordSuccess', '/login')
+  resetPassword: async (context, model: <%-loginHolderModel.name%>) => {
+<%_ if (loginRespModel.hasResetPassword) { _%>
+    await new <%-loginRespModel.name%>(Number).resetPassword(model)
+    successAndPush('system.success.resetPassword', '/login')
+<%_ } else { _%>
+      /**/
+<%_ } _%>
   },
 
   /**
-   * Changes Password With Hash
+   * Recover password
    * @param context
    * @param model
    */
-  changePasswordWithHash: async (context, model: <%-loginHolderModel.name%>) => {
-    // const changePasswordWithHashResp = new ChangePasswordWithHashResp(Number)
-    // await changePasswordWithHashResp.changePasswordWithHash(model)
-    // successAndPush('system.success.changePasswordSuccess', '/login')
+  recoverPassword: async (context, model: <%-loginHolderModel.name%>) => {
+<%_ if (loginRespModel.hasRecoverPassword) { _%>
+    await new <%-loginRespModel.name%>(String).recoverPassword(model)
+    successAndPush('system.success.recoverPassword', '/login')
+<%_ } else { _%>
+    /**/
+<%_ } _%>
   },
 
   /**

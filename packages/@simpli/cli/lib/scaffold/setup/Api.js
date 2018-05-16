@@ -88,6 +88,14 @@ module.exports = class Api {
     return !!this.tags.find((tag) => (tag || '').toLowerCase() === name.toLowerCase())
   }
 
+  get isResetPassword () {
+    return this.name === 'resetPassword'
+  }
+
+  get isRecoverPassword () {
+    return this.name === 'recoverPassword'
+  }
+
   convertType (type = '') {
     if (type === 'integer' || type === 'double') return 'number'
     if (type === 'boolean') return 'boolean'
@@ -137,11 +145,17 @@ module.exports = class Api {
   /**
    * Print this api into the template generator
    */
-  build () {
+  build (signInApiName, accountAttrName, passwordAttrName) {
     let result = ''
     const method = (this.method || '').toUpperCase()
 
-    if (method === 'GET') {
+    if (this.name === signInApiName && this.body.model === 'LoginHolder') {
+      result += this.buildSignIn(accountAttrName, passwordAttrName)
+    } else if (this.isResetPassword && this.body.model === 'LoginHolder') {
+      result += this.buildResetPassword(accountAttrName, passwordAttrName)
+    } else if (this.isRecoverPassword && this.body.model === 'LoginHolder') {
+      result += this.buildRecoverPassword(accountAttrName, passwordAttrName)
+    } else if (method === 'GET') {
       result += `  async ${this.name}(${this.stringfyAttrs}) {\n`
       if (this.queries.length) result += `    const params = {${this.stringfyParams}}\n`
       result += `    return await this.GET(\`${this.stringfyEndpoint}\`${this.queries.length ? ', {params}' : ''})\n`
@@ -160,6 +174,90 @@ module.exports = class Api {
       result += `    return await this.DELETE(\`${this.stringfyEndpoint}\`${this.queries.length ? ', {params}' : ''})\n`
       result += `  }\n`
     }
+    return result
+  }
+
+  /**
+   * Reserved API print
+   */
+  buildSignIn (accountAttrName, passwordAttrName) {
+    let result = ''
+    const method = (this.method || '').toUpperCase()
+
+    result += `  async ${this.name}(model: LoginHolder) {\n`
+    result += `    const email = model.${accountAttrName}\n`
+    result += `    const ${passwordAttrName} = encrypt(model.${passwordAttrName} || '')\n`
+    result += `    const hash = model.hash = ''\n`
+
+    result += `    try {\n`
+    result += `      $.await.init('login') // start login loader\n\n`
+    result += `      await sleep(1000)\n`
+    result += `      await model.validate()\n`
+    result += `      const resp = await this.${method}(\`${this.stringfyEndpoint}\`, {${accountAttrName}, ${passwordAttrName}, hash} as ${this.body.model})\n\n`
+    result += `      $.await.done('login') // stop login loader\n`
+    result += `      return resp\n`
+    result += `    } catch (e) {\n`
+    result += `      $.await.error('login')\n`
+    result += `      throw e\n`
+    result += `    }\n`
+    result += `  }\n`
+
+    return result
+  }
+
+  /**
+   * Reserved API print
+   */
+  buildResetPassword (accountAttrName, passwordAttrName) {
+    let result = ''
+    const method = (this.method || '').toUpperCase()
+
+    result += `  async ${this.name}(model: LoginHolder) {\n`
+    result += `    const email = model.${accountAttrName}\n`
+    result += `    const senha = model.${passwordAttrName} = '######' // it will be ignored (accepted validation)\n`
+    result += `    const hash = model.hash = ''\n`
+
+    result += `    try {\n`
+    result += `      $.await.init('resetPassword') // start resetPassword loader\n\n`
+    result += `      await sleep(1000)\n`
+    result += `      await model.validate()\n`
+    result += `      const resp = await this.${method}(\`${this.stringfyEndpoint}\`, {${accountAttrName}, ${passwordAttrName}, hash} as ${this.body.model})\n\n`
+    result += `      $.await.done('resetPassword') // stop resetPassword loader\n`
+    result += `      return resp\n`
+    result += `    } catch (e) {\n`
+    result += `      $.await.error('resetPassword')\n`
+    result += `      throw e\n`
+    result += `    }\n`
+    result += `  }\n`
+
+    return result
+  }
+
+  /**
+   * Reserved API print
+   */
+  buildRecoverPassword (accountAttrName, passwordAttrName) {
+    let result = ''
+    const method = (this.method || '').toUpperCase()
+
+    result += `  async ${this.name}(model: LoginHolder) {\n`
+    result += `    const ${accountAttrName} = model.${accountAttrName} = 'xx@xx.co' // it will be ignored (accepted validation)\n`
+    result += `    const ${passwordAttrName} = encrypt(model.${passwordAttrName} || '')\n`
+    result += `    const hash = model.hash\n`
+
+    result += `    try {\n`
+    result += `      $.await.init('recoverPassword') // start recoverPassword loader\n\n`
+    result += `      await sleep(1000)\n`
+    result += `      await model.validate()\n`
+    result += `      const resp = await this.${method}(\`${this.stringfyEndpoint}\`, {${accountAttrName}, ${passwordAttrName}, hash} as ${this.body.model})\n\n`
+    result += `      $.await.done('recoverPassword') // stop recoverPassword loader\n`
+    result += `      return resp\n`
+    result += `    } catch (e) {\n`
+    result += `      $.await.error('recoverPassword')\n`
+    result += `      throw e\n`
+    result += `    }\n`
+    result += `  }\n`
+
     return result
   }
 }

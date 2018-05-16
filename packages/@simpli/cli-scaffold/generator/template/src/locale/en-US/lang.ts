@@ -47,8 +47,8 @@ export default {
       welcome: 'Welcome',
     },
     success: {
-      forgotPassword: 'An E-Mail has been sent to your account',
-      changePassword: 'The password has successfully changed',
+      resetPassword: 'An E-Mail has been sent to your account',
+      recoverPassword: 'The password has successfully changed',
       persist: 'Persisted Successfully!',
     },
     error: {
@@ -128,11 +128,25 @@ export default {
 
   view: {
     login: {
-      title: 'Login',
-      subtitle: 'Please sign in',
+      title: 'Sign-in',
       account: 'Account',
       password: 'Password',
       signin: 'Sign in',
+      forgotPassword: 'Forgot password',
+    },
+
+    resetPassword: {
+      title: 'Forgot Password',
+      account: 'E-Mail',
+      submit: 'Submit',
+      signIn: 'Sign-in',
+    },
+
+    recoverPassword: {
+      title: 'Recover Password',
+      newPassword: 'New password',
+      confirmPassword: 'Confirm password',
+      submit: 'Submit',
     },
 
     dashboard: {

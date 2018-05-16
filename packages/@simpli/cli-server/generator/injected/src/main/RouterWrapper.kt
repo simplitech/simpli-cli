@@ -1,18 +1,17 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
+<%_ var moduleName = options.serverSetup.moduleName _%>
 <%_ var database = options.serverSetup.connection.database _%>
 package <%-packageAddress%>
 
-import com.google.common.base.Strings
-import com.simpli.model.EnglishLanguage
+import <%-packageAddress%>.<%-moduleName%>.AuthPipe
 import com.simpli.model.LanguageHolder
+import com.simpli.model.EnglishLanguage
 import com.simpli.model.PortugueseLanguage
 import com.simpli.model.RespException
 import com.simpli.sql.TransactionPipe
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 import javax.ws.rs.ext.ExceptionMapper
@@ -22,7 +21,8 @@ import javax.ws.rs.ext.ExceptionMapper
  * @author Simpli© CLI generator
  */
 open class RouterWrapper : ExceptionMapper<Throwable> {
-    protected var pipe = TransactionPipe("jdbc/<%-database%>DS")
+    protected var transacPipe = TransactionPipe("jdbc/usecaseDS")
+    protected var authPipe = AuthPipe(transacPipe)
 
     protected val langs: HashMap<String, LanguageHolder> = object : HashMap<String, LanguageHolder>() {
         init {
@@ -54,17 +54,5 @@ open class RouterWrapper : ExceptionMapper<Throwable> {
                     .type(MediaType.APPLICATION_JSON)
                     .build()
         }
-    }
-
-    protected fun extractToken(authorization: String): String? {
-        if (Strings.isNullOrEmpty(authorization)) {
-            return null
-        }
-
-        val matcher = Pattern.compile("Bearer (.*)").matcher(authorization)
-
-        return if (!matcher.find()) {
-            null
-        } else matcher.group(1)
     }
 }

@@ -7,12 +7,13 @@ package <%-packageAddress%>.<%-moduleName%>.process
 
 import <%-packageAddress%>.dao.LoginServiceDao
 import com.google.gson.Gson
+import java.util.*
 import java.sql.Connection
+import <%-packageAddress%>.<%-moduleName%>.mail.ResetPasswordMail
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
 import <%-packageAddress%>.exception.HttpException
 import <%-packageAddress%>.model.<%-userTable.modelName%>
 import com.simpli.model.LanguageHolder
-import com.simpli.model.RespException
 import com.simpli.tools.SecurityUtils
 import javax.ws.rs.core.Response
 
@@ -46,6 +47,67 @@ class LoginService(private val con: Connection, private val lang: LanguageHolder
         }
 
         return LoginResp(token, id, <%-userTable.instanceName%>)
+    }
+
+    fun resetPassword(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?): Long {
+        val dao = LoginServiceDao(con, lang)
+
+        if (<%-accountColumn.name%> === null) {
+            throw HttpException(lang.cannotBeNull("<%-accountColumn.capitalizedName%>"), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        val user = dao.getUserByEmail(<%-accountColumn.name%>)
+
+        if (user === null || user.<%-accountColumn.name%> === null) {
+            throw HttpException(lang.emailNotFound(), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        var hash = Gson().toJson(TokenForgottenPassword(user.<%-accountColumn.name%> as String))
+        hash = SecurityUtils.encrypt(hash, LoginService.CRIPTOGRAPHY_HASH)
+        hash = hash.replace("/", "%2F")
+
+        ResetPasswordMail("http://localhost:8181", lang, user, hash).send()
+
+        return 1L
+    }
+
+    fun recoverPassword(<%-passwordColumn.name%>: <%-accountColumn.kotlinType%>?, hash: String?): String? {
+        val dao = LoginServiceDao(con, lang)
+
+        if (<%-passwordColumn.name%>.isNullOrEmpty()) {
+            throw HttpException(lang.cannotBeNull("<%-passwordColumn.capitalizedName%>"), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        if (hash.isNullOrEmpty()) {
+            throw HttpException(lang.cannotBeNull("Hash"), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        val hashResolved = hash!!.replace(" ", "+")
+        val token = SecurityUtils.decrypt(hashResolved, LoginService.CRIPTOGRAPHY_HASH)
+
+        if (token === null) {
+            throw HttpException(lang.invalidToken(), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        val objToken = Gson().fromJson<TokenForgottenPassword>(token, TokenForgottenPassword::class.java)
+
+        if (objToken === null) {
+            throw HttpException(lang.expiredToken(), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        val calendar = Calendar.getInstance()
+        calendar.time = objToken.date
+        calendar.add(Calendar.DAY_OF_MONTH, 15)
+        val dataExpiracao = calendar.time
+
+        //token expires after 15 days
+        if (dataExpiracao.before(Date())) {
+            throw HttpException(lang.expiredToken(), Response.Status.NOT_ACCEPTABLE)
+        }
+
+        dao.updateUserPassword(objToken.<%-accountColumn.name%>, <%-passwordColumn.name%>!!)
+
+        return loginToToken(objToken.<%-accountColumn.name%>, <%-passwordColumn.name%>)
     }
 
     fun allowAccess(token: String?): LoginHolderWithId {
@@ -96,12 +158,13 @@ class LoginService(private val con: Connection, private val lang: LanguageHolder
         } catch (e: Exception) {
             return null
         }
-
     }
 
-    class LoginHolder(val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?)
+    class LoginHolder(val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?, val hash: String? = "")
 
     class LoginHolderWithId(val loginHolder: LoginHolder, val id: Long)
+
+    class TokenForgottenPassword (val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>, val date: Date? = Date())
 
     companion object {
         val CRIPTOGRAPHY_HASH = "<%-options.serverSetup.uuid()%>"

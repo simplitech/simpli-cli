@@ -31,27 +31,24 @@ class <%-table.modelName%>ProcessTest @Throws(NamingException::class, SQLExcepti
 constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     private val con: Connection
-    private val loginS: LoginService
     private val subject: <%-table.modelName%>Process
 
     init {
         con = getConnection()
         val lang = EnglishLanguage()
         val clientVersion = "w1.0.0"
-        subject = <%-table.modelName%>Process(con, lang, clientVersion)
-        loginS = LoginService(con, lang, clientVersion)
+        subject = <%-table.modelName%>Process(con, lang, null)
     }
 
     @Test
     fun testListNoQuery() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val query: String? = null
         val page = 0
         val limit = 20
         val orderRequest: String? = null
         val asc: Boolean? = null
                 
-        val result = subject.list(token, query, page, limit, orderRequest, asc)
+        val result = subject.list(query, page, limit, orderRequest, asc)
         assertNotNull(result)
         assertNotNull(result.list)
         assertNotEquals(result.recordsTotal.toLong(), 0)
@@ -61,14 +58,13 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testListWithQuery() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val query: String? = "1"
         val page = 0
         val limit = 20
         val orderRequest: String? = null
         val asc: Boolean? = null
                 
-        val result = subject.list(token, query, page, limit, orderRequest, asc)
+        val result = subject.list(query, page, limit, orderRequest, asc)
         assertNotNull(result)
         assertNotNull(result.list)
         assertNotEquals(result.recordsTotal.toLong(), 0)
@@ -78,9 +74,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testGetOne() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
-
-        val result = subject.getOne(<%-table.primariesTestValuesByParam()%>, token)
+        val result = subject.getOne(<%-table.primariesTestValuesByParam()%>)
         assertNotNull(result)
         assertNotNull(result.<%-table.instanceName%>)
 <%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
@@ -93,7 +87,6 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
     @Test(expected = HttpException::class)
     fun testPersistWithRepeated<%-column.capitalizedName%>() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
 <%_ if (column.name !== col.name && !col.isID) { _%>
@@ -103,7 +96,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
         <%-table.instanceName%>.<%-column.name%> = "lorem"
 
-        subject.persist(<%-table.instanceName%>, token)
+        subject.persist(<%-table.instanceName%>)
     }
 <%_ } _%>
 <%_ } _%>
@@ -111,13 +104,12 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersist() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
 <%_ } _%>
 
-        val result = subject.persist(<%-table.instanceName%>, token)
+        val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
@@ -125,7 +117,6 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersistWith<%-m2m.pivotModelName%>() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
@@ -135,7 +126,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         <%-m2m.crossRelationInstanceName%>.<%-m2m.crossRelationColumnName%> = 1
         <%-table.instanceName%>.<%-m2m.pivotInstanceName%>!!.add(<%-m2m.crossRelationInstanceName%>)
         
-        val result = subject.persist(<%-table.instanceName%>, token)
+        val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
@@ -143,13 +134,12 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testPersistUpdating() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         val <%-table.instanceName%> = <%-table.modelName%>()
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
 <%_ } _%>
 
-        val result = subject.persist(<%-table.instanceName%>, token)
+        val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
         assertTrue(result ?: 0 > 0)
     }
@@ -158,9 +148,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testRemove() {
-        val token = loginS.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
-        
-        subject.remove(1L, token)
+        subject.remove(1L)
     }
 <%_ } _%>
 }

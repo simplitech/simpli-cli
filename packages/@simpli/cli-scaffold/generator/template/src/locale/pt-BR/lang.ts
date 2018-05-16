@@ -47,8 +47,8 @@ export default {
       welcome: 'Bem-vindo',
     },
     success: {
-      forgotPassword: 'Um e-mail foi enviado à sua conta',
-      changePassword: 'Senha alterada com sucesso',
+      resetPassword: 'Um e-mail foi enviado à sua conta',
+      recoverPassword: 'Senha alterada com sucesso',
       persist: 'Salvo com Sucesso!',
     },
     error: {
@@ -128,11 +128,25 @@ export default {
 
   view: {
     login: {
-      title: 'Login',
-      subtitle: 'Faça Login',
+      title: 'Fazer Login',
       account: 'Conta',
       password: 'Senha',
       signin: 'Entrar',
+      forgotPassword: 'Esqueci senha',
+    },
+
+    resetPassword: {
+      title: 'Esqueci senha',
+      account: 'E-Mail',
+      submit: 'Enviar',
+      signIn: 'Fazer login',
+    },
+
+    recoverPassword: {
+      title: 'Recuperar senha',
+      newPassword: 'Nova senha',
+      confirmPassword: 'Confirmar senha',
+      submit: 'Enviar',
     },
 
     dashboard: {

@@ -79,6 +79,27 @@ module.exports = class Model {
   }
 
   /**
+   * Has reset password API
+   */
+  get hasResetPassword () {
+    return !!this.apis.find((api) => api.name === 'resetPassword')
+  }
+
+  /**
+   * Has Hash Attr
+   */
+  get hasHashAttr () {
+    return !!this.attrs.find((attr) => attr.name === 'hash')
+  }
+
+  /**
+   * Has recover password API
+   */
+  get hasRecoverPassword () {
+    return !!this.apis.find((api) => api.name === 'recoverPassword')
+  }
+
+  /**
    * Set module
    */
   resolveModule () {
@@ -204,7 +225,7 @@ module.exports = class Model {
     const conditionsOr = (api) => [
       api.respModel === this.name, // or
       !api.respModel && api.hasTag(this.name), // or
-      !api.respModel && !api.hasTag(this.name) && api.body.model === this.name
+      !api.respModel && !api.hasTag(this.name) && !api.tags.length && api.body.model === this.name
     ]
     // Get APIs which have the same response model, body model or tag of this model
     this.apis = apis.filter((api) => !!conditionsOr(api).find((item) => item))
@@ -242,6 +263,9 @@ module.exports = class Model {
       const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
       if (hasID) dep.addChild('ID')
       dep.addChild('Model')
+      dep.addChild('$')
+      dep.addChild('sleep')
+      dep.addChild('encrypt')
     }
   }
 

@@ -1,3 +1,6 @@
+<%_ var signIn = rootOptions.scaffoldSetup.auth.api.signIn _%>
+<%_ var accountAttrName = rootOptions.scaffoldSetup.auth.accountAttrName _%>
+<%_ var passwordAttrName = rootOptions.scaffoldSetup.auth.passwordAttrName _%>
 /**
  * <%-model.name%>
  * @author Simpli© CLI generator
@@ -18,7 +21,7 @@ export default class <%-model.name%> extends <%-model.isResource ? 'Resource' : 
 <%_ } _%>
 <%_ } _%>
 <%_ for (var i in model.apis) { var api = model.apis[i] _%>
-<%-api.build()-%>
+<%-api.build(signIn.name, accountAttrName, passwordAttrName)-%>
 <%_ if (i < model.apis.length - 1 || model.isResource) { _%>
 
 <%_ } _%>

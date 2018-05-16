@@ -82,6 +82,11 @@
       <artifactId>kotlin-reflect</artifactId>
       <version>${kotlin.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-core</artifactId>
+      <version>1.11.302</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName><%-options.serverSetup.serverName%></finalName>

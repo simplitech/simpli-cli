@@ -39,6 +39,10 @@ module.exports = class ServerSetup {
     return (this.packageAddress || '').replace(/\./g, '\/')
   }
 
+  get projectDomain () {
+    return (this.packageAddress || '').split('.').reverse().join('.')
+  }
+
   findTableByName (name) {
     return this.tables.find((table) => table.name === name)
   }

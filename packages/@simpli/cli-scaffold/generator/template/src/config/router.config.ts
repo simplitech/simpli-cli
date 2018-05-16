@@ -2,6 +2,8 @@ import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import LoginView from '@/views/LoginView.vue'
+import ResetPasswordView from '@/views/ResetPasswordView.vue'
+import RecoverPasswordView from '@/views/RecoverPasswordView.vue'
 <%_ } _%>
 
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
@@ -27,6 +29,17 @@ export const router = {
       path: '/login',
       name: 'login',
       component: LoginView,
+    },
+    {
+      path: '/password/reset',
+      name: 'resetPassword',
+      component: ResetPasswordView,
+    },
+    {
+      path: '/password/recover/:hash',
+      name: 'recoverPassword',
+      component: RecoverPasswordView,
+      props: true,
     },
 <%_ } _%>
     {

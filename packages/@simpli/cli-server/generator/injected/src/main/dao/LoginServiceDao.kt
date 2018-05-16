@@ -33,4 +33,23 @@ class LoginServiceDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
             WHERE <%-userTable.idColumn.field%> = ?
             """, { rs -> <%-userTable.modelName%>.buildAll(rs) }, <%-userTable.idColumn.name%>)
     }
+
+    fun getUserByEmail(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?): User? {
+        //TODO: review generated method
+        return selectOne("""
+            SELECT *
+            FROM <%-userTable.name%>
+            WHERE <%-accountColumn.field%> = ?
+            """, { rs -> <%-userTable.modelName%>.buildAll(rs)}, <%-accountColumn.name%>)
+    }
+
+    fun updateUserPassword(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-accountColumn.kotlinType%>): Int {
+        //TODO: review generated method
+        return update("""
+            UPDATE <%-userTable.name%>
+            SET <%-passwordColumn.field%> = IF(? IS NOT NULL, SHA2(?, 256), <%-passwordColumn.field%>)
+            WHERE <%-passwordColumn.field%> = ?
+            """, <%-passwordColumn.name%>, <%-passwordColumn.name%>, <%-accountColumn.name%>).affectedRows
+    }
+
 }

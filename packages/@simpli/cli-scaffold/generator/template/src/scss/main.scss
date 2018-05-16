@@ -39,6 +39,16 @@ body {
   transform: translateY(-20px);
 }
 
+.entry-view {
+  background: url(./assets/img/bg.jpg);
+  >form {
+    border: 3px solid $accent-color;
+    h2 {
+      text-transform: uppercase;
+    }
+  }
+}
+
 td .icon {
   display: block;
   margin: 5px;
@@ -62,7 +72,7 @@ aside.menu {
     a {
       display: flex;
       align-items: center;
-      font-size: 11px;
+      font-size: 12px;
       text-decoration: none;
       text-transform: uppercase;
       margin: 2px 0;
@@ -71,11 +81,13 @@ aside.menu {
       padding: 10px;
       transition: color ease-out 0.4s, background ease-out 0.4s, border-left ease-out 0.3s;
       border-radius: 10px 0 0 10px;
+      border-left: 0 solid $accent-color;
       @extend .transition;
 
       &:hover, &.router-link-active {
-        border-left: 5px solid $accent-color;
-        background: $body-bg;
+        border-left: 10px solid $dark-accent;
+        color: rgba(255, 255, 255, 0.8);
+        background: $accent-color;
       }
     }
   }

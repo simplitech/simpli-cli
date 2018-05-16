@@ -313,7 +313,7 @@
       "required": [
         "email",
         "idUserPk",
-        "senha"
+        "password"
       ],
       "properties": {
         "idUserPk": {
@@ -323,7 +323,7 @@
         "email": {
           "type": "string"
         },
-        "senha": {
+        "password": {
           "type": "string"
         }
       }
@@ -354,7 +354,7 @@
     "LoginHolder": {
       "type": "object",
       "properties": {
-        "account": {
+        "email": {
           "type": "string"
         },
         "password": {

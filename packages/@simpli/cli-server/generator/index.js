@@ -16,12 +16,17 @@ module.exports = (api, options) => {
 
   if (!options.sync) {
     // From root
+    api.renderFrom('./injected', 'src/main/AppMail.kt', `./java/${dir}/AppMail.kt`)
     api.renderFrom('./injected', 'src/main/AppProvider.kt', `./java/${dir}/AppProvider.kt`)
     api.renderFrom('./injected', 'src/main/RouterWrapper.kt', `./java/${dir}/RouterWrapper.kt`)
     api.renderFrom('./injected', 'src/main/SwaggerInit.kt', `./java/${dir}/SwaggerInit.kt`)
 
     // Router
     api.renderFrom('./injected', 'src/main/module/Router.kt', `../java/${dir}/${moduleName}/Router.kt`)
+    api.renderFrom('./injected', 'src/main/module/AuthPipe.kt', `../java/${dir}/${moduleName}/AuthPipe.kt`)
+
+    // Mail
+    api.renderFrom('./injected', 'src/main/module/mail/ResetPasswordMail.kt', `../../java/${dir}/${moduleName}/mail/ResetPasswordMail.kt`)
 
     // Login Controller
     api.renderFrom('./injected', 'src/main/module/process/LoginService.kt', `../../java/${dir}/${moduleName}/process/LoginService.kt`)
@@ -46,6 +51,7 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/test/model/TemplateTest.kt', `../java/${dir}/model/${table.modelName}Test.kt`, data)
     api.renderFrom('./injected', 'src/test/module/process/TemplateProcessTest.kt', `../../java/${dir}/${moduleName}/process/${table.modelName}ProcessTest.kt`, data)
   })
+
   pivotTables.forEach((table) => {
     const data = { table }
     api.renderFrom('./injected', 'src/main/dao/TemplateDao.kt', `../java/${dir}/dao/${table.modelName}Dao.kt`, data)
