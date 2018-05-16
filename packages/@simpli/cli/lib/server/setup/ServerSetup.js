@@ -241,7 +241,8 @@ module.exports = class ServerSetup {
             } else {
               if (column.size && column.size > 128) result += `'${faker.lorem.sentence()}'`
               else if (column.size && column.size > 32) result += `'${faker.lorem.words()}'`
-              else result += `'${faker.lorem.word()}'`
+              else if (column.size && column.size > 16) result += `'${faker.lorem.words()}'`
+              else result += `'${faker.random.alphaNumeric(column.size)}'`
             }
           } else if (column.isLong) {
             result += `${faker.random.number({ max: 999 })}`
