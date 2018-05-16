@@ -1,3 +1,13 @@
+<a name="1.0.6"></a>
+## [1.0.6](https://github.com/simplitech/simpli-cli/compare/v1.0.5...v1.0.6) (2018-05-16)
+
+
+### Features
+
+* Implemented forget password ([b7cd3db](https://github.com/simplitech/simpli-cli/commit/b7cd3db))
+
+
+
 <a name="1.0.5"></a>
 ## [1.0.5](https://github.com/simplitech/simpli-cli/compare/v1.0.4...v1.0.5) (2018-05-14)
 
