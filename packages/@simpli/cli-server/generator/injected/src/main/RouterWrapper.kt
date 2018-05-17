@@ -21,7 +21,7 @@ import javax.ws.rs.ext.ExceptionMapper
  * @author Simpli© CLI generator
  */
 open class RouterWrapper : ExceptionMapper<Throwable> {
-    protected var transacPipe = TransactionPipe("jdbc/usecaseDS")
+    protected var transacPipe = TransactionPipe("jdbc/<%-options.serverSetup.connection.database%>DS")
     protected var authPipe = AuthPipe(transacPipe)
 
     protected val langs: HashMap<String, LanguageHolder> = object : HashMap<String, LanguageHolder>() {

@@ -214,7 +214,7 @@ module.exports = class Api {
 
     result += `  async ${this.name}(model: LoginHolder) {\n`
     result += `    const email = model.${accountAttrName}\n`
-    result += `    const senha = model.${passwordAttrName} = '######' // it will be ignored (accepted validation)\n`
+    result += `    const ${passwordAttrName} = model.${passwordAttrName} = '######' // it will be ignored (accepted validation)\n`
     result += `    const hash = model.hash = ''\n`
 
     result += `    try {\n`
