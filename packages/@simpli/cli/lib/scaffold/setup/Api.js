@@ -35,11 +35,11 @@ module.exports = class Api {
   }
 
   setTags (config) {
-    this.tags = config.tags
+    this.tags = config.tags || []
   }
 
   setPaths (config) {
-    this.paths = config.parameters
+    this.paths = config.parameters || []
       .filter((param) => param.in === 'path')
       .map((param) => ({
         name: param.name,
@@ -49,7 +49,7 @@ module.exports = class Api {
   }
 
   setQueries (config) {
-    this.queries = config.parameters
+    this.queries = config.parameters || []
       .filter((param) => param.in === 'query')
       .map((param) => ({
         name: param.name,
