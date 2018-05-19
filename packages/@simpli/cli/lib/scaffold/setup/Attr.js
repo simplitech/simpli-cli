@@ -27,6 +27,7 @@ module.exports = class Attr {
     this.foreignIsRequired = null
     this.fromResp = false
     this.isArray = false
+    this.isArrayPrimitive = null
     this.isObject = false
     this.isRequired = false
 
@@ -52,7 +53,15 @@ module.exports = class Attr {
     } else if (entry.type === 'array') {
       this.isArray = true
       this.isObject = false
-      this.type = entry.items && entry.items.$ref && entry.items.$ref.match(/[^\/]+(?=\/$|$)/)[0]
+      if (entry.items) {
+        if (entry.items.$ref) {
+          this.type = entry.items.$ref.match(/[^\/]+(?=\/$|$)/)[0]
+          this.isArrayPrimitive = false
+        } else {
+          this.type = entry.items.type
+          this.isArrayPrimitive = true
+        }
+      }
     } else if (entry.type === 'object' || entry.$ref) {
       this.isArray = false
       this.isObject = true
@@ -134,7 +143,7 @@ module.exports = class Attr {
     // Decorator in type 'ID' is not allowed
     if (this.isID || this.isForeign) return result
 
-    if (this.isObjectOrigin || this.isArrayOrigin) {
+    if (this.isObjectOrigin || (this.isArrayOrigin && !this.isArrayPrimitive)) {
       result.push({
         title: 'ResponseSerialize',
         attr: `${this.type}`

@@ -48,7 +48,7 @@ class LoginServiceDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
         return update("""
             UPDATE <%-userTable.name%>
             SET <%-passwordColumn.field%> = IF(? IS NOT NULL, SHA2(?, 256), <%-passwordColumn.field%>)
-            WHERE <%-passwordColumn.field%> = ?
+            WHERE <%-accountColumn.field%> = ?
             """, <%-passwordColumn.name%>, <%-passwordColumn.name%>, <%-accountColumn.name%>).affectedRows
     }
 

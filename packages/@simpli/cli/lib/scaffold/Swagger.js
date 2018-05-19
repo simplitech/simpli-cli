@@ -182,7 +182,8 @@ module.exports = class Swagger {
       }
     ])
 
-    if (!useAuth) return { auth: null }
+    const auth = new Auth()
+    if (!useAuth) return { auth, useAuth }
 
     const { signInApiName } = await inquirer.prompt([
       {
@@ -238,8 +239,6 @@ module.exports = class Swagger {
       }
     ])
 
-    const auth = new Auth()
-
     auth.accountAttrName = accountAttrName
     auth.passwordAttrName = passwordAttrName
     auth.api.signIn = signInApi
@@ -265,7 +264,7 @@ module.exports = class Swagger {
     // Attempt to resolve all models dependencies
     auth.notResolvedDependencies.forEach((dep) => dep.resolve(availableModels))
 
-    return { auth }
+    return { auth, useAuth }
   }
 
   static async requestLocalePlugin () {

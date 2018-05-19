@@ -69,7 +69,7 @@ module.exports = class Scaffold {
     const { filteredModels } = await Swagger.requestModels(availableModels, this.scaffoldSetup)
 
     // Config authentication
-    const { auth } = await Swagger.requestAuthPlugin(this.scaffoldSetup.apis, availableModels, filteredModels)
+    const { auth, useAuth } = await Swagger.requestAuthPlugin(this.scaffoldSetup.apis, availableModels, filteredModels)
 
     // Resolve all dependencies
     await Swagger.resolveDependencies(availableModels, filteredModels)
@@ -89,7 +89,7 @@ module.exports = class Scaffold {
     this.scaffoldSetup.apiUrlDev = apiUrlDev
     this.scaffoldSetup.apiUrlProd = apiUrlProd
 
-    this.scaffoldSetup.useAuth = !!auth
+    this.scaffoldSetup.useAuth = useAuth
     this.scaffoldSetup.auth = auth
 
     this.scaffoldSetup.availableLanguages = availableLanguages

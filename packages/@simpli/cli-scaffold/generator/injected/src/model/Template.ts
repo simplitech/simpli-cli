@@ -1,4 +1,4 @@
-<%_ var signIn = rootOptions.scaffoldSetup.auth.api.signIn _%>
+<%_ var signIn = rootOptions.scaffoldSetup.auth.api.signIn || {} _%>
 <%_ var accountAttrName = rootOptions.scaffoldSetup.auth.accountAttrName _%>
 <%_ var passwordAttrName = rootOptions.scaffoldSetup.auth.passwordAttrName _%>
 /**

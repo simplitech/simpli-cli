@@ -162,7 +162,8 @@ module.exports = class Model {
 
     // Get WS endpoint
     const wsEndpoint = Object.keys(path).find((endpoint) => {
-      const regex = new RegExp(`^\/\\w+\/(?:${this.resp.origin || this.name})(?:\/\{\\w+\})+$`, 'g')
+      // Find any endpoint with this format: /###/[name]/{###}
+      const regex = new RegExp(`^(?:\\/\\w+)*\\/${this.resp.origin || this.name}(?:\\/\\{\\w+\\})+$`, 'gi')
       return endpoint.match(regex)
     })
 
