@@ -5,7 +5,7 @@ package <%-packageAddress%>
 
 import com.simpli.model.LanguageHolder
 import com.amazonaws.regions.Regions
-import com.simpli.tools.AWSSendEmailRequest
+import com.simpli.ws.AWSSendEmailRequest
 
 import java.util.HashMap
 

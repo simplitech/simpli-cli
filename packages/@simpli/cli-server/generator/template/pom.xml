@@ -29,6 +29,11 @@
       <version>1.0.0</version>
     </dependency>
     <dependency>
+      <groupId>com.simpli.ws</groupId>
+      <artifactId>simpli-ws</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.simpli.sql</groupId>
       <artifactId>simpli-sql</artifactId>
       <version>1.0.0</version>
