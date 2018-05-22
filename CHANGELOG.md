@@ -1,3 +1,13 @@
+<a name="1.0.15"></a>
+## [1.0.15](https://github.com/simplitech/simpli-cli/compare/v1.0.14...v1.0.15) (2018-05-22)
+
+
+### Features
+
+* RequestLogger ([cb42f08](https://github.com/simplitech/simpli-cli/commit/cb42f08))
+
+
+
 <a name="1.0.14"></a>
 ## [1.0.14](https://github.com/simplitech/simpli-cli/compare/v1.0.13...v1.0.14) (2018-05-21)
 
