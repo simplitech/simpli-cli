@@ -18,6 +18,7 @@ module.exports = (api, options) => {
     // From root
     api.renderFrom('./injected', 'src/main/AppMail.kt', `./java/${dir}/AppMail.kt`)
     api.renderFrom('./injected', 'src/main/AppProvider.kt', `./java/${dir}/AppProvider.kt`)
+    api.renderFrom('./injected', 'src/main/RequestLogger.kt', `./java/${dir}/RequestLogger.kt`)
     api.renderFrom('./injected', 'src/main/RouterWrapper.kt', `./java/${dir}/RouterWrapper.kt`)
     api.renderFrom('./injected', 'src/main/SwaggerInit.kt', `./java/${dir}/SwaggerInit.kt`)
 
