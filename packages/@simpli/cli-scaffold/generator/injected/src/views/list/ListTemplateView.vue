@@ -21,9 +21,9 @@
 <%_ if (model.resource.deletable) { _%>
 
     <modal-remove
-      :active="!!toRemove.$id"
+      name="modalRemove"
       :text="toRemove.nome"
-      @cancel="resetRemove"
+      @cancel="closeRemoveModal"
       @confirm="removeItem"
     />
 <%_ } _%>
@@ -34,7 +34,7 @@
   import {Component, Vue} from 'vue-property-decorator'
   <%-model.injectIntoDependence().build()%>
   import PagedResp from '@/model/collection/PagedResp'
-  import {pushByName} from '@/simpli'
+  import {$, pushByName} from '@/simpli'
 
   @Component
   export default class List<%-model.name%>View extends Vue {
@@ -50,16 +50,18 @@
 
     async removeItem() {
       await this.toRemove.remove()
-      this.resetRemove()
+      this.closeRemoveModal()
       await this.collection.search()
     }
 
     openRemoveModal(item: <%-model.name%>) {
       this.toRemove = item
+      $.modal.open('modalRemove')
     }
 
-    resetRemove() {
+    closeRemoveModal() {
       this.toRemove = new <%-model.name%>()
+      $.modal.close('modalRemove')
     }
 <%_ } _%>  }
 </script>

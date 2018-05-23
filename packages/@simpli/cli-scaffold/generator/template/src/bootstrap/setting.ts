@@ -38,3 +38,10 @@ $.await.defaultTransition = 'fade'
 $.await.defaultSpinner = 'ScaleLoader'
 $.await.defaultSpinnerColor = '#21AEB6'
 $.await.defaultSpinnerPadding = '0'
+$.await.defaultSpinnerScale = 1
+
+$.modal.defaultBody = document.body
+$.modal.defaultTransition = 'fade-y'
+$.modal.defaultBackgroundTransition = 'fade'
+$.modal.defaultClosable = true
+$.modal.defaultCloseOutside = true

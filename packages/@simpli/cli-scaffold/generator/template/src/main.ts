@@ -2,8 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 
 import '@/bootstrap/app'
+import '@/bootstrap/setting'
 import '@/bootstrap/vendor'
-import '@/bootstrap/await'
 
 import {$} from '@/simpli'
 import {store} from '@/store'

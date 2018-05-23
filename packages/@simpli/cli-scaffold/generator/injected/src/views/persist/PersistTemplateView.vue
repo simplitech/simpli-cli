@@ -6,7 +6,7 @@
     </h1>
 
     <await name="get" class="verti scroll weight-1 items-center-top p-30">
-      <form @submit.prevent="await.run(persist, 'persist')" class="elevated w-full max-w-650 p-20">
+      <form @submit.prevent="$await.run(persist, 'persist')" class="elevated w-full max-w-650 p-20">
 <%_ for (var i in origin.attrs) { var attr = origin.attrs[i] _%>
 <%-attr.buildPersist(origin.name, model.resp.originAttr)-%>
 <%_ } _%>

@@ -196,15 +196,6 @@ input:not([type=submit]):not([type=checkbox]):not([type=radio]).accent, textarea
   background: white;
 }
 
-.poped {
-  border-radius: 18px;
-  padding: 15px;
-  -webkit-box-shadow: 0px 9px 30px 0px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 0px 9px 30px 0px rgba(0, 0, 0, 0.4);
-  box-shadow: 0px 9px 30px 0px rgba(0, 0, 0, 0.4);
-  background: white;
-}
-
 div.accent-bg {
   background: $accent-color;
   color: white;
@@ -219,11 +210,6 @@ div.accent-bg {
   color: $light-accent-text;
 }
 
-.scrim {
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 99999;
-}
-
 .transition {
   -webkit-transition: 200ms all;
   -moz-transition: 200ms all;
@@ -233,6 +219,86 @@ div.accent-bg {
   -moz-transition-timing-function: ease-in;
   -o-transition-timing-function: ease-in;
   transition-timing-function: ease-in;
+}
+
+.modal {
+  .modal-scroll {
+    overflow-y: scroll;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    z-index: 90001;
+    .modal-view {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: min-content;
+
+      padding: 8px;
+      width: 100vw;
+      height: 100vh;
+
+      .modal-content {
+        position: relative;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 9px 30px 0 rgba(0, 0, 0, 0.4);
+
+        .modal-header {
+          display: flex;
+          justify-content: center;
+          background: $accent-color;
+          border-radius: 6px 6px 0 0;
+          border-bottom: 3px solid $dark-accent;
+          padding: 6px;
+
+          .modal-title {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            text-transform: uppercase;
+            cursor: default;
+            user-select: none;
+          }
+
+          .close-icon {
+            flex: 0;
+            text-decoration: none;
+            font-size: 21px;
+            line-height: 16px;
+            margin-right: 4px;
+            transition: opacity ease-out 0.4s;
+            color: white;
+            opacity: 0.6;
+            &:before {
+              content: '×';
+            }
+            &:hover {
+              opacity: 0.9;
+            }
+          }
+        }
+
+        .modal-body {
+          padding: 8px;
+        }
+      }
+    }
+  }
+
+  .modal-bg {
+    background: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    min-height: 100vh;
+    z-index: 90000;
+  }
 }
 
 .await-spinner {
@@ -246,7 +312,6 @@ div.accent-bg {
 }
 
 .multiselect {
-
   .multiselect__option--highlight {
     background: $accent-color !important;
     &:after {

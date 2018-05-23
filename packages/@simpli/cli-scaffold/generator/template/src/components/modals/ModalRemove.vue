@@ -1,11 +1,10 @@
 <template>
-  <modal v-if="active">
+  <modal :name="name">
     <div class="verti">
       <div class="horiz">
         <h4 class="weight-1 mt-0 mr-10">
           {{ $t("system.question.confirmRemove") }}
         </h4>
-        <a class="close" @click="cancelEvent"></a>
       </div>
       <p class="text-center">{{ text }}</p>
       <div class="horiz items-center">
@@ -23,7 +22,7 @@
 
   @Component
   export default class ModalRemove extends Vue {
-    @Prop({default: false}) active?: boolean
+    @Prop({type: String}) name?: string
     @Prop({default: ''}) text?: string
 
     cancelEvent() {
