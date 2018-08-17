@@ -1,3 +1,13 @@
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/simplitech/simpli-cli/compare/v1.0.16...v1.1.1) (2018-08-17)
+
+
+### Features
+
+* Paired vue-cli version ([0b10f89](https://github.com/simplitech/simpli-cli/commit/0b10f89))
+
+
+
 <a name="1.0.16"></a>
 ## [1.0.16](https://github.com/simplitech/simpli-cli/compare/v1.0.15...v1.0.16) (2018-05-23)
 
