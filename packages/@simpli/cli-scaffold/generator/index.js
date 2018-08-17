@@ -63,8 +63,8 @@ module.exports = (api, options) => {
       'normalize-scss': '7.0.1',
       'register-service-worker': '1.1.1',
       'simple-line-icons': '2.4.1',
-      'simpli-ts-vue': '1.7.0',
-      'vue': '2.5.16',
+      'simpli-ts-vue': '^1.7.1',
+      'vue': '2.5.17',
       'vue-chartjs': '3.2.1',
       'vue-chartkick': '0.2.1',
       'vue-class-component': '6.2.0',
@@ -72,7 +72,7 @@ module.exports = (api, options) => {
       'vue-meta': '1.4.4',
       'vue-moment': '3.2.0',
       'vue-multiselect': '2.0.8',
-      'vue-property-decorator': '6.0.0',
+      'vue-property-decorator': '7.0.0',
       'vue-resource': '1.5.0',
       'vue-router': '3.0.1',
       'vue-snotify': '3.0.4',
@@ -81,20 +81,16 @@ module.exports = (api, options) => {
       'vuex-class': '0.3.0'
     },
     devDependencies: {
-      '@vue/cli-plugin-babel': '3.0.0-beta.7',
-      '@vue/cli-plugin-pwa': '3.0.0-beta.7',
-      '@vue/cli-plugin-typescript': '3.0.0-beta.7',
-      '@vue/cli-service': '3.0.0-beta.7',
-      'lint-staged': '7.0.0',
-      'node-sass': '4.8.2',
-      'sass-loader': '6.0.7',
-      'vue-template-compiler': '2.5.16'
+      '@vue/cli-plugin-babel': '3.0.1',
+      '@vue/cli-plugin-pwa': '3.0.1',
+      '@vue/cli-plugin-typescript': '3.0.1',
+      '@vue/cli-service': '3.0.1',
+      'lint-staged': '7.2.2',
+      'node-sass': '4.9.0',
+      'sass-loader': '7.0.1',
+      'typescript': '3.0.1',
+      'vue-template-compiler': '2.5.17'
     },
-    'browserslist': [
-      '> 1%',
-      'last 2 versions',
-      'not ie <= 8'
-    ],
     'gitHooks': {
       'pre-commit': 'lint-staged'
     },
