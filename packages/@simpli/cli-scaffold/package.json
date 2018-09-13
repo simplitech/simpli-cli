@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli-scaffold",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "scaffold for simpli-cli",
   "main": "index.js",
   "publishConfig": {
