@@ -1,3 +1,13 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/simplitech/simpli-cli/compare/v1.1.1...v1.2.1) (2018-09-13)
+
+
+### Features
+
+* New Style ([ddbf2bb](https://github.com/simplitech/simpli-cli/commit/ddbf2bb))
+
+
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://github.com/simplitech/simpli-cli/compare/v1.0.16...v1.1.1) (2018-08-17)
 
