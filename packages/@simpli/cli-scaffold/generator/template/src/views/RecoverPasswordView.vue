@@ -1,14 +1,18 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <template>
-  <div class="entry-view verti w-window h-window items-center p-10">
-    <form @submit.prevent="submit" class="des-w-300 tab-w-400 mob-w-full elevated p-20">
+  <div class="container verti w-window h-window items-center">
+    <form @submit.prevent="submit" class="des-w-300 tab-w-400 mob-w-full">
       <await name="recoverPassword" :spinnerScale="1.5">
-        <h2 class="text-center accent mt-0">{{ $t("view.recoverPassword.title") }}</h2>
+        <h2 class="text-center text-uppercase contrast">
+          {{ $t('view.recoverPassword.title') }}
+        </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" :placeholder="$t('view.recoverPassword.newPassword')"/>
-        <input-group v-model="<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" :placeholder="$t('view.recoverPassword.confirmPassword')"/>
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.newPassword')"/>
+        <input-group v-model="<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.confirmPassword')"/>
 
-        <button class="accent w-full" type="submit">{{ $t("view.recoverPassword.submit") }}</button>
+        <button class="secondary fluid" type="submit">
+          {{ $t('view.recoverPassword.submit') }}
+        </button>
       </await>
     </form>
   </div>

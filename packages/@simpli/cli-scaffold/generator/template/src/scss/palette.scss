@@ -1,0 +1,131 @@
+@import "variables";
+@import "function";
+
+/**
+Name your palette color in:
+http://chir.ag/projects/name-that-color
+ */
+
+// Primary Color
+.pal-primary, .pal-eastern-blue {
+  @include palette($primary-color);
+}
+
+// Secondary Color
+.pal-secondary, .pal-mountain-meadow {
+  @include palette($secondary-color);
+}
+
+// Tertiary Color
+.pal-tertiary, .pal-eden{
+  @include palette($tertiary-color);
+}
+
+// Success Color
+.pal-success, .pal-nasty-green {
+  @include palette($success-color);
+}
+
+// Warning Color
+.pal-warning, .pal-light-gold {
+  @include palette($warning-color);
+}
+
+// Danger Color
+.pal-danger, .pal-cardinal {
+  @include palette($danger-color);
+}
+
+// Light Background Color
+.pal-light-background, .pal-polar {
+  @include palette($light-background-color);
+}
+
+// Dark Background Color
+.pal-dark-background, .pal-bleached-cedar {
+  @include palette($dark-background-color);
+}
+
+/** White Palette **/
+/********************************************************/
+.pal-white {
+  @include palette(#ffffff);
+}
+
+.pal-white-10 {
+  @include palette(rgba(255, 255, 255, 0.1));
+}
+
+.pal-white-20 {
+  @include palette(rgba(255, 255, 255, 0.2));
+}
+
+.pal-white-30 {
+  @include palette(rgba(255, 255, 255, 0.3));
+}
+
+.pal-white-40 {
+  @include palette(rgba(255, 255, 255, 0.4));
+}
+
+.pal-white-50 {
+  @include palette(rgba(255, 255, 255, 0.5));
+}
+
+.pal-white-60 {
+  @include palette(rgba(255, 255, 255, 0.6));
+}
+
+.pal-white-70 {
+  @include palette(rgba(255, 255, 255, 0.7));
+}
+
+.pal-white-80 {
+  @include palette(rgba(255, 255, 255, 0.8));
+}
+
+.pal-white-90 {
+  @include palette(rgba(255, 255, 255, 0.9));
+}
+
+/** Black Palette **/
+/********************************************************/
+.pal-black {
+  @include palette(#000000);
+}
+
+.pal-black-10 {
+  @include palette(rgba(0, 0, 0, 0.1));
+}
+
+.pal-black-20 {
+  @include palette(rgba(0, 0, 0, 0.2));
+}
+
+.pal-black-30 {
+  @include palette(rgba(0, 0, 0, 0.3));
+}
+
+.pal-black-40 {
+  @include palette(rgba(0, 0, 0, 0.4));
+}
+
+.pal-black-50 {
+  @include palette(rgba(0, 0, 0, 0.5));
+}
+
+.pal-black-60 {
+  @include palette(rgba(0, 0, 0, 0.6));
+}
+
+.pal-black-70 {
+  @include palette(rgba(0, 0, 0, 0.7));
+}
+
+.pal-black-80 {
+  @include palette(rgba(0, 0, 0, 0.8));
+}
+
+.pal-black-90 {
+  @include palette(rgba(0, 0, 0, 0.9));
+}

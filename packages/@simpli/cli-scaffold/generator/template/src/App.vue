@@ -1,6 +1,6 @@
 <template>
   <div>
-    <transition name="fade-y" mode="out-in">
+    <transition name="blur" mode="out-in">
       <router-view/>
     </transition>
     <vue-snotify :class="toastStyle"/>
@@ -8,7 +8,7 @@
 </template>
 
 <style lang="scss">
-  @import './scss/main.scss';
+  @import './scss/app.scss';
 </style>
 
 <script lang="ts">

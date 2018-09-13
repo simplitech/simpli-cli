@@ -10,7 +10,7 @@
 
     <section>
       <adap-table :collection="collection">
-        <div slot="options" slot-scope="props">
+        <div slot="options" slot-scope="props" class="horiz nowrap">
           <a @click="openPersist(props.item)" class="icon icon-pencil"></a>
 <%_ if (model.resource.deletable) { _%>
           <a @click="openRemoveModal(props.item)" class="icon icon-trash"></a>

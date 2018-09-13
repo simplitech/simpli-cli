@@ -1,19 +1,19 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
-  <div class="verti">
-    <h1 class="header px-30 py-10 m-0">
+  <div>
+    <h1 class="adap-header px-30 py-10 m-0">
       {{ $t("classes.<%-origin.name%>.title") }}
     </h1>
 
-    <await name="get" class="verti scroll weight-1 items-center-top p-30">
-      <form @submit.prevent="$await.run(persist, 'persist')" class="elevated w-full max-w-650 p-20">
+    <await name="get" class="weight-1 items-center p-20">
+      <form @submit.prevent="$await.run(persist, 'persist')" class="elevated padded w-full max-w-650">
 <%_ for (var i in origin.attrs) { var attr = origin.attrs[i] _%>
 <%-attr.buildPersist(origin.name, model.resp.originAttr)-%>
 <%_ } _%>
         <hr class="mb-20"/>
 
         <await name="persist" class="verti items-center">
-          <button type="submit" class="accent">{{ $t("persist.submit") }}</button>
+          <button type="submit" class="primary">{{ $t("persist.submit") }}</button>
         </await>
       </form>
     </await>

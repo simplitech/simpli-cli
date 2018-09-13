@@ -1,25 +1,29 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <template>
-  <div class="entry-view verti w-window h-window items-center p-10">
-    <form @submit.prevent="signIn(model)" class="des-w-300 tab-w-400 mob-w-full elevated p-20">
+  <div class="container verti w-window h-window items-center">
+    <form @submit.prevent="signIn(model)" class="des-w-300 tab-w-400 mob-w-full">
       <await name="login" :spinnerScale="1.5">
-        <h2 class="text-center accent mt-0">{{ $t("view.login.title") }}</h2>
+        <h2 class="text-center text-uppercase contrast">
+          {{ $t('view.login.title') }}
+        </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" autofocus>
-          {{ $t("view.login.account") }}
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast">
+          {{ $t('view.login.account') }}
         </input-group>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password">
-          {{ $t("view.login.password") }}
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast">
+          {{ $t('view.login.password') }}
         </input-group>
 
-        <div class="horiz items-space-between mb-10">
-          <router-link to="/password/reset">
+        <div class="horiz items-space-between">
+          <router-link to="/password/reset" class="text-link contrast">
             {{ $t('view.login.forgotPassword') }}
           </router-link>
         </div>
 
-        <button class="accent w-full" type="submit">{{ $t("view.login.signin") }}</button>
+        <button class="secondary fluid" type="submit">
+          {{ $t('view.login.signin') }}
+        </button>
       </await>
     </form>
   </div>
@@ -27,7 +31,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import { State, Action, Getter } from 'vuex-class'
+  import {State, Action, Getter} from 'vuex-class'
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.auth.model.loginHolder _%>
   <%-loginHolderModel.injectIntoDependence().build()%>
 

@@ -63,7 +63,7 @@ module.exports = (api, options) => {
       'normalize-scss': '7.0.1',
       'register-service-worker': '1.1.1',
       'simple-line-icons': '2.4.1',
-      'simpli-ts-vue': '^1.7.1',
+      'simpli-ts-vue': '^1.8.2',
       'vue': '2.5.17',
       'vue-chartjs': '3.2.1',
       'vue-chartkick': '0.2.1',

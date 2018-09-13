@@ -1,19 +1,23 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <template>
-  <div class="entry-view verti w-window h-window items-center p-10">
-    <form @submit.prevent="resetPassword(model)" class="des-w-300 tab-w-400 mob-w-full elevated p-20">
+  <div class="contrast verti w-window h-window items-center">
+    <form @submit.prevent="resetPassword(model)" class="des-w-300 tab-w-400 mob-w-full">
       <await name="resetPassword" :spinnerScale="1.5">
-        <h2 class="text-center accent mt-0">{{ $t("view.resetPassword.title") }}</h2>
+        <h2 class="text-center text-uppercase contrast">
+          {{ $t('view.resetPassword.title') }}
+        </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" :placeholder="$t('view.resetPassword.account')" autofocus/>
+        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
 
-        <div class="horiz items-space-between mb-10">
-          <router-link to="/login">
+        <div class="horiz items-space-between">
+          <router-link to="/login" class="text-link contrast">
             {{ $t('view.resetPassword.signIn') }}
           </router-link>
         </div>
 
-        <button class="accent w-full" type="submit">{{ $t("view.resetPassword.submit") }}</button>
+        <button class="secondary fluid" type="submit">
+          {{ $t('view.resetPassword.submit') }}
+        </button>
       </await>
     </form>
   </div>

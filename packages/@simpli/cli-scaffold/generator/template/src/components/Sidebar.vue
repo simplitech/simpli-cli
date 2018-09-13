@@ -1,31 +1,30 @@
 <template>
-  <div class="des-w-200 tab-w-200 w-full des-h-window">
-    <aside class="menu verti des-w-200 tab-w-200 w-full des-h-window tab-h-window des-fixed tab-fixed y-scroll">
+  <div class="sidebar des-w-200 tab-w-200 w-full des-h-window">
+    <aside class="verti des-w-200 tab-w-200 w-full des-h-window tab-h-window des-fixed tab-fixed y-scroll">
+
       <div class="horiz items-center">
-        <a class="mobile icon icon-menu" @click="toggleMenu"></a>
-        <h1 class="horiz weight-1 accent truncate">
-          <img src="@/assets/img/logo.png"
-               class="ml-10"
-               width="32"
-               height="32"
-               alt="Logo"
-               style="vertical-align: middle;">
-          <span class="weight-1 truncate mr-10">
-          <%- rootOptions.scaffoldSetup.appName %>
+        <div class="brand">
+          <img src="@/assets/img/logo.png" alt="Logo">
+          <span>
+            <%- rootOptions.scaffoldSetup.appName %>
           </span>
-        </h1>
+        </div>
+
+        <a class="mobile icon icon-menu" @click="toggleMenu"></a>
       </div>
+
       <!--<div class="horiz items-center">-->
       <!--<h3 class="truncate">-->
       <!--{{user.email}}-->
       <!--</h3>-->
       <!--</div>-->
+
       <div class="weight-1" :class="{ 'desktop-tablet': !menu }">
-        <ul class="verti h-full p-0 py-10">
+        <ul>
 
           <li>
-            <router-link to="/dashboard" @click.native="menuOff">
-              <i class="icon icon-home mr-3"></i>
+            <router-link to="/dashboard" @click.native="menuOff" class="btn fluid flat contrast">
+              <i class="icon icon-home"></i>
               {{ $t('view.dashboard.title') }}
             </router-link>
           </li>
@@ -34,7 +33,7 @@
 <%_ var resources = rootOptions.scaffoldSetup.resourceModels _%>
 <%_ for (var i in resources) { var resource = resources[i] _%>
           <li>
-            <router-link to="/<%-kebabCase(resource.name)%>/list" @click.native="menuOff">
+            <router-link to="/<%-kebabCase(resource.name)%>/list" @click.native="menuOff" class="btn fluid flat contrast">
               {{ $t('classes.<%-resource.name%>.title') }}
             </router-link>
           </li>
@@ -44,8 +43,8 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
           <li>
-            <a @click="signOut(false)">
-              <i class="icon icon-logout mr-3"/>
+            <a @click="signOut(false)" class="btn fluid flat contrast">
+              <i class="icon icon-logout"/>
               {{$t('app.logout')}}
             </a>
           </li>
@@ -54,7 +53,7 @@
 
       </div>
 
-      <footer class="p-10 desktop-tablet">
+      <footer class="p-10 desktop-tablet text-light">
         <small>
           <b>Version</b>
           {{version}}

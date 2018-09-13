@@ -1,7 +1,7 @@
 <template>
-  <main class="horiz nowrap h-window mob-verti">
+  <main>
     <sidebar/>
-    <transition name="fade-y" mode="out-in">
+    <transition name="fade-down" mode="out-in">
       <router-view class="weight-1 des-w-0 tab-w-0 mob-w-full"/>
     </transition>
   </main>
