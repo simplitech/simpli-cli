@@ -4,7 +4,7 @@ package <%-packageAddress%>.<%-moduleName%>.mail
 
 import <%-packageAddress%>.AppMail
 import <%-packageAddress%>.model.User
-import com.simpli.model.LanguageHolder
+import br.com.simpli.model.LanguageHolder
 
 class ResetPasswordMail(appUrl: String, lang: LanguageHolder, user: User, hash: String) : AppMail(appUrl, lang) {
     init {

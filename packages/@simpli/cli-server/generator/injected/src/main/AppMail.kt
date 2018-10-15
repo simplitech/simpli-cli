@@ -3,9 +3,9 @@
 <%_ var serverName = options.serverSetup.serverName _%>
 package <%-packageAddress%>
 
-import com.simpli.model.LanguageHolder
+import br.com.simpli.model.LanguageHolder
 import com.amazonaws.regions.Regions
-import com.simpli.ws.AWSSendEmailRequest
+import br.com.simpli.ws.AWSSendEmailRequest
 
 import java.util.HashMap
 

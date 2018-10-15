@@ -5,8 +5,8 @@ package <%-packageAddress%>.<%-moduleName%>
 
 import <%-packageAddress%>.<%-moduleName%>.process.LoginService
 import com.google.common.base.Strings
-import com.simpli.model.LanguageHolder
-import com.simpli.sql.TransactionPipe
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.sql.TransactionPipe
 import java.sql.Connection
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -14,7 +14,7 @@ import java.util.regex.Pattern
 
 class AuthPipe(val transactionPipe: TransactionPipe) {
 
-    fun <T> handle(authorization: String, lang: LanguageHolder, clientVersion:String, c: (con: Connection, loginHolder: LoginService.LoginHolderWithId) -> T): T {
+    fun <T> handle(authorization: String, lang: LanguageHolder, clientVersion:String, c: (con: Connection, loginHolder: LoginService.LoginInfo) -> T): T {
         var result: T? = null
 
         transactionPipe.handle { con ->
@@ -26,7 +26,7 @@ class AuthPipe(val transactionPipe: TransactionPipe) {
                         """
                             Following Exception occured with user
                             id: ${auth.id};
-                            email: ${auth.loginHolder.<%-accountColumn.name%>};
+                            email: ${auth.loginSerialized.<%-accountColumn.name%>};
                             clientVersion: ${clientVersion}
                             """)
                 throw e

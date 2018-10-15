@@ -2,8 +2,8 @@
 package <%-packageAddress%>.model
 
 import <%-packageAddress%>.exception.HttpException
-import com.simpli.model.EnglishLanguage
-import com.simpli.model.RespException
+import br.com.simpli.model.EnglishLanguage
+import br.com.simpli.model.RespException
 import java.util.ArrayList
 import java.util.Date
 import org.junit.Test

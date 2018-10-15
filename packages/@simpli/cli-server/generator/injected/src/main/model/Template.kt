@@ -5,11 +5,11 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import java.sql.SQLException
 import java.util.Date
-import com.simpli.model.LanguageHolder
-import com.simpli.model.RespException
-import com.simpli.sql.*
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.model.RespException
+import br.com.simpli.sql.*
 import java.sql.ResultSet
-import com.simpli.tools.Validator
+import br.com.simpli.tools.Validator
 import <%-packageAddress%>.exception.HttpException
 import javax.ws.rs.core.Response
 

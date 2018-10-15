@@ -5,8 +5,8 @@
 package <%-packageAddress%>.dao
 
 import <%-packageAddress%>.model.<%-userTable.modelName%>
-import com.simpli.model.LanguageHolder
-import com.simpli.sql.Dao
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.sql.Dao
 import java.sql.Connection
 
 /**

@@ -37,6 +37,10 @@ module.exports = (api, options) => {
     // Exception
     api.renderFrom('./injected', 'src/main/exception/HttpException.kt', `../java/${dir}/exception/HttpException.kt`)
 
+    // Lang
+    api.renderFrom('./injected', 'src/main/lang/EnUs.kt', `../java/${dir}/lang/EnUs.kt`)
+    api.renderFrom('./injected', 'src/main/lang/PtBr.kt', `../java/${dir}/lang/PtBr.kt`)
+
     // Test
     api.renderFrom('./injected', 'src/test/module/process/LoginServiceTest.kt', `../../java/${dir}/${moduleName}/process/LoginServiceTest.kt`)
     api.renderFrom('./injected', 'src/test/OtherTest.kt', `./java/${dir}/OtherTest.kt`)

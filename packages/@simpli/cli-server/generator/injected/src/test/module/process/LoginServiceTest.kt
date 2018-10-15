@@ -6,10 +6,10 @@
 <%_ var database = options.serverSetup.connection.database _%>
 package <%-packageAddress%>.<%-moduleName%>.process
 
-import com.simpli.model.EnglishLanguage
-import com.simpli.model.RespException
-import com.simpli.sql.DaoTest
-import com.simpli.tools.SecurityUtils
+import br.com.simpli.model.EnglishLanguage
+import br.com.simpli.model.RespException
+import br.com.simpli.sql.DaoTest
+import br.com.simpli.tools.SecurityUtils
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
 import <%-packageAddress%>.exception.HttpException
 import java.sql.Connection
@@ -33,7 +33,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         val lang = EnglishLanguage()
         val clientVersion = "w1.0.0"
         subject = LoginService(con, lang, clientVersion)
-        token = subject.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
+        token = LoginService.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
     }
 
     @Test(expected = HttpException::class)
@@ -82,7 +82,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
     @Test
     fun testTokenToLoginNull() {
-        val result = subject.tokenToLogin(null)
+        val result = LoginService.tokenToLogin(null)
         assertNull(result)
     }
 
@@ -92,28 +92,28 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
         tokenOtherObject = SecurityUtils.encode(tokenOtherObject!!, "UTF-8")
 
-        val result = subject.tokenToLogin(tokenOtherObject)
+        val result = LoginService.tokenToLogin(tokenOtherObject)
         assertNull(result)
     }
 
     @Test
     fun testLoginToToken() {
-        val result = subject.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
+        val result = LoginService.loginToToken("test@test.com", SecurityUtils.sha256("tester"))
         assertEquals(token,
                 result)
     }
 
     @Test
-    fun testLoginHolder() {
-        val lh = LoginService.LoginHolder("a", "1")
+    fun testLoginSerialized() {
+        val lh = LoginService.LoginSerialized("a", "1")
         assertEquals("a", lh.<%-accountColumn.name%>)
         assertEquals("1", lh.<%-passwordColumn.name%>)
     }
 
     @Test
-    fun testLoginHolderWithId() {
-        val lh = LoginService.LoginHolderWithId(LoginService.LoginHolder("a", "1"), 2)
-        assertNotNull(lh.loginHolder)
+    fun testLoginInfo() {
+        val lh = LoginService.LoginInfo(2, LoginService.LoginSerialized("a", "1"))
+        assertNotNull(lh.loginSerialized)
         assertEquals(2, lh.id)
     }
 

@@ -4,11 +4,11 @@
 package <%-packageAddress%>
 
 import <%-packageAddress%>.<%-moduleName%>.AuthPipe
-import com.simpli.model.LanguageHolder
-import com.simpli.model.EnglishLanguage
-import com.simpli.model.PortugueseLanguage
-import com.simpli.model.RespException
-import com.simpli.sql.TransactionPipe
+import <%-packageAddress%>.lang.EnUs
+import <%-packageAddress%>.lang.PtBr
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.model.RespException
+import br.com.simpli.sql.TransactionPipe
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -26,13 +26,13 @@ open class RouterWrapper : ExceptionMapper<Throwable> {
 
     protected val langs: HashMap<String, LanguageHolder> = object : HashMap<String, LanguageHolder>() {
         init {
-            put("en-US", EnglishLanguage())
-            put("pt-BR", PortugueseLanguage())
+            put("en-US", EnUs())
+            put("pt-BR", PtBr())
         }
     }
 
     fun getLang(lang: String = "en-US"): LanguageHolder {
-        return langs[lang] ?: EnglishLanguage()
+        return langs[lang] ?: EnUs()
     }
 
     override fun toResponse(e: Throwable): Response {

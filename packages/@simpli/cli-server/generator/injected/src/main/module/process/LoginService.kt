@@ -13,8 +13,8 @@ import <%-packageAddress%>.<%-moduleName%>.mail.ResetPasswordMail
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
 import <%-packageAddress%>.exception.HttpException
 import <%-packageAddress%>.model.<%-userTable.modelName%>
-import com.simpli.model.LanguageHolder
-import com.simpli.tools.SecurityUtils
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.tools.SecurityUtils
 import javax.ws.rs.core.Response
 
 /**
@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response
 class LoginService(private val con: Connection, private val lang: LanguageHolder, private val clientVersion: String) {
 
     fun auth(token: String?): LoginResp {
-        val lHolder: LoginHolder? = tokenToLogin(token)
+        val lHolder: LoginSerialized? = tokenToLogin(token)
         val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>? = lHolder?.<%-accountColumn.name%>
         val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>? = lHolder?.<%-passwordColumn.name%>
         val id = getId(<%-accountColumn.name%>, <%-passwordColumn.name%>)
@@ -110,18 +110,6 @@ class LoginService(private val con: Connection, private val lang: LanguageHolder
         return loginToToken(objToken.<%-accountColumn.name%>, <%-passwordColumn.name%>)
     }
 
-    fun allowAccess(token: String?): LoginHolderWithId {
-        val login = tokenToLogin(token) ?: throw HttpException(lang.pleaseLogin(), Response.Status.UNAUTHORIZED)
-
-        val id = getId(login.<%-accountColumn.name%>, login.<%-passwordColumn.name%>)
-
-        if (id == 0L) {
-            throw HttpException(lang.pleaseLogin(), Response.Status.UNAUTHORIZED)
-        }
-
-        return LoginHolderWithId(login, id)
-    }
-
     fun getId(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?): Long {
         val dao = LoginServiceDao(con, lang)
 
@@ -134,39 +122,65 @@ class LoginService(private val con: Connection, private val lang: LanguageHolder
         return dao.get<%-userTable.modelName%>(id)
     }
 
-    fun loginToToken(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?): String? {
-        var token = Gson().toJson(LoginHolder(<%-accountColumn.name%>, <%-passwordColumn.name%>))
-        token = SecurityUtils.encrypt(token, CRIPTOGRAPHY_HASH)
+    fun allowAccess(token: String?): LoginInfo {
+        val login = tokenToLogin(token) ?: throw HttpException(lang.pleaseLogin(), Response.Status.UNAUTHORIZED)
 
-        token = SecurityUtils.encode(token, "UTF-8")
+        val id = getId(login.<%-accountColumn.name%>, login.<%-passwordColumn.name%>)
 
-        return token
-    }
-
-    fun tokenToLogin(tokenP: String?): LoginHolder? {
-        var token: String? = tokenP ?: return null
-
-        token = SecurityUtils.decode(token ?: "", "UTF-8")
-        token = SecurityUtils.decrypt(token ?: "", CRIPTOGRAPHY_HASH)
-
-        if (token == null) {
-            return null
+        if (id == 0L) {
+            throw HttpException(lang.pleaseLogin(), Response.Status.UNAUTHORIZED)
         }
 
-        try {
-            return Gson().fromJson(token, LoginHolder::class.java)
-        } catch (e: Exception) {
-            return null
-        }
+        return LoginInfo(id, login)
     }
 
-    class LoginHolder(val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?, val hash: String? = "")
+    class LoginSerialized(val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?, val hash: String? = "")
 
-    class LoginHolderWithId(val loginHolder: LoginHolder, val id: Long)
+    class LoginInfo {
+        val id: Long
+        val loginSerialized: LoginSerialized
+
+        constructor(id: Long, loginSerialized: LoginSerialized) {
+            this.loginSerialized = loginSerialized
+            this.id = id
+        }
+
+        constructor(id: Long, email: String?, password: String?, hash: String? = "") {
+            this.loginSerialized = LoginSerialized(email, password, hash)
+            this.id = id
+        }
+    }
 
     class TokenForgottenPassword (val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>, val date: Date? = Date())
 
     companion object {
+
+        fun loginToToken(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?): String? {
+            var token = Gson().toJson(LoginSerialized(<%-accountColumn.name%>, <%-passwordColumn.name%>))
+            token = SecurityUtils.encrypt(token, CRIPTOGRAPHY_HASH)
+
+            token = SecurityUtils.encode(token, "UTF-8")
+
+            return token
+        }
+
+        fun tokenToLogin(tokenP: String?): LoginSerialized? {
+            var token: String? = tokenP ?: return null
+
+            token = SecurityUtils.decode(token ?: "", "UTF-8")
+            token = SecurityUtils.decrypt(token ?: "", CRIPTOGRAPHY_HASH)
+
+            if (token == null) {
+                return null
+            }
+
+            try {
+                return Gson().fromJson(token, LoginSerialized::class.java)
+            } catch (e: Exception) {
+                return null
+            }
+        }
+
         val CRIPTOGRAPHY_HASH = "<%-options.serverSetup.uuid()%>"
     }
 }

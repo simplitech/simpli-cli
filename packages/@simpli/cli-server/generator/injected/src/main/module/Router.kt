@@ -7,7 +7,7 @@
 package <%-packageAddress%>.<%-moduleName%>
 
 import <%-packageAddress%>.RouterWrapper
-import com.simpli.model.PagedResp
+import br.com.simpli.model.PagedResp
 import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.DELETE
@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 
 import <%-packageAddress%>.<%-moduleName%>.process.LoginService
-import <%-packageAddress%>.<%-moduleName%>.process.LoginService.LoginHolder
+import <%-packageAddress%>.<%-moduleName%>.process.LoginService.LoginSerialized
 import <%-packageAddress%>.<%-moduleName%>.response.LoginResp
 <%_ for (var i in commonTables) { var table = commonTables[i] _%>
 import <%-packageAddress%>.<%-moduleName%>.process.<%-table.modelName%>Process
@@ -67,7 +67,7 @@ class Router : RouterWrapper() {
             clientVersion: String,
 
         @ApiParam(required = true)
-            body: LoginHolder
+            body: LoginSerialized
     ): LoginResp {
         //TODO: review generated method
         return transacPipe.handle { con ->
@@ -85,7 +85,7 @@ class Router : RouterWrapper() {
         @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
             clientVersion: String,
 
-        body: LoginHolder
+        body: LoginSerialized
     ): Long {
         return transacPipe.handle { con ->
             LoginService(con, getLang(lang), clientVersion)
@@ -102,7 +102,7 @@ class Router : RouterWrapper() {
         @HeaderParam("X-Client-Version") @ApiParam(required = true, example = "w1.1.0")
         clientVersion: String,
 
-        body: LoginHolder
+        body: LoginSerialized
     ): String? {
         return transacPipe.handle { con ->
             LoginService(con, getLang(lang), clientVersion)
@@ -130,10 +130,10 @@ class Router : RouterWrapper() {
             authorization: String
     ): <%-table.modelName%>Resp {
         //TODO: review generated method
-        return authPipe.handle(authorization, getLang(lang), clientVersion, {
-            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+        return authPipe.handle(authorization, getLang(lang), clientVersion) {
+            con, loginInfo -> <%-table.modelName%>Process(con, getLang(lang))
                 .getOne(<%-table.primariesByComma()%>)
-        })
+        }
     }
 
     @GET
@@ -159,10 +159,10 @@ class Router : RouterWrapper() {
             asc: Boolean?
     ): PagedResp<<%-table.modelName%>> {
         //TODO: review generated method
-        return authPipe.handle(authorization, getLang(lang), clientVersion, {
-            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+        return authPipe.handle(authorization, getLang(lang), clientVersion) {
+            con, loginInfo -> <%-table.modelName%>Process(con, getLang(lang))
                 .list(query, page, limit, orderRequest, asc != null && asc)
-        })
+        }
     }
 
 <%_ if (table.hasPersist) { _%>
@@ -181,10 +181,10 @@ class Router : RouterWrapper() {
             <%-table.instanceName%>: <%-table.modelName%>
     ): Long {
         //TODO: review generated method
-        return authPipe.handle(authorization, getLang(lang), clientVersion, {
-            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+        return authPipe.handle(authorization, getLang(lang), clientVersion) {
+            con, loginInfo -> <%-table.modelName%>Process(con, getLang(lang))
                 .persist(<%-table.instanceName%>)
-        })
+        }
     }
 
 <%_ } _%>
@@ -207,10 +207,10 @@ class Router : RouterWrapper() {
             authorization: String
     ): Any? {
         //TODO: review generated method
-        return authPipe.handle(authorization, getLang(lang), clientVersion, {
-            con, loginHolder -> <%-table.modelName%>Process(con, getLang(lang), loginHolder)
+        return authPipe.handle(authorization, getLang(lang), clientVersion) {
+            con, loginInfo -> <%-table.modelName%>Process(con, getLang(lang))
                 .remove(<%-table.primariesByComma()%>)
-        })
+        }
     }
 
 <%_ } _%>

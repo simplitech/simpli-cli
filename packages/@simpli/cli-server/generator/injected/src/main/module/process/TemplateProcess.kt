@@ -9,8 +9,8 @@ import <%-packageAddress%>.dao.<%-obj.modelName%>Dao
 <%_ } _%>
 import <%-packageAddress%>.exception.HttpException
 import com.google.common.base.Strings
-import com.simpli.model.LanguageHolder
-import com.simpli.model.PagedResp
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.model.PagedResp
 import java.sql.Connection
 import javax.ws.rs.core.Response
 
@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response
  * <%-table.modelName%> business logic
  * @author Simpli© CLI generator
  */
-class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder, private val loginHolder: LoginService.LoginHolderWithId?) {
+class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder) {
 
     fun list(
         queryP: String?,

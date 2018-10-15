@@ -19,22 +19,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.simpli.model</groupId>
+      <groupId>br.com.simpli</groupId>
       <artifactId>simpli-model</artifactId>
       <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.simpli.tools</groupId>
+      <groupId>br.com.simpli</groupId>
       <artifactId>simpli-tools</artifactId>
       <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.simpli.ws</groupId>
+      <groupId>br.com.simpli</groupId>
       <artifactId>simpli-ws</artifactId>
       <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.simpli.sql</groupId>
+      <groupId>br.com.simpli</groupId>
       <artifactId>simpli-sql</artifactId>
       <version>1.0.0</version>
     </dependency>
@@ -73,7 +73,7 @@
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib-jre8</artifactId>
+      <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>${kotlin.version}</version>
     </dependency>
     <dependency>

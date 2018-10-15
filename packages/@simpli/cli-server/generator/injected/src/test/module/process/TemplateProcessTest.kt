@@ -9,11 +9,11 @@ import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
 import <%-packageAddress%>.model.<%-m2m.crossRelationModelName%>
 <%_ } _%>
 import <%-packageAddress%>.exception.HttpException
-import com.simpli.model.EnglishLanguage
-import com.simpli.model.RespException
-import com.simpli.sql.Dao
-import com.simpli.sql.DaoTest
-import com.simpli.tools.SecurityUtils
+import br.com.simpli.model.EnglishLanguage
+import br.com.simpli.model.RespException
+import br.com.simpli.sql.Dao
+import br.com.simpli.sql.DaoTest
+import br.com.simpli.tools.SecurityUtils
 import java.sql.Connection
 import java.sql.SQLException
 import javax.naming.NamingException
@@ -37,7 +37,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         con = getConnection()
         val lang = EnglishLanguage()
         val clientVersion = "w1.0.0"
-        subject = <%-table.modelName%>Process(con, lang, null)
+        subject = <%-table.modelName%>Process(con, lang)
     }
 
     @Test

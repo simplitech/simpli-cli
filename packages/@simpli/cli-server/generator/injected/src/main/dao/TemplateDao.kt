@@ -7,14 +7,14 @@ import com.google.common.base.Strings
 import java.sql.Connection
 import java.util.ArrayList
 import java.util.HashMap
-import com.simpli.model.LanguageHolder
-import com.simpli.sql.Dao
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.sql.Dao
 <%_ } else { _%>
 <%_ for (var i in table.foreignColumns) { var column = table.foreignColumns[i] _%>
 import <%-packageAddress%>.model.<%-column.foreign.referencedTableModelName%>
 <%_ } _%>
-import com.simpli.model.LanguageHolder
-import com.simpli.sql.Dao
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.sql.Dao
 import java.sql.Connection
 <%_ } _%>
 
