@@ -11,8 +11,13 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types/"
+    ],
     "types": [
-      "node"
+      "node",
+      "webpack-env"
     ],
     "paths": {
       "@/*": [

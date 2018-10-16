@@ -39,6 +39,13 @@ import <%-packageAddress%>.model.<%-table.modelName%>
 @Produces(MediaType.APPLICATION_JSON)
 class Router : RouterWrapper() {
 
+    //    ██████╗  ██████╗ ██╗   ██╗████████╗███████╗██████╗
+    //    ██╔══██╗██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██╔══██╗
+    //    ██████╔╝██║   ██║██║   ██║   ██║   █████╗  ██████╔╝
+    //    ██╔══██╗██║   ██║██║   ██║   ██║   ██╔══╝  ██╔══██╗
+    //    ██║  ██║╚██████╔╝╚██████╔╝   ██║   ███████╗██║  ██║
+    //    ╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝
+
     @GET
     @Path("/Auth")
     @ApiOperation(tags=["LoginResp"], value = "Get user authentication")

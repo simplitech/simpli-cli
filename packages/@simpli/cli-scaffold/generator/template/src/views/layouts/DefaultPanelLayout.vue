@@ -1,10 +1,12 @@
 <template>
-  <main>
-    <sidebar/>
-    <transition name="fade-down" mode="out-in">
-      <router-view class="weight-1 des-w-0 tab-w-0 mob-w-full"/>
-    </transition>
-  </main>
+  <await name="auth" spinner="FadeLoader">
+    <main>
+      <sidebar/>
+      <transition name="fade-down" mode="out-in">
+        <router-view v-if="authorized" class="weight-1 des-w-0 tab-w-0 mob-w-full"/>
+      </transition>
+    </main>
+  </await>
 </template>
 
 <script lang="ts">
@@ -19,10 +21,13 @@ import Sidebar from '@/components/Sidebar.vue'
 })
 export default class DefaultPanelLayout extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-  @Action('auth/auth') auth?: Function
+  @Action('auth/auth') auth!: Function
 
-  created() {
-    this.auth!()
+  authorized = false
+
+  async mounted() {
+    await this.auth()
+    this.authorized = true
   }
 <%_ } _%>
 }

@@ -21,15 +21,6 @@ module.exports = {
   // tweak internal webpack configuration.
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
   chainWebpack: config => {
-    if (process.env.NODE_ENV === 'production') {
-      config
-        .plugin('uglify')
-        .tap(args => {
-          args[0].uglifyOptions.keep_classnames = true
-          args[0].uglifyOptions.keep_fnames = true
-          return args
-        })
-    }
   },
 
   // configure webpack-dev-server behavior

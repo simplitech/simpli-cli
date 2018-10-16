@@ -1,3 +1,10 @@
+/**
+ * @file
+ * Vendor bootstrap
+ *
+ * This file contains the initialization of vendors library
+ */
+
 import Vue from 'vue'
 
 import './registerServiceWorker'

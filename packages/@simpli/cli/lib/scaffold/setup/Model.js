@@ -256,6 +256,7 @@ module.exports = class Model {
   }
 
   populateSimpliCommons (dep = new Dependence()) {
+    dep.addChild('$')
     if (this.isResource) {
       dep.addChild('Resource')
       dep.addChild('ID')
@@ -264,7 +265,6 @@ module.exports = class Model {
       const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
       if (hasID) dep.addChild('ID')
       dep.addChild('Model')
-      dep.addChild('$')
       dep.addChild('sleep')
       dep.addChild('encrypt')
     }

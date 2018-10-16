@@ -44,13 +44,13 @@ const actions: ActionTree<AuthState, RootState> = {
   signIn: async ({state, commit, getters}, model: <%-loginHolderModel.name%>) => {
     const loginResp = new <%-loginRespModel.name%>()
 
-    await loginResp.<%-signInApi.name%>(model)
+    await loginResp.<%-signInApi.name%>(model, 'signIn', 1000)
 
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
     commit(types.POPULATE)
 
-    if (getters!.unauthenticatedPath && $.route.name !== 'login') {
+    if (getters!.unauthenticatedPath && $.route.name !== 'signIn') {
       infoAndPush('system.info.welcome', getters!.unauthenticatedPath)
     } else {
       infoAndPush('system.info.welcome', '/dashboard')
@@ -90,8 +90,8 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param showError
    */
   signOut: ({state, commit}, showError: boolean = false) => {
-    if (showError) errorAndPush('system.error.unauthorized', '/login')
-    else push('/login')
+    if (showError) errorAndPush('system.error.unauthorized', '/signIn')
+    else push('/signIn')
 
     commit(types.FORGET)
     state.eventListener.signOut.forEach((item) => item())
@@ -105,7 +105,7 @@ const actions: ActionTree<AuthState, RootState> = {
   resetPassword: async (context, model: <%-loginHolderModel.name%>) => {
 <%_ if (loginRespModel.hasResetPassword) { _%>
     await new <%-loginRespModel.name%>(Number).resetPassword(model)
-    successAndPush('system.success.resetPassword', '/login')
+    successAndPush('system.success.resetPassword', '/signIn')
 <%_ } else { _%>
       /**/
 <%_ } _%>
@@ -119,7 +119,7 @@ const actions: ActionTree<AuthState, RootState> = {
   recoverPassword: async (context, model: <%-loginHolderModel.name%>) => {
 <%_ if (loginRespModel.hasRecoverPassword) { _%>
     await new <%-loginRespModel.name%>(String).recoverPassword(model)
-    successAndPush('system.success.recoverPassword', '/login')
+    successAndPush('system.success.recoverPassword', '/signIn')
 <%_ } else { _%>
     /**/
 <%_ } _%>

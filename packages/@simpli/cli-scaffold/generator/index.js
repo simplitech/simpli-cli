@@ -36,7 +36,6 @@ module.exports = (api, options) => {
   if (options.sync) return
 
   api.extendPackage({
-    typings: 'types/index.d.ts',
     scripts: {
       'serve': 'vue-cli-service serve' + (
         // only auto open browser on MacOS where applescript
@@ -49,47 +48,38 @@ module.exports = (api, options) => {
       'lint': 'vue-cli-service lint'
     },
     dependencies: {
-      '@types/lodash': '4.14.104',
-      '@types/papaparse': '4.1.33',
       'chart.js': '2.7.2',
-      'chartkick': '2.3.3',
-      'class-transformer': '0.1.9',
-      'class-validator': '0.8.1',
+      'chartkick': '3.0.1',
       'font-awesome': '4.7.0',
-      'js-sha256': '0.9.0',
       'linelay': '1.1.0',
-      'lodash': '4.17.5',
-      'moment': '2.21.0',
       'normalize-scss': '7.0.1',
-      'register-service-worker': '1.1.1',
+      'register-service-worker': '1.5.2',
       'simple-line-icons': '2.4.1',
-      'simpli-ts-vue': '^1.8.2',
-      'vue': '2.5.17',
-      'vue-chartjs': '3.2.1',
-      'vue-chartkick': '0.2.1',
-      'vue-class-component': '6.2.0',
-      'vue-i18n': '7.6.0',
-      'vue-meta': '1.4.4',
-      'vue-moment': '3.2.0',
+      'simpli-web-sdk': '^0.1.11',
+      'vue': '^2.5.17',
+      'vue-chartjs': '3.4.0',
+      'vue-chartkick': '0.5.0',
+      'vue-meta': '1.5.5',
+      'vue-moment': '4.0.0',
       'vue-multiselect': '2.0.8',
-      'vue-property-decorator': '7.0.0',
-      'vue-resource': '1.5.0',
-      'vue-router': '3.0.1',
-      'vue-snotify': '3.0.4',
+      'vue-property-decorator': '7.2.0',
       'vue-spinner': '1.0.3',
       'vuex': '3.0.1',
-      'vuex-class': '0.3.0'
+      'vuex-class': '0.3.1'
     },
     devDependencies: {
-      '@vue/cli-plugin-babel': '3.0.1',
-      '@vue/cli-plugin-pwa': '3.0.1',
-      '@vue/cli-plugin-typescript': '3.0.1',
-      '@vue/cli-service': '3.0.1',
-      'lint-staged': '7.2.2',
-      'node-sass': '4.9.0',
-      'sass-loader': '7.0.1',
-      'typescript': '3.0.1',
-      'vue-template-compiler': '2.5.17'
+      '@babel/core': '^7.1.2',
+      '@cypress/webpack-preprocessor': '^3.0.0',
+      '@vue/cli-plugin-babel': '^3.0.5',
+      '@vue/cli-plugin-pwa': '^3.0.5',
+      '@vue/cli-plugin-typescript': '^3.0.5',
+      '@vue/cli-service': '^3.0.5',
+      'babel-core': '7.0.0-bridge.0',
+      'lint-staged': '^7.2.2',
+      'node-sass': '^4.9.0',
+      'sass-loader': '^7.0.1',
+      'typescript': '^3.0.0',
+      'vue-template-compiler': '^2.5.17'
     },
     'gitHooks': {
       'pre-commit': 'lint-staged'

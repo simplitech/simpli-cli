@@ -1,7 +1,17 @@
+/**
+ * @file
+ * Router Configuration
+ * Used in library: vue-router
+ *
+ * Use this file to register the App routes
+ * See https://router.vuejs.org/guide/#javascript
+ * This configuration will be set in @/bootstrap/app.ts
+ */
+
 import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-import LoginView from '@/views/LoginView.vue'
+import SignInView from '@/views/SignInView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import RecoverPasswordView from '@/views/RecoverPasswordView.vue'
 <%_ } _%>
@@ -19,16 +29,16 @@ import Persist<%-resource.resp.origin%>View from '@/views/persist/Persist<%-reso
 <%_ } _%>
 <%_ } _%>
 
-/*
- *** SET HERE THE ROUTER OPTIONS ***
+/**
+ * VUE Router Configuration
  */
 export const router = {
   routes: [
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
+      path: '/signIn',
+      name: 'signIn',
+      component: SignInView,
     },
     {
       path: '/password/reset',
@@ -69,7 +79,7 @@ export const router = {
       ],
     },
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    {path: '/', redirect: '/login'},
+    {path: '/', redirect: '/signIn'},
 <%_ } else { _%>
     {path: '/', redirect: '/dashboard'},
 <%_ } _%>

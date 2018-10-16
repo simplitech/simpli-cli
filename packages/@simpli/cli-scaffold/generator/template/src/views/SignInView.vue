@@ -2,27 +2,27 @@
 <template>
   <div class="container verti w-window h-window items-center">
     <form @submit.prevent="signIn(model)" class="des-w-300 tab-w-400 mob-w-full">
-      <await name="login" :spinnerScale="1.5">
+      <await name="signIn" :spinnerScale="1.5">
         <h2 class="text-center text-uppercase contrast">
-          {{ $t('view.login.title') }}
+          {{ $t('view.signIn.title') }}
         </h2>
 
         <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast">
-          {{ $t('view.login.account') }}
+          {{ $t('view.signIn.account') }}
         </input-group>
 
         <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast">
-          {{ $t('view.login.password') }}
+          {{ $t('view.signIn.password') }}
         </input-group>
 
         <div class="horiz items-space-between">
           <router-link to="/password/reset" class="text-link contrast">
-            {{ $t('view.login.forgotPassword') }}
+            {{ $t('view.signIn.forgotPassword') }}
           </router-link>
         </div>
 
         <button class="secondary fluid" type="submit">
-          {{ $t('view.login.signin') }}
+          {{ $t('view.signIn.signin') }}
         </button>
       </await>
     </form>

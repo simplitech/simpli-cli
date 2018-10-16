@@ -10,7 +10,7 @@
         <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
 
         <div class="horiz items-space-between">
-          <router-link to="/login" class="text-link contrast">
+          <router-link to="/signIn" class="text-link contrast">
             {{ $t('view.resetPassword.signIn') }}
           </router-link>
         </div>
@@ -32,7 +32,7 @@
   @Component
   export default class ResetPasswordView extends Vue {
     @Action('auth/resetPassword') resetPassword?: Function
-    model = new LoginHolder()
+    model = new <%-loginHolderModel.name%>()
   }
 </script>
 <%_ } _%>

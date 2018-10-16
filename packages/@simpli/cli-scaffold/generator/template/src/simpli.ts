@@ -1,4 +1,4 @@
-export * from 'simpli-ts-vue'
+export * from 'simpli-web-sdk'
 
 export * from '@/helpers/custom.helper'
 

@@ -5,7 +5,7 @@
       :collection="collection"
       :title="$t('classes.<%-model.name%>.title')"
       persistUrl="/<%-kebabCase(model.name)%>/new"
-      hasSearch hasCsv
+      :hasSearch="true" :hasCsv="true"
     />
 
     <section>
