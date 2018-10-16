@@ -1,3 +1,14 @@
+<a name="1.3.1"></a>
+## [1.3.1](https://github.com/simplitech/simpli-cli/compare/v1.2.1...v1.3.1) (2018-10-16)
+
+
+### Features
+
+* Added Simpli packages to Maven ([1ddcab1](https://github.com/simplitech/simpli-cli/commit/1ddcab1))
+* Migrated the library simpli-ts-vue to the simpli-web-sdk ([74cd7a6](https://github.com/simplitech/simpli-cli/commit/74cd7a6))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/simplitech/simpli-cli/compare/v1.1.1...v1.2.1) (2018-09-13)
 
