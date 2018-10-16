@@ -19,6 +19,7 @@ const reservedWords = mergeWith(
 module.exports = class Attr {
   constructor (name, belongsTo, prop) {
     this.name = name || ''
+    this.description = prop.description || null
     this.belongsTo = belongsTo
     this.default = prop.default !== undefined ? prop.default : null
     this.type = prop.type
@@ -270,6 +271,12 @@ module.exports = class Attr {
    */
   build () {
     let result = ''
+
+    if (this.description) {
+      result += `  /**\n`
+      result += `   * ${this.description}\n`
+      result += `   */\n`
+    }
 
     this.responses.forEach((resp) => {
       result += `  @${resp.title}(${resp.attr})\n`

@@ -19,6 +19,7 @@ const reservedWords = mergeWith(
 module.exports = class Column {
   constructor (dataColumn = {}) {
     this.field = dataColumn.Field || null
+    this.commentary = dataColumn.Commentary || null
     this.type = dataColumn.Type || null
     this.keyType = dataColumn.Key || null
     this.nullable = dataColumn.Null || null

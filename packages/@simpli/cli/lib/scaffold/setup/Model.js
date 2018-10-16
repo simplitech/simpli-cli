@@ -11,6 +11,9 @@ module.exports = class Model {
     // Model name //e.g User
     this.name = name || ''
 
+    // Model description (not mandatory)
+    this.description = definition.description || null
+
     // Model module //e.g @/model/User
     this.module = null
 

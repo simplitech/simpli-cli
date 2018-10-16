@@ -7,6 +7,7 @@ const startCase = require('lodash.startcase')
 module.exports = class Table {
   constructor (dataTable = {}) {
     this.name = null
+    this.commentary = null
     this.modelName = null
     this.instanceName = null
     this.isPivot = null
@@ -15,6 +16,7 @@ module.exports = class Table {
     this.manyToMany = []
 
     this.setName(dataTable)
+    this.setCommentary(dataTable)
     this.setColumns(dataTable)
     this.setRelations(dataTable)
   }
@@ -83,6 +85,10 @@ module.exports = class Table {
     this.name = dataTable.tableName || null
     this.modelName = capitalizeFirstLetter(camelCase(this.name) || '')
     this.instanceName = camelCase(this.name)
+  }
+
+  setCommentary (dataTable = {}) {
+    this.commentary = dataTable.tableCommentary || null
   }
 
   setColumns (dataTable = {}) {

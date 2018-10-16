@@ -15,8 +15,17 @@ import javax.ws.rs.core.Response
 
 /**
  * Reference model of table <%-table.name%>
+<%_ if (table.commentary) { _%>
+ * Note: <%-table.commentary%>
+ *
+<%_ } _%>
  * @author Simpli© CLI generator
  */
+<%_ if (table.commentary) { _%>
+@ApiModel(description = "<%-table.commentary%>")
+<%_ } else { _%>
+@ApiModel
+<%_ } _%>
 class <%-table.modelName%> {
 <%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>
 <%_ if (!relation.isManyToMany) { _%>
@@ -29,7 +38,13 @@ class <%-table.modelName%> {
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (!column.isForeign) { _%>
 <%_ if (column.isRequired) { _%>
+<%_ if (column.commentary) { _%>
+    @ApiModelProperty(required = true, value = "<%-column.commentary%>")
+<%_ } else { _%>
     @ApiModelProperty(required = true)
+<%_ } _%>
+<%_ } else if (column.commentary) { _%>
+    @ApiModelProperty(value = "<%-column.commentary%>")
 <%_ } _%>
     var <%-column.name%>: <%-column.kotlinType%><%-column.qMark%> = <%-column.defaultValue%>
 

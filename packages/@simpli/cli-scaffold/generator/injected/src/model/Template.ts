@@ -3,6 +3,10 @@
 <%_ var passwordAttrName = rootOptions.scaffoldSetup.auth.passwordAttrName _%>
 /**
  * <%-model.name%>
+<%_ if (model.description) { _%>
+ * Note: <%-model.description%>
+ *
+<%_ } _%>
  * @author Simpli© CLI generator
  */
 <%_ for (var i in model.resolvedDependencies) { var dependence = model.resolvedDependencies[i] _%>

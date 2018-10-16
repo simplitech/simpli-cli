@@ -92,15 +92,41 @@ module.exports = class Database {
       const allTableNames = queryTables.map((row) => row[getFirstKey(row)])
 
       for (const i in allTableNames) {
+        // Get the name of this table
         const tableName = allTableNames[i]
+
+        // Get the scheme (columns) of this table
         const tableScheme = await pool.query(`DESCRIBE ${tableName};`)
+
+        // Get the relations of this table
         const tableRelations = await pool.query(`
         SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
         FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
         WHERE REFERENCED_TABLE_NAME IS NOT NULL AND REFERENCED_COLUMN_NAME IS NOT NULL
-        AND TABLE_NAME = '${tableName}';
+        AND TABLE_NAME = '${tableName}' AND TABLE_SCHEMA = '${database}';
         `)
-        dataTables.push({ tableName, tableScheme, tableRelations })
+
+        // Get the commentary of this table
+        const queryTableCommentaries = await pool.query(`
+        SELECT table_comment 
+        FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_NAME='${tableName}' AND TABLE_SCHEMA = '${database}';
+        `)
+        const tableCommentary = queryTableCommentaries.map((row) => row[getFirstKey(row)])[0] || ''
+
+        // Find all commentaries in the columns and map it into the scheme
+        const queryColumnsCommentaries = await pool.query(`
+        SELECT COLUMN_NAME, COLUMN_COMMENT
+        FROM information_schema.COLUMNS
+        WHERE TABLE_NAME='${tableName}' AND TABLE_SCHEMA = '${database}';
+        `)
+        tableScheme.map((scheme) => {
+          const column = queryColumnsCommentaries.find((column) => column['COLUMN_NAME'] === scheme['Field'])
+          scheme['Commentary'] = column['COLUMN_COMMENT']
+          return scheme
+        })
+
+        dataTables.push({ tableName, tableCommentary, tableScheme, tableRelations })
       }
 
       pool.end()
