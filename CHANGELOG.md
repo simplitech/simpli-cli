@@ -1,3 +1,13 @@
+<a name="1.3.2"></a>
+## [1.3.2](https://github.com/simplitech/simpli-cli/compare/v1.3.1...v1.3.2) (2018-10-16)
+
+
+### Features
+
+* Added tables and columns commentary support ([dd903b9](https://github.com/simplitech/simpli-cli/commit/dd903b9))
+
+
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://github.com/simplitech/simpli-cli/compare/v1.2.1...v1.3.1) (2018-10-16)
 
