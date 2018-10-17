@@ -123,7 +123,9 @@ module.exports = class Api {
   }
 
   get stringfyAttrsWithModel () {
-    return [this.stringfyBody, ...this.stringfyAttrs.split(', ')].join(', ')
+    const stringfyBody = this.stringfyBody
+    if (stringfyBody) return [stringfyBody, ...this.stringfyAttrs.split(', ')].join(', ')
+    return this.stringfyAttrs
   }
 
   get stringfyBody () {
@@ -167,7 +169,7 @@ module.exports = class Api {
     } else if (method === 'POST') {
       result += `  async ${this.name}(${this.stringfyAttrsWithModel}) {\n`
       result += `    const fetch = async () => {\n`
-      if (this.body.model) {
+      if (this.body.model && this.body.type !== 'array') {
         if (this.body.required) {
           result += `      await model.validate()\n`
         } else {
@@ -181,7 +183,7 @@ module.exports = class Api {
     } else if (method === 'PUT') {
       result += `  async ${this.name}(${this.stringfyAttrsWithModel}) {\n`
       result += `    const fetch = async () => {\n`
-      if (this.body.model) {
+      if (this.body.model && this.body.type !== 'array') {
         if (this.body.required) {
           result += `      await model.validate()\n`
         } else {

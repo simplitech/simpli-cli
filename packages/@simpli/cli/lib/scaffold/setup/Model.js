@@ -428,7 +428,7 @@ module.exports = class Model {
     result += `  ${methodName}() {\n`
     result += `    return {\n`
     attrs.forEach((attr) => {
-      if (attr.isObjectOrigin) {
+      if (attr.isObjectOrigin && attr.isObjectResource) {
         if (attr.isRequired) {
           result += `      ${attr.name}: this.${attr.name}.$id,\n`
         } else {

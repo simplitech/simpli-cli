@@ -14,21 +14,25 @@ import DashboardView from '@/views/DashboardView.vue'
 import SignInView from '@/views/SignInView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
 import RecoverPasswordView from '@/views/RecoverPasswordView.vue'
-<%_ } _%>
 
+<%_ } _%>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
 <%_ var resourceModels = rootOptions.scaffoldSetup.resourceModels _%>
+<%_ if (resourceModels.length) { _%>
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
 import List<%-resource.name%>View from '@/views/list/List<%-resource.name%>View.vue'
 <%_ } _%>
 
+<%_ } _%>
 <%_ var respResourceModels = rootOptions.scaffoldSetup.respResourceModels _%>
+<%_ if (respResourceModels.length) { _%>
 <%_ for (var i in respResourceModels) { var resource = respResourceModels[i] _%>
 <%_ if (resource.resp.origin) { _%>
 import Persist<%-resource.resp.origin%>View from '@/views/persist/Persist<%-resource.resp.origin%>View.vue'
 <%_ } _%>
 <%_ } _%>
 
+<%_ } _%>
 /**
  * VUE Router Configuration
  */

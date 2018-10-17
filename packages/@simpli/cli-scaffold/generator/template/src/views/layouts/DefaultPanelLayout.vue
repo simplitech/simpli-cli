@@ -3,7 +3,11 @@
     <main>
       <sidebar/>
       <transition name="fade-down" mode="out-in">
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
         <router-view v-if="authorized" class="weight-1 des-w-0 tab-w-0 mob-w-full"/>
+<%_ } else { _%>
+        <router-view class="weight-1 des-w-0 tab-w-0 mob-w-full"/>
+<%_ } _%>
       </transition>
     </main>
   </await>

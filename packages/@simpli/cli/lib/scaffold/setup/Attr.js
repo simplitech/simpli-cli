@@ -32,6 +32,9 @@ module.exports = class Attr {
     this.isObject = false
     this.isRequired = false
 
+    // The object model is a resource (only if isObject = true)
+    this.isObjectResource = false
+
     this.setType(prop)
   }
 

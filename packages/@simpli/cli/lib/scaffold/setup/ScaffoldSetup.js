@@ -158,5 +158,12 @@ module.exports = class ScaffoldSetup {
    */
   setModels (definition = {}, path = {}) {
     this.models = map(definition, (def, name) => new Model(name, def, path, this.apis)) || []
+
+    this.models.forEach((model) => {
+      model.objectAtrrs.forEach((attr) => {
+        const model = this.models.find((m) => m.name === attr.type)
+        if (model) attr.isObjectResource = model.isResource
+      })
+    })
   }
 }

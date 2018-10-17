@@ -18,12 +18,15 @@ import {ToastDefaultConfig, ToastDefaultStyle, ToastGlobalConfig, ToastStyle} fr
 
 @Component
 export default class App extends Vue {
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
   @Action('auth/onSignIn') onSignIn!: Function
   @Action('auth/onAuth') onAuth!: Function
   @Action('auth/onSignOut') onSignOut!: Function
 
+<%_ } _%>
   toastStyle: ToastStyle = ToastDefaultStyle
 
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
   // When the user or system signs in
   signInEvent() {
     //
@@ -39,12 +42,15 @@ export default class App extends Vue {
     //
   }
 
+<%_ } _%>
   // Standard Behaviours
   created() {
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     this.onSignIn(this.signInEvent)
     this.onAuth(this.authEvent)
     this.onSignOut(this.signOutEvent)
 
+<%_ } _%>
     this.$snotify.setDefaults({
       global: ToastGlobalConfig,
       toast: ToastDefaultConfig,
