@@ -1,3 +1,14 @@
+<a name="1.4.1"></a>
+## [1.4.1](https://github.com/simplitech/simpli-cli/compare/v1.3.3...v1.4.1) (2018-10-25)
+
+
+### Features
+
+* added debug mode ([8e6194c](https://github.com/simplitech/simpli-cli/commit/8e6194c))
+* allows string primary keys ([dc935de](https://github.com/simplitech/simpli-cli/commit/dc935de))
+
+
+
 <a name="1.3.3"></a>
 ## [1.3.3](https://github.com/simplitech/simpli-cli/compare/v1.3.2...v1.3.3) (2018-10-17)
 
