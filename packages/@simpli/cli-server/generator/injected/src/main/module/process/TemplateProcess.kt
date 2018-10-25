@@ -83,7 +83,7 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
     }
 
 <%_ if (table.hasPersist) { _%>
-    fun persist(<%-table.instanceName%>: <%-table.modelName%>): Long {
+    fun persist(<%-table.instanceName%>: <%-table.modelName%>): <%-table.hasID && table.idColumn.isString ? 'String' : 'Long'%> {
         //TODO: review generated method
         val dao = <%-table.modelName%>Dao(con, lang)
 
@@ -95,14 +95,14 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
 <%_ } _%>
 <%_ if (table.hasID) { _%>
         val id<%-table.modelName%>: <%-table.idColumn.kotlinType%>
-        if (<%-table.instanceName%>.<%-table.idColumn.name%> > 0) {
+        if (<%-table.instanceName%>.<%-table.idColumn.name%> > <%-table.idColumn.isString ? '\"\"' : '0'%>) {
             <%-table.instanceName%>.validate(true, lang)
             id<%-table.modelName%> = <%-table.instanceName%>.<%-table.idColumn.name%>
             
             dao.update<%-table.modelName%>(<%-table.instanceName%>)
         } else {
             <%-table.instanceName%>.validate(false, lang)
-            id<%-table.modelName%> = dao.insert(<%-table.instanceName%>)
+            id<%-table.modelName%> = dao.insert(<%-table.instanceName%>)<%-table.idColumn.isString ? '.toString()' : ''%>
             <%-table.instanceName%>.<%-table.idColumn.name%> = id<%-table.modelName%>
         }
 <%_ } else { _%>

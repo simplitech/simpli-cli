@@ -162,7 +162,10 @@ module.exports = class Table {
   primariesByConditions (opposite = false) {
     const columns = this.primaryColumns
     if (columns.length === 0) columns.push(new Column())
-    return columns.map((column) => `${column.name} ${opposite ? '==' : '!='} null ${opposite ? '||' : '&&'} ${column.name} ${opposite ? '==' : '>'} 0L`).join(' && ')
+    return columns.map((column) => {
+      if (column.isString) return `${column.name} ${opposite ? '==' : '!='} null ${opposite ? '||' : '&&'} ${opposite ? '' : '!'}${column.name}.isEmpty()`
+      return `${column.name} ${opposite ? '==' : '!='} null ${opposite ? '||' : '&&'} ${column.name} ${opposite ? '==' : '>'} 0L`
+    }).join(' && ')
   }
 
   primariesByWhere (different = false) {
@@ -174,7 +177,10 @@ module.exports = class Table {
   primariesTestValuesByParam () {
     const columns = this.primaryColumns
     if (columns.length === 0) columns.push(new Column())
-    return columns.map((column) => `1L`).join(', ')
+    return columns.map((column) => {
+      if (column.isString) return `\"1\"`
+      return `1L`
+    }).join(', ')
   }
 
   get daoModels () {
@@ -269,7 +275,11 @@ module.exports = class Table {
       } else if (column.isDouble) {
         result += `\t\t\t${this.instanceName}.${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isString) {
-        result += `\t\t\t${this.instanceName}.${column.name} = rs.getString(alias, "${column.field}")\n`
+        if (column.isRequired) {
+          result += `\t\t\t${this.instanceName}.${column.name} = rs.getString(alias, "${column.field}").toString()\n`
+        } else {
+          result += `\t\t\t${this.instanceName}.${column.name} = rs.getString(alias, "${column.field}")\n`
+        }
       } else if (column.isBoolean) {
         result += `\t\t\t${this.instanceName}.${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDate) {

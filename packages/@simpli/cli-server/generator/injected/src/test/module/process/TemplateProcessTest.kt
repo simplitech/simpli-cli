@@ -111,7 +111,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
         val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
-        assertTrue(result ?: 0 > 0)
+        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
     }
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 
@@ -128,7 +128,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
         
         val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
-        assertTrue(result ?: 0 > 0)
+        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
     }
 <%_ } _%>
 
@@ -141,7 +141,7 @@ constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
 
         val result = subject.persist(<%-table.instanceName%>)
         assertNotNull(result)
-        assertTrue(result ?: 0 > 0)
+        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
     }
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>

@@ -269,6 +269,9 @@ module.exports = class Scaffold {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
+      if (debug) {
+        log(`Building generator in DEBUG MODE...`)
+      }
       const module = !debug
         ? resolve.sync(`${id}/generator`, { basedir: this.context })
         : resolve.sync(`../../../cli-scaffold/generator`)

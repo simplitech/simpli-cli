@@ -43,8 +43,8 @@ module.exports = class ServerSetup {
     return (this.packageAddress || '').split('.').reverse().join('.')
   }
 
-  findTableByName (name) {
-    return this.tables.find((table) => table.name === name)
+  findTableByName (name = '') {
+    return this.tables.find((table) => (table.name || '').toLowerCase() === name.toLowerCase())
   }
 
   injectDatabase (dataTables = []) {
@@ -72,6 +72,18 @@ module.exports = class ServerSetup {
         }
       })
       table.setPivot()
+
+      // Find duplicate relation names to index them
+      const names = table.validRelations.map((relation) => relation.name)
+      const duplicateNames = names.filter((name1) => names.filter((name2) => name1 === name2).length >= 2)
+
+      duplicateNames.forEach((name) => {
+        const duplicateRelations = table.validRelations.filter((relation) => relation.name === name)
+
+        duplicateRelations.forEach((relation, i) => {
+          relation.name = `${relation.name}${i + 1}`
+        })
+      })
     })
 
     // Populate manyToMany relation
@@ -209,10 +221,10 @@ module.exports = class ServerSetup {
         result += `(`
         table.columns.forEach((column) => {
           if (column.isID) {
-            result += `${i + 1}`
+            result += column.isString ? `\'${i + 1}\'` : `${i + 1}`
           } else if (column.isForeign) {
-            if (i === 0 || !table.hasID) result += `${i + 1}`
-            else result += `${faker.random.number({ min: 1, max: samples })}`
+            if (i === 0 || !table.hasID) result += column.isString ? `\'${i + 1}\'` : `${i + 1}`
+            else result += column.isString ? `\'${faker.random.number({ min: 1, max: samples })}\'` : `${faker.random.number({ min: 1, max: samples })}`
           } else if (column.isString) {
             if (column.isEmail) {
               const accountColumn = column.name === this.accountColumn.name

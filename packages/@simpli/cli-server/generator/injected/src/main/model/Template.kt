@@ -50,7 +50,7 @@ class <%-table.modelName%> {
 
 <%_ } else if (column.isRequired) {_%>
     var <%-column.name%>: <%-column.kotlinType%>
-        get() = <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> ?: 0
+        get() = <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> ?: <%-column.isString ? '\"\"' : '0'%>
         set(<%-column.name%>) {
             if (<%-column.foreign.name%> == null) {
                 <%-column.foreign.name%> = <%-column.foreign.referencedTableModelName%>()
@@ -60,7 +60,7 @@ class <%-table.modelName%> {
 
 <%_ } else { _%>
     var <%-column.name%>: <%-column.kotlinType%>?
-        get() = if (<%-column.foreign.name%> == null || <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> == 0L) null else <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%>
+        get() = if (<%-column.foreign.name%> == null || <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> == <%-column.isString ? '\"\"' : '0L'%>) null else <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%>
         set(<%-column.name%>) {
             if (<%-column.name%> == null) {
                 <%-column.foreign.name%> = null

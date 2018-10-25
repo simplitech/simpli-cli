@@ -60,7 +60,10 @@ module.exports = class Column {
 
   get defaultValue () {
     if (!this.isRequired) return 'null'
-    if (this.isID) return '0'
+    if (this.isID) {
+      if (this.isString) return '\"\"'
+      return '0'
+    }
     if (this.isLong) return '0'
     if (this.isDouble) return '0.0'
     if (this.isBoolean) return 'false'
@@ -69,12 +72,15 @@ module.exports = class Column {
 
   get testValue () {
     if (!this.isRequired) return 'null'
-    if (this.isID) return '1'
+    if (this.isID) {
+      if (this.isString) return '\"1\"'
+      return '1'
+    }
     if (this.isLong) return '1'
     if (this.isDouble) return '1.0'
     if (this.isBoolean) return 'true'
     if (this.isEmail) return '\"any@email.com\"'
-    if (this.isString) return '\"X\"'
+    if (this.isString) return '\"1\"'
     if (this.isDate) return 'Date()'
     return 'null'
   }
@@ -117,7 +123,7 @@ module.exports = class Column {
   }
 
   get isID () {
-    return !!(this.keyType === 'PRI' && this.isAutoIncrement)
+    return this.keyType === 'PRI'
   }
 
   get isPrimary () {

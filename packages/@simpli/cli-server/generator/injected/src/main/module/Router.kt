@@ -186,7 +186,7 @@ class Router : RouterWrapper() {
 
         @ApiParam(required = true)
             <%-table.instanceName%>: <%-table.modelName%>
-    ): Long {
+    ): <%-table.hasID && table.idColumn.isString ? 'String' : 'Long'%> {
         //TODO: review generated method
         return authPipe.handle(authorization, getLang(lang), clientVersion) {
             con, loginInfo -> <%-table.modelName%>Process(con, getLang(lang))
