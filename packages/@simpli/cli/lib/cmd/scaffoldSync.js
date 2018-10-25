@@ -6,7 +6,7 @@ const { error, stopSpinner } = require('@vue/cli-shared-utils')
 const Scaffold = require('../scaffold/Scaffold')
 const execa = require('execa')
 
-async function sync () {
+async function sync (options) {
   require('dotenv').config()
 
   const appName = process.env.VUE_APP_NAME
@@ -63,7 +63,7 @@ async function sync () {
 
   await clearConsole()
   const scaffold = new Scaffold(appName, targetDir, [])
-  await scaffold.syncModels(swaggerUrl)
+  await scaffold.syncModels(swaggerUrl, options)
 }
 
 module.exports = (...args) => {

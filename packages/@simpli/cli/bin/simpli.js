@@ -23,6 +23,7 @@ program
   .description('create a new simpli project')
   .option('-d, --default', 'skip prompts and use default preset')
   .option('-f, --force', 'overwrite target directory if it exists')
+  .option('-D, --debug', 'run in debug mode')
   .action((name, cmd) => {
     require('../lib/cmd/newProject')(name, cleanArgs(cmd))
   })
@@ -30,8 +31,9 @@ program
 program
   .command('new:seed')
   .description('create test data from a backend project and store it into data.sql')
-  .action(() => {
-    require('../lib/cmd/newSeed')()
+  .option('-D, --debug', 'run in debug mode')
+  .action((cmd) => {
+    require('../lib/cmd/newSeed')(cleanArgs(cmd))
   })
 
 program
@@ -44,8 +46,9 @@ program
 program
   .command('scaffold:sync')
   .description('synchronize the models of the current frontend project based on its web server swagger')
-  .action(() => {
-    require('../lib/cmd/scaffoldSync')()
+  .option('-D, --debug', 'run in debug mode')
+  .action((cmd) => {
+    require('../lib/cmd/scaffoldSync')(cleanArgs(cmd))
   })
 
 program
@@ -58,8 +61,9 @@ program
 program
   .command('server:sync')
   .description('synchronize the tables of the current backend project based on its MySQL database')
-  .action(() => {
-    require('../lib/cmd/serverSync')()
+  .option('-D, --debug', 'run in debug mode')
+  .action((cmd) => {
+    require('../lib/cmd/serverSync')(cleanArgs(cmd))
   })
 
 program

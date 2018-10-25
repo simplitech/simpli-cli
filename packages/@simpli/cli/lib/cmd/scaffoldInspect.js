@@ -6,7 +6,7 @@ const inquirer = require('inquirer')
 const { error } = require('@vue/cli-shared-utils')
 const clearConsole = require('../util/clearConsole')
 
-module.exports = async (inspectPaths = []) => {
+module.exports = async (inspectPaths = [], options) => {
   require('dotenv').config()
   const get = require('get-value')
   const stringify = require('javascript-stringify')

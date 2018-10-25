@@ -98,13 +98,13 @@ async function createScaffold (name, targetDir, options) {
     } else return
   } else await scaffold.swaggerDefaultSetup()
 
-  await scaffold.create()
+  await scaffold.create(options)
 }
 
 async function createServer (name, targetDir, options) {
   const server = new Server(name, targetDir, [])
   await server.databaseSetup()
-  await server.create()
+  await server.create(options)
 }
 
 module.exports = (...args) => {

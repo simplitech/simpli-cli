@@ -85,7 +85,7 @@ module.exports = class Server {
     this.serverSetup.seedSamples = seedSamples
   }
 
-  async create () {
+  async create (options = {}) {
     const { name, context, createCompleteCbs, serverSetup } = this
 
     const run = (command, args) => {
@@ -140,7 +140,7 @@ module.exports = class Server {
     // run generator
     log()
     log(`🚀  Invoking generators...`)
-    const plugins = this.resolvePlugins(preset.plugins)
+    const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg,
       plugins,
@@ -175,7 +175,7 @@ module.exports = class Server {
     generator.printExitLogs()
   }
 
-  async syncModels (defaultConnection) {
+  async syncModels (defaultConnection, options = {}) {
     const run = (command, args) => {
       if (!args) { [command, ...args] = command.split(/\s+/) }
       return execa(command, args, { cwd: context })
@@ -227,7 +227,7 @@ module.exports = class Server {
 
     log()
     log(`⚙️  Synchronizing tables...`)
-    const plugins = this.resolvePlugins(preset.plugins)
+    const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg: { _ignore: true },
       plugins,
@@ -245,7 +245,7 @@ module.exports = class Server {
     log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
   }
 
-  async newSeed (defaultConnection) {
+  async newSeed (defaultConnection, options = {}) {
     const run = (command, args) => {
       if (!args) { [command, ...args] = command.split(/\s+/) }
       return execa(command, args, { cwd: context })
@@ -313,7 +313,7 @@ module.exports = class Server {
 
     log()
     log(`⚙️  Creating data.sql...`)
-    const plugins = this.resolvePlugins(preset.plugins)
+    const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg: { _ignore: true },
       plugins,
@@ -329,12 +329,13 @@ module.exports = class Server {
     log(`🎉  Successfully created data.sql`)
   }
 
-  resolvePlugins (rawPlugins) {
+  resolvePlugins (rawPlugins, debug = false) {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-server'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync(`../../../cli-server/generator`)
+      const module = !debug
+        ? resolve.sync(`${id}/generator`, { basedir: this.context })
+        : resolve.sync(`../../../cli-server/generator`)
       return {
         id,
         apply: require(module),

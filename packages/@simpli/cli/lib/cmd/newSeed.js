@@ -5,7 +5,7 @@ const { error, stopSpinner } = require('@vue/cli-shared-utils')
 const Server = require('../server/Server')
 const contextConnection = require('../server/util/contextConnection')
 
-async function newSeed () {
+async function newSeed (options) {
   const targetDir = path.resolve('./')
   const pom = path.resolve('./pom.xml')
 
@@ -18,7 +18,7 @@ async function newSeed () {
 
   await contextConnection(async (connection) => {
     const server = new Server(null, targetDir, [])
-    await server.newSeed(connection)
+    await server.newSeed(connection, options)
   })
 }
 

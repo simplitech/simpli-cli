@@ -136,7 +136,7 @@ module.exports = class Scaffold {
     this.scaffoldSetup.defaultCurrency = 'USD'
   }
 
-  async create () {
+  async create (options = {}) {
     const { name, context, createCompleteCbs, scaffoldSetup } = this
 
     const run = (command, args) => {
@@ -191,7 +191,7 @@ module.exports = class Scaffold {
     // run generator
     log()
     log(`🚀  Invoking generators...`)
-    const plugins = this.resolvePlugins(preset.plugins)
+    const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg,
       plugins,
@@ -233,7 +233,7 @@ module.exports = class Scaffold {
     generator.printExitLogs()
   }
 
-  async syncModels (swaggerUrl) {
+  async syncModels (swaggerUrl, options = {}) {
     await Swagger.requestSwagger(this.scaffoldSetup, swaggerUrl)
     const { syncModels } = await Swagger.requestSync(this.scaffoldSetup)
     await Swagger.confirm()
@@ -251,7 +251,7 @@ module.exports = class Scaffold {
 
     log()
     log(`⚙️  Synchronizing models...`)
-    const plugins = this.resolvePlugins(preset.plugins)
+    const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg: { _ignore: true },
       plugins,
@@ -265,12 +265,13 @@ module.exports = class Scaffold {
     log(`👉  Run ${chalk.cyan('git add . && git stash')} to revert the changes safely.\n\n`)
   }
 
-  resolvePlugins (rawPlugins) {
+  resolvePlugins (rawPlugins, debug = false) {
     // ensure cli-service is invoked first
     rawPlugins = sortObject(rawPlugins, ['@simpli/cli-scaffold'])
     return Object.keys(rawPlugins).map(id => {
-      const module = resolve.sync(`${id}/generator`, { basedir: this.context })
-      // const module = resolve.sync(`../../../cli-scaffold/generator`)
+      const module = !debug
+        ? resolve.sync(`${id}/generator`, { basedir: this.context })
+        : resolve.sync(`../../../cli-scaffold/generator`)
       return {
         id,
         apply: require(module),

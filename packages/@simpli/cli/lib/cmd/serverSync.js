@@ -7,7 +7,7 @@ const { error, stopSpinner } = require('@vue/cli-shared-utils')
 const Server = require('../server/Server')
 const contextConnection = require('../server/util/contextConnection')
 
-async function sync () {
+async function sync (options) {
   const targetDir = path.resolve('./')
   const pom = path.resolve('./pom.xml')
 
@@ -36,7 +36,7 @@ async function sync () {
 
   await contextConnection(async (connection) => {
     const server = new Server(null, targetDir, [])
-    await server.syncModels(connection)
+    await server.syncModels(connection, options)
   })
 }
 
