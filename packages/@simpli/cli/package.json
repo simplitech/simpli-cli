@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Tools to generate either web-server or web-client projects based on a MySQL database scheme",
   "homepage": "https://github.com/simplitech/simpli-cli#readme",
   "repository": {
