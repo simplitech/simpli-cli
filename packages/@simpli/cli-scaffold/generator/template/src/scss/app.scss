@@ -14,6 +14,14 @@
 
 @import "components/sidebar";
 
+.header {
+  padding: 10px 30px;
+
+  background: white;
+  box-shadow: 2px 4px 20px -4px rgba(0, 0, 0, .4);
+  z-index: 1;
+}
+
 .form-group {
   display: flex;
   flex-flow: column nowrap;
@@ -152,6 +160,14 @@
 
   border-radius: $radius-base;
   padding: 0;
+
+  &.intense {
+    @extend .pal-black-30.box-shadow.deep-15;
+  }
+
+  &.square {
+    border-radius: 0;
+  }
 
   &.padded {
     padding: #{$padding-base * 2};

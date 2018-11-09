@@ -274,7 +274,7 @@ module.exports = class ServerSetup {
         result = result.slice(0, -1) // remove last comma
         result += `),\n`
       }
-      result = result.slice(0, -2) // remove last comma
+      result = result.slice(0, -2) // remove last line
       result += `;\n\n`
 
       result += `UNLOCK TABLES;\n\n`

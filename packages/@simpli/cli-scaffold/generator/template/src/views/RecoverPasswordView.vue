@@ -7,8 +7,8 @@
           {{ $t('view.recoverPassword.title') }}
         </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.newPassword')"/>
-        <input-group v-model="<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.confirmPassword')"/>
+        <input-text v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.newPassword')"/>
+        <input-text v-model="<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast" :placeholder="$t('view.recoverPassword.confirmPassword')"/>
 
         <button class="secondary fluid" type="submit">
           {{ $t('view.recoverPassword.submit') }}

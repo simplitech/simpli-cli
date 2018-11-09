@@ -26,12 +26,8 @@ export default class <%-model.name%> extends <%-model.isResource ? 'Resource' : 
 <%_ } _%>
 <%_ for (var i in model.apis) { var api = model.apis[i] _%>
 <%-api.build(signIn.name, accountAttrName, passwordAttrName)-%>
-<%_ if (i < model.apis.length - 1 || model.isResource) { _%>
+<%_ if (i < model.apis.length - 1) { _%>
 
 <%_ } _%>
-<%_ } _%>
-<%_ if (model.isResource) { _%>
-<%-model.buildScheme()%>
-<%-model.buildScheme(true)-%>
 <%_ } _%>
 }

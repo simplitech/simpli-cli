@@ -7,13 +7,13 @@
           {{ $t('view.signIn.title') }}
         </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast">
+        <input-text v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast">
           {{ $t('view.signIn.account') }}
-        </input-group>
+        </input-text>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast">
+        <input-text v-model="model.<%-rootOptions.scaffoldSetup.auth.passwordAttrName%>" type="password" class="contrast">
           {{ $t('view.signIn.password') }}
-        </input-group>
+        </input-text>
 
         <div class="horiz items-space-between">
           <router-link to="/password/reset" class="text-link contrast">

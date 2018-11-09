@@ -143,13 +143,13 @@ section, .custom-scroll {
   /* Track */
   ::-webkit-scrollbar-track {
     @extend .pal-black-10.bg;
-    border-radius: $radius-base;
+    //border-radius: $radius-base;
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
     @extend .pal-primary.bg;
-    border-radius: $radius-base;
+    //border-radius: $radius-base;
   }
 
   /* Handle on hover */

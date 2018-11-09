@@ -7,7 +7,7 @@
           {{ $t('view.resetPassword.title') }}
         </h2>
 
-        <input-group v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
+        <input-text v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
 
         <div class="horiz items-space-between">
           <router-link to="/signIn" class="text-link contrast">

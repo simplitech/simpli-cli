@@ -37,6 +37,10 @@ module.exports = class Table {
     return this.columns.filter((column) => column.isUnique)
   }
 
+  get softDeleteColumns () {
+    return this.columns.filter((column) => column.isSoftDelete)
+  }
+
   get exceptPrimaryColumns () {
     return this.columns.filter((column) => !column.isPrimary)
   }

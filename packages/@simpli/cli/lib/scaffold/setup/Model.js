@@ -46,11 +46,13 @@ module.exports = class Model {
 
     // Dependencies to import
     this.dependencies = []
+    this.schemaDependencies = []
 
     this.setAttr(name, definition.properties, definition.required)
     this.setDefinition(path)
     this.setAPIs(apis)
     this.setDependencies()
+    this.setSchemaDependencies()
   }
 
   /**
@@ -68,10 +70,24 @@ module.exports = class Model {
   }
 
   /**
+   * Filter attrs by non-foreign
+   */
+  get nonForeignAtrrs () {
+    return this.attrs.filter((attr) => !attr.isForeign)
+  }
+
+  /**
    * Only resolved dependencies
    */
   get resolvedDependencies () {
     return this.dependencies.filter((dep) => dep.resolved)
+  }
+
+  /**
+   * Only resolved schema dependencies
+   */
+  get resolvedSchemaDependencies () {
+    return this.schemaDependencies.filter((dep) => dep.resolved)
   }
 
   /**
@@ -244,18 +260,48 @@ module.exports = class Model {
 
     const simpliCommons = new Dependence(simpliModule)
     const simpliDecorator = new Dependence(simpliModule, false)
-    const simpliMisc = new Dependence(simpliModule)
 
     this.populateSimpliCommons(simpliCommons)
     this.populateSimpliDecorator(simpliDecorator)
-    this.populateSimpliMisc(simpliMisc)
 
     if (simpliCommons.hasChildren) dependencies.push(simpliCommons)
     if (simpliDecorator.hasChildren) dependencies.push(simpliDecorator)
-    if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
     dependencies.push(...this.generateModelResources())
 
+    // Add Schema
+    if (this.isResource && !this.isResp && !this.isPagedResp) {
+      const modelResource = new Dependence(`@/schema/${this.name}.schema`, true, false)
+      modelResource.addChild(`${this.name}Schema`)
+      dependencies.push(modelResource)
+    }
+
     this.dependencies = dependencies
+  }
+
+  /**
+   * Populates all dependencies of Schema
+   */
+  setSchemaDependencies () {
+    const dependencies = []
+    const simpliModule = '@/simpli'
+
+    const simpliSchemaCommons = new Dependence(simpliModule)
+    const simpliMisc = new Dependence(simpliModule)
+
+    this.populateSimpliSchemaCommons(simpliSchemaCommons)
+    this.populateSimpliMisc(simpliMisc)
+
+    if (simpliSchemaCommons.hasChildren) dependencies.push(simpliSchemaCommons)
+    if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
+
+    // Add this model
+    if (this.isResource && !this.isResp && !this.isPagedResp) {
+      const modelResource = new Dependence(`@/model/resource/${this.name}`, true, false)
+      modelResource.addChild(this.name)
+      dependencies.push(modelResource)
+    }
+
+    this.schemaDependencies = dependencies
   }
 
   populateSimpliCommons (dep = new Dependence()) {
@@ -271,6 +317,11 @@ module.exports = class Model {
       dep.addChild('sleep')
       dep.addChild('encrypt')
     }
+  }
+
+  populateSimpliSchemaCommons (dep = new Dependence()) {
+    dep.addChild('Schema')
+    dep.addChild('InputType')
   }
 
   populateSimpliDecorator (dep = new Dependence()) {
@@ -299,8 +350,8 @@ module.exports = class Model {
     if (hasBoolean) dep.addChild('bool')
     if (hasDate) dep.addChild('date')
     if (hasDatetime) dep.addChild('datetime')
-    if (hasUrl) dep.addChild('AnchorRender')
-    if (hasImageUrl) dep.addChild('ImageRender')
+    if (hasUrl) dep.addChild('RenderAnchor')
+    if (hasImageUrl) dep.addChild('RenderImage')
     if (hasPhone) dep.addChild('phone')
     if (hasZipcode) dep.addChild('cep')
     if (hasCpf) dep.addChild('cpf')
@@ -355,7 +406,14 @@ module.exports = class Model {
     const attrFromID = this.attrs.find((attr) => attr.name === this.resource.keyID)
     const attrFromTAG = this.attrs.find((attr) => attr.name === this.resource.keyTAG)
 
+    result += `  readonly $name: string = '${this.name}'\n`
     result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n\n`
+
+    if (!this.isResp) {
+      result += `  get $schema() {\n`
+      result += `    return ${this.name}Schema(this)\n`
+      result += `  }\n\n`
+    }
 
     result += `  get $id() {\n`
     if (attrFromID && !attrFromID.isArrayOrigin) {
@@ -416,49 +474,168 @@ module.exports = class Model {
   }
 
   /**
-   * Print the scheme method into the template generator
+   * Print the schema into the template generator
    */
-  buildScheme (isCsv = false) {
+  buildSchema () {
     let result = ''
     if (!this.isResource) return result
-    // Exclude the hidden attributes
-    const attrs = this.attrs.filter((attr) => !attr.responses.find((resp) => resp.title === 'ResponseHidden'))
-    const methodName = !isCsv ? 'scheme' : 'csvScheme'
 
-    result += `  ${methodName}() {\n`
-    result += `    return {\n`
-    attrs.forEach((attr) => {
+    this.nonForeignAtrrs.forEach((attr) => {
+      result += `  ${attr.name}: {\n`
       if (attr.isObjectOrigin && attr.isObjectResource) {
         if (attr.isRequired) {
-          result += `      ${attr.name}: this.${attr.name}.$id,\n`
+          result += `    content: model.${attr.name}.$id,\n`
         } else {
-          result += `      ${attr.name}: this.${attr.name} && this.${attr.name}.$id,\n`
+          result += `    content: model.${attr.name} && model.${attr.name}.$id,\n`
         }
-      } else if (attr.isUrl && !isCsv) {
-        result += `      ${attr.name}: new AnchorRender(this.${attr.name}, this.${attr.name}, '_blank').toHtml(),\n`
-      } else if (attr.isImageUrl && !isCsv) {
-        result += `      ${attr.name}: new ImageRender(this.${attr.name}).toHtml(),\n`
+        result += `    inputType: InputType.SELECT,\n`
+      } else if (attr.isArrayOrigin) {
+        result += `    hidden: true,\n`
+        result += `    inputType: InputType.SELECT,\n`
+      } else if (attr.isID) {
+        result += `    content: model.${attr.name},\n`
+        result += `    editable: false,\n`
+      } else if (attr.isSoftDelete) {
+        result += `    content: bool(model.${attr.name}),\n`
+        result += `    hidden: true,\n`
+        result += `    editable: false,\n`
+      } else if (attr.isUrl) {
+        result += `    content: {\n`
+        result += `      component: RenderAnchor,\n`
+        result += `      props: {\n`
+        result += `        href: model.${attr.name},\n`
+        result += `        label: model.${attr.name},\n`
+        result += `        target: '_black',\n`
+        result += `      },\n`
+        result += `    },\n`
+        result += `    textContent: model.${attr.name},\n`
+        result += `    inputType: InputType.TEXT,\n`
+        result += `    meta: {\n`
+        if (attr.isRequired) {
+          result += `      required: true,\n`
+        }
+        result += `      maxlength: '255',\n`
+        result += `    },\n`
+      } else if (attr.isImageUrl) {
+        result += `    content: {\n`
+        result += `      component: RenderImage,\n`
+        result += `      props: {\n`
+        result += `        src: model.${attr.name},\n`
+        result += `        alt: model.$tag,\n`
+        result += `      },\n`
+        result += `    },\n`
+        result += `    textContent: model.${attr.name},\n`
+        result += `    inputType: InputType.TEXT,\n`
+        result += `    meta: {\n`
+        if (attr.isRequired) {
+          result += `      required: true,\n`
+        }
+        result += `      maxlength: '255',\n`
+        result += `    },\n`
       } else if (attr.isBoolean) {
-        result += `      ${attr.name}: bool(this.${attr.name}),\n`
+        result += `    content: bool(model.${attr.name}),\n`
+        result += `    inputType: InputType.CHECKBOX,\n`
       } else if (attr.isDate) {
-        result += `      ${attr.name}: date(this.${attr.name}),\n`
+        result += `    content: date(model.${attr.name}),\n`
+        result += `    inputType: InputType.DATETIME,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
       } else if (attr.isDatetime) {
-        result += `      ${attr.name}: datetime(this.${attr.name}),\n`
+        result += `    content: datetime(model.${attr.name}),\n`
+        result += `    inputType: InputType.DATETIME,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
+      } else if (attr.isMoney) {
+        result += `    content: model.${attr.name},\n`
+        result += `    inputType: InputType.CURRENCY,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
+      } else if (attr.isInteger || attr.isDouble) {
+        result += `    content: model.${attr.name},\n`
+        result += `    inputType: InputType.NUMBER,\n`
+        result += `    meta: {\n`
+        if (attr.isRequired) {
+          result += `      required: true,\n`
+        }
+        if (attr.isInteger) {
+          result += `      step: '1',\n`
+        } else if (attr.isDouble) {
+          result += `      step: 'any',\n`
+        }
+        result += `    },\n`
+      } else if (attr.isEmail) {
+        result += `    content: model.${attr.name},\n`
+        result += `    inputType: InputType.EMAIL,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
+      } else if (attr.isPassword) {
+        result += `    content: model.${attr.name},\n`
+        result += `    hidden: true,\n`
+        result += `    inputType: InputType.PASSWORD,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
       } else if (attr.isPhone) {
-        result += `      ${attr.name}: phone(this.${attr.name}),\n`
+        result += `    content: phone(model.${attr.name}),\n`
+        result += `    inputType: InputType.PHONE,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
       } else if (attr.isZipcode) {
-        result += `      ${attr.name}: cep(this.${attr.name}),\n`
+        result += `    content: cep(model.${attr.name}),\n`
+        result += `    inputType: InputType.CEP,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
       } else if (attr.isCpf) {
-        result += `      ${attr.name}: cpf(this.${attr.name}),\n`
+        result += `    content: cpf(model.${attr.name}),\n`
+        result += `    inputType: InputType.CPF,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
       } else if (attr.isCnpj) {
-        result += `      ${attr.name}: cnpj(this.${attr.name}),\n`
-      } else if (!attr.isArrayOrigin && !attr.isForeign) {
-        result += `      ${attr.name}: this.${attr.name},\n`
+        result += `    content: cnpj(model.${attr.name}),\n`
+        result += `    inputType: InputType.CNPJ,\n`
+        if (attr.isRequired) {
+          result += `    meta: {\n`
+          result += `      required: true,\n`
+          result += `    },\n`
+        }
+      } else {
+        result += `    content: model.${attr.name},\n`
+        result += `    inputType: InputType.TEXT,\n`
+        result += `    meta: {\n`
+        if (attr.isRequired) {
+          result += `      required: true,\n`
+        }
+        result += `      maxlength: '255',\n`
+        result += `    },\n`
       }
-    })
-    result += `    }\n`
-    result += `  }\n`
 
+      result += `  },\n\n`
+    })
+
+    result = result.slice(0, -2) // remove last line
     return result
   }
 
@@ -478,6 +655,22 @@ module.exports = class Model {
       result += `      },\n`
     }
     result += `    },\n`
+
+    return result
+  }
+
+  buildPersistRespResourceGetter (origin = new Model()) {
+    let result = ''
+
+    this.arrayAtrrs.forEach((attr) => {
+      const attrs = origin.attrs.filter((attrOrigin) => attrOrigin.type === attr.type)
+
+      attrs.forEach((attrResource) => {
+        result += `        ${attrResource.name}: this.model.${attr.name},\n`
+      })
+    })
+
+    result = result.slice(0, -2) // remove last line
 
     return result
   }

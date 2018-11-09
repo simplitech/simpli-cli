@@ -1,27 +1,38 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
-  <div>
-    <h1 class="adap-header px-30 py-10 m-0">
-      {{ $t("classes.<%-origin.name%>.title") }}
-    </h1>
+  <div class="verti">
+    <section class="header">
+      <h1 class="m-0">
+        {{ $t('classes.<%-origin.name%>.title') }}
+      </h1>
+    </section>
 
-    <await name="get" class="weight-1 items-center p-20">
-      <form @submit.prevent="$await.run(persist, 'persist')" class="elevated padded w-full max-w-650">
-<%_ for (var i in origin.attrs) { var attr = origin.attrs[i] _%>
-<%-attr.buildPersist(origin.name, model.resp.originAttr)-%>
+    <section class="container fluid">
+      <await init name="find<%-origin.name%>Resp" class="my-20">
+        <form class="elevated padded" @submit.prevent="$await.run(persist, 'persist')">
+
+          <div v-for="(schemaRow, field) in model.<%-model.resp.originAttr%>.$schema" :key="field">
+<%_ if (model.arrayAtrrs.length) { _%>
+            <resource-input v-model="model.<%-model.resp.originAttr%>" :field="field" :selectItems="resource[field]"/>
+<%_ } else { _%>
+            <resource-input v-model="model.<%-model.resp.originAttr%>" :field="field"/>
 <%_ } _%>
-        <hr class="mb-20"/>
+          </div>
 
-        <await name="persist" class="verti items-center">
-          <button type="submit" class="primary">{{ $t("persist.submit") }}</button>
-        </await>
-      </form>
-    </await>
+          <hr>
+
+          <await name="persist" class="items-center">
+            <button type="submit" class="primary">{{ $t('persist.submit') }}</button>
+          </await>
+
+        </form>
+      </await>
+    </section>
   </div>
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue} from 'vue-property-decorator'
+  import {Component, Prop, Watch, Vue} from 'vue-property-decorator'
   <%-model.injectIntoDependence().build()%>
   import {$, successAndPush} from '@/simpli'
 
@@ -30,10 +41,16 @@
     @Prop({type: [String, Number]}) id?: string
     model = new <%-model.name%>()
 
+<%_ if (model.arrayAtrrs.length) { _%>
+    get resource() {
+      return {
+<%-model.buildPersistRespResourceGetter(origin)%>
+      }
+    }
+
+<%_ } _%>
     async mounted() {
-      await $.await.init('get')
       await this.model.find(this.id || 0)
-      await $.await.done('get')
     }
 
     async persist() {

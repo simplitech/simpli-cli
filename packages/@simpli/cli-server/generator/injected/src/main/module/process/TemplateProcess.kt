@@ -87,6 +87,10 @@ class <%-table.modelName%>Process(private val con: Connection, private val lang:
         //TODO: review generated method
         val dao = <%-table.modelName%>Dao(con, lang)
 
+<%_ for (var i in table.softDeleteColumns) { var column = table.softDeleteColumns[i] _%>
+        <%-table.instanceName%>.<%-column.name%> = true
+
+<%_ } _%>
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
         if (dao.exist<%-column.capitalizedName%>(<%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-table.idColumn.name%>)) {
             throw HttpException(lang.alreadyExist("<%-column.name%>"), Response.Status.NOT_ACCEPTABLE)
