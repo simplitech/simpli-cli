@@ -7,11 +7,11 @@
       </h1>
     </section>
 
-    <section class="container fluid">
+    <section class="container small">
       <await init name="find<%-origin.name%>Resp" class="my-20">
         <form class="elevated padded" @submit.prevent="$await.run(persist, 'persist')">
 
-          <div v-for="(schemaRow, field) in model.<%-model.resp.originAttr%>.$schema" :key="field">
+          <div v-for="(field, i) in model.<%-model.resp.originAttr%>.fieldsToInput" :key="i">
 <%_ if (model.arrayAtrrs.length) { _%>
             <resource-input v-model="model.<%-model.resp.originAttr%>" :field="field" :selectItems="resource[field]"/>
 <%_ } else { _%>

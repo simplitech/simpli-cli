@@ -56,7 +56,7 @@ module.exports = (api, options) => {
       'normalize-scss': '7.0.1',
       'register-service-worker': '1.5.2',
       'simple-line-icons': '2.4.1',
-      'simpli-web-sdk': '^1.0.0',
+      'simpli-web-sdk': '^1.1.0',
       'vue': '^2.5.17',
       'vue-chartjs': '3.4.0',
       'vue-chartkick': '0.5.0',

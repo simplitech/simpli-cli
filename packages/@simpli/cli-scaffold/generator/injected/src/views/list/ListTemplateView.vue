@@ -53,16 +53,16 @@
               </thead>
 
               <tbody>
-              <tr v-for="(data, i) in collection.data" :key="i">
+              <tr v-for="(item, i) in collection.items" :key="i">
                 <td class="horiz nowrap">
-                  <a @click="pushByName('edit<%-model.name%>', collection.items[i].$id)" class="icon icon-pencil"></a>
+                  <a @click="pushByName('edit<%-model.name%>', item.$id)" class="icon icon-pencil"></a>
 <%_ if (model.resource.deletable) { _%>
-                  <a @click="openRemoveModal(collection.items[i])" class="icon icon-trash"></a>
+                  <a @click="openRemoveModal(item)" class="icon icon-trash"></a>
 <%_ } _%>
                 </td>
 
-                <td v-for="(value, key) in data" :key="key">
-                  <resource-render v-model="collection.items[i]" :field="key"/>
+                <td v-for="(field, j) in item.fieldsToRender" :key="j">
+                  <resource-render v-model="collection.items[i]" :field="field"/>
                 </td>
               </tr>
               </tbody>

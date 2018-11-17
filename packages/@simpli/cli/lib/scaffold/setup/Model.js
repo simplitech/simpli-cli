@@ -488,10 +488,10 @@ module.exports = class Model {
         } else {
           result += `    content: model.${attr.name} && model.${attr.name}.$id,\n`
         }
-        result += `    inputType: InputType.SELECT,\n`
+        result += `    input: InputType.SELECT,\n`
       } else if (attr.isArrayOrigin) {
         result += `    hidden: true,\n`
-        result += `    inputType: InputType.SELECT,\n`
+        result += `    input: InputType.SELECT,\n`
       } else if (attr.isID) {
         result += `    content: model.${attr.name},\n`
         result += `    editable: false,\n`
@@ -509,7 +509,7 @@ module.exports = class Model {
         result += `      },\n`
         result += `    },\n`
         result += `    textContent: model.${attr.name},\n`
-        result += `    inputType: InputType.TEXT,\n`
+        result += `    input: InputType.TEXT,\n`
         result += `    meta: {\n`
         if (attr.isRequired) {
           result += `      required: true,\n`
@@ -525,7 +525,7 @@ module.exports = class Model {
         result += `      },\n`
         result += `    },\n`
         result += `    textContent: model.${attr.name},\n`
-        result += `    inputType: InputType.TEXT,\n`
+        result += `    input: InputType.TEXT,\n`
         result += `    meta: {\n`
         if (attr.isRequired) {
           result += `      required: true,\n`
@@ -534,10 +534,10 @@ module.exports = class Model {
         result += `    },\n`
       } else if (attr.isBoolean) {
         result += `    content: bool(model.${attr.name}),\n`
-        result += `    inputType: InputType.CHECKBOX,\n`
+        result += `    input: InputType.CHECKBOX,\n`
       } else if (attr.isDate) {
         result += `    content: date(model.${attr.name}),\n`
-        result += `    inputType: InputType.DATETIME,\n`
+        result += `    input: InputType.DATETIME,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -545,7 +545,7 @@ module.exports = class Model {
         }
       } else if (attr.isDatetime) {
         result += `    content: datetime(model.${attr.name}),\n`
-        result += `    inputType: InputType.DATETIME,\n`
+        result += `    input: InputType.DATETIME,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -553,7 +553,7 @@ module.exports = class Model {
         }
       } else if (attr.isMoney) {
         result += `    content: model.${attr.name},\n`
-        result += `    inputType: InputType.CURRENCY,\n`
+        result += `    input: InputType.CURRENCY,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -561,7 +561,7 @@ module.exports = class Model {
         }
       } else if (attr.isInteger || attr.isDouble) {
         result += `    content: model.${attr.name},\n`
-        result += `    inputType: InputType.NUMBER,\n`
+        result += `    input: InputType.NUMBER,\n`
         result += `    meta: {\n`
         if (attr.isRequired) {
           result += `      required: true,\n`
@@ -574,7 +574,7 @@ module.exports = class Model {
         result += `    },\n`
       } else if (attr.isEmail) {
         result += `    content: model.${attr.name},\n`
-        result += `    inputType: InputType.EMAIL,\n`
+        result += `    input: InputType.EMAIL,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -583,7 +583,7 @@ module.exports = class Model {
       } else if (attr.isPassword) {
         result += `    content: model.${attr.name},\n`
         result += `    hidden: true,\n`
-        result += `    inputType: InputType.PASSWORD,\n`
+        result += `    input: InputType.PASSWORD,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -591,7 +591,7 @@ module.exports = class Model {
         }
       } else if (attr.isPhone) {
         result += `    content: phone(model.${attr.name}),\n`
-        result += `    inputType: InputType.PHONE,\n`
+        result += `    input: InputType.PHONE,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -599,7 +599,7 @@ module.exports = class Model {
         }
       } else if (attr.isZipcode) {
         result += `    content: cep(model.${attr.name}),\n`
-        result += `    inputType: InputType.CEP,\n`
+        result += `    input: InputType.CEP,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -607,7 +607,7 @@ module.exports = class Model {
         }
       } else if (attr.isCpf) {
         result += `    content: cpf(model.${attr.name}),\n`
-        result += `    inputType: InputType.CPF,\n`
+        result += `    input: InputType.CPF,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -615,7 +615,7 @@ module.exports = class Model {
         }
       } else if (attr.isCnpj) {
         result += `    content: cnpj(model.${attr.name}),\n`
-        result += `    inputType: InputType.CNPJ,\n`
+        result += `    input: InputType.CNPJ,\n`
         if (attr.isRequired) {
           result += `    meta: {\n`
           result += `      required: true,\n`
@@ -623,7 +623,7 @@ module.exports = class Model {
         }
       } else {
         result += `    content: model.${attr.name},\n`
-        result += `    inputType: InputType.TEXT,\n`
+        result += `    input: InputType.TEXT,\n`
         result += `    meta: {\n`
         if (attr.isRequired) {
           result += `      required: true,\n`
