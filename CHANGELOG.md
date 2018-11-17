@@ -1,3 +1,13 @@
+<a name="1.5.2"></a>
+## [1.5.2](https://github.com/simplitech/simpli-cli/compare/v1.5.1...v1.5.2) (2018-11-17)
+
+
+### Features
+
+* syncronized simpli-web-sdk ([cb0b7f5](https://github.com/simplitech/simpli-cli/commit/cb0b7f5))
+
+
+
 <a name="1.5.1"></a>
 ## [1.5.1](https://github.com/simplitech/simpli-cli/compare/v1.4.1...v1.5.1) (2018-11-09)
 
