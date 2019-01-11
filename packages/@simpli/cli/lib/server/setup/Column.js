@@ -18,13 +18,13 @@ const reservedWords = mergeWith(
 
 module.exports = class Column {
   constructor (dataColumn = {}) {
-    this.field = dataColumn.Field || null
-    this.commentary = dataColumn.Commentary || null
-    this.type = dataColumn.Type || null
-    this.keyType = dataColumn.Key || null
-    this.nullable = dataColumn.Null || null
-    this.default = dataColumn.Default || null
-    this.extra = dataColumn.Extra || null
+    this.field = dataColumn.Field || null // column field name (e.g. myColumn)
+    this.commentary = dataColumn.Commentary || null // column commentary
+    this.type = dataColumn.Type || null // column type from SQL (e.g VARCHAR)
+    this.keyType = dataColumn.Key || null // column key type from SQL (e.g. PRI)
+    this.nullable = dataColumn.Null || null // defined if column can be null
+    this.default = dataColumn.Default || null // default column value
+    this.extra = dataColumn.Extra || null // extra information from SQL (e.g. auto_increment)
     this.foreign = null // Relation class
   }
 

@@ -1,87 +1,81 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.model
 
-import <%-packageAddress%>.exception.HttpException
-import br.com.simpli.model.EnglishLanguage
-import br.com.simpli.model.RespException
-import java.util.ArrayList
+import <%-packageAddress%>.AppTest
+import <%-packageAddress%>.dao.<%-table.modelName%>Dao
+import <%-packageAddress%>.exception.response.BadRequestException
 import java.util.Date
+import org.apache.commons.lang3.RandomStringUtils
 import org.junit.Test
-import org.junit.Assert.*
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * Tests <%-table.modelName%>
- * @author Simpli© CLI generator
+ * @author Simpli CLI generator
  */
-class <%-table.modelName%>Test {
+class <%-table.modelName%>Test: AppTest() {
+    private val model = <%-table.modelName%>()
+    private val dao = <%-table.modelName%>Dao(con, lang)
+
+    init {
+<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
+        model.<%-column.name%> = <%-column.testValue%>
+<%_ } _%>
+    }
 
 <%_ for (var i in table.columns) { var column = table.columns[i] _%>
 <%_ if (column.isRequired && !column.isBoolean && !column.isDouble && !column.isID) { _%>
-    @Test(expected = HttpException::class)
-    fun testValidateIn<%-column.capitalizedName%>() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
-<%_ if (column.name !== col.name && !col.isID) { _%>
-        <%-table.instanceName%>.<%-col.name%> = <%-col.testValue%>
-<%_ } _%>
+    @Test(expected = BadRequestException::class)
+    fun testValidate<%-column.capitalizedName%>NullFail() {
+<%_ if (!column.isRequired) { _%>
+        model.<%-column.name%> = null
+<%_ } else if (column.isLong) { _%>
+        model.<%-column.name%> = 0L
+<%_ } else if (column.isDouble) { _%>
+        model.<%-column.name%> = 0
+<%_ } else if (column.isBoolean) { _%>
+        model.<%-column.name%> = false
+<%_ } else if (column.qMark === '?') { _%>
+        model.<%-column.name%> = null
 <%_ } _%>
 
-        <%-table.instanceName%>.validate(false, EnglishLanguage())
+        model.validate(true, dao, lang)
     }
 
 <%_ } _%>
 <%_ if (column.isString && column.size) { _%>
-    @Test(expected = HttpException::class)
-    fun testValidate<%-column.capitalizedName%>Length<%-column.size%>() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
-<%_ if (column.name !== col.name && !col.isID) { _%>
-        <%-table.instanceName%>.<%-col.name%> = <%-col.testValue%>
-<%_ } _%>
-<%_ } _%>
+    @Test(expected = BadRequestException::class)
+    fun testValidate<%-column.capitalizedName%>LengthFail() {
+        model.<%-column.name%> = RandomStringUtils.randomAlphabetic(<%-Number(column.size) + 1%>)
 
-        <%-table.instanceName%>.<%-column.name%> = "<%-options.serverSetup.randomString(column.size + 1)%>"
-
-        <%-table.instanceName%>.validate(false, EnglishLanguage())
+        model.validate(true, dao, lang)
     }
 
 <%_ } _%>
 <%_ if (column.isEmail) { _%>
-    @Test(expected = HttpException::class)
-    fun testValidate<%-column.capitalizedName%>AsInvalidEmail() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
-<%_ if (column.name !== col.name && !col.isID) { _%>
-        <%-table.instanceName%>.<%-col.name%> = <%-col.testValue%>
-<%_ } _%>
-<%_ } _%>
+    @Test(expected = BadRequestException::class)
+    fun testValidate<%-column.capitalizedName%>InvalidEmailFail() {
+        model.<%-column.name%> = "notAnEmail"
 
-        <%-table.instanceName%>.<%-column.name%> = "notAnEmail"
-
-        <%-table.instanceName%>.validate(false, EnglishLanguage())
+        model.validate(true, dao, lang)
     }
 
 <%_ } _%>
 <%_ if (column.isForeign && !column.isRequired) { _%>
     @Test
     fun testSet<%-column.foreign.capitalizedName%>Null() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-        <%-table.instanceName%>.<%-column.foreign.name%> = <%-column.foreign.referencedTableModelName%>()
-        <%-table.instanceName%>.<%-column.name%> = null
-        assertNull(<%-table.instanceName%>.<%-column.foreign.name%>)
-        <%-table.instanceName%>.<%-column.name%> = 1L
-        assertNotNull(<%-table.instanceName%>.<%-column.foreign.name%>)
+        model.<%-column.foreign.name%> = <%-column.foreign.referencedTableModelName%>()
+        model.<%-column.name%> = null
+        assertNull(model.<%-column.foreign.name%>)
+        model.<%-column.name%> = <%-column.isString ? '\"1\"' : '1L'%>
+        assertNotNull(model.<%-column.foreign.name%>)
     }
 
 <%_ } _%>
 <%_ } _%>
     @Test
     fun testValidateSuccess() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
-<%_ } _%>
-
-        <%-table.instanceName%>.validate(false, EnglishLanguage())
+        model.validate(true, dao, lang)
     }
 }

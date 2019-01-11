@@ -3,152 +3,197 @@
 <%_ var database = options.serverSetup.connection.database _%>
 package <%-packageAddress%>.<%-moduleName%>.process
 
+import <%-packageAddress%>.<%-moduleName%>.ProcessTest
+import <%-packageAddress%>.exception.response.BadRequestException
+import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.model.<%-table.modelName%>
-import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+<%_ if (m2m.crossRelationModelName !== table.modelName) { _%>
 import <%-packageAddress%>.model.<%-m2m.crossRelationModelName%>
 <%_ } _%>
-import <%-packageAddress%>.exception.HttpException
-import br.com.simpli.model.EnglishLanguage
-import br.com.simpli.model.RespException
-import br.com.simpli.sql.Dao
-import br.com.simpli.sql.DaoTest
-import br.com.simpli.tools.SecurityUtils
-import java.sql.Connection
-import java.sql.SQLException
-import javax.naming.NamingException
-import java.util.ArrayList
+<%_ } _%>
 import java.util.Date
-import org.junit.Assert.*
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
+import org.junit.Ignore
 import org.junit.Test
-import org.junit.Before
 
 /**
  * Tests <%-table.modelName%> business logic
- * @author Simpli© CLI generator
+ * @author Simpli CLI generator
  */
-class <%-table.modelName%>ProcessTest @Throws(NamingException::class, SQLException::class)
-constructor() : DaoTest("jdbc/<%-database%>DS", "<%-database%>") {
+class <%-table.modelName%>ProcessTest : ProcessTest() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+    private val id = <%-table.idColumn.isString ? '\"1\"' : '1L'%>
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+    private val id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"1\"' : '1L'%>
+<%_ } _%>
+<%_ } _%>
+    private val model = <%-table.modelName%>()
 
-    private val con: Connection
-    private val subject: <%-table.modelName%>Process
+    private object Request {
+        val get = <%-table.modelName%>.GetParam()
+        val list = <%-table.modelName%>.ListParam()
+    }
+
+    private val subject = <%-table.modelName%>Process()
 
     init {
-        con = getConnection()
-        val lang = EnglishLanguage()
-        val clientVersion = "w1.0.0"
-        subject = <%-table.modelName%>Process(con, lang)
+        subject.assign(con, lang, clientVersion)
+
+<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
+        model.<%-column.name%> = <%-column.testValue%>
+<%_ } _%>
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+
+        val <%-m2m.crossRelationInstanceName%> = <%-m2m.crossRelationModelName%>()
+        <%-m2m.crossRelationInstanceName%>.id = 1L
+        model.<%-m2m.pivotInstanceName%> = mutableListOf(<%-m2m.crossRelationInstanceName%>)
+<%_ } _%>
     }
 
     @Test
-    fun testListNoQuery() {
-        val query: String? = null
-        val page = 0
-        val limit = 20
-        val orderRequest: String? = null
-        val asc: Boolean? = null
-                
-        val result = subject.list(query, page, limit, orderRequest, asc)
-        assertNotNull(result)
-        assertNotNull(result.list)
-        assertNotEquals(result.recordsTotal.toLong(), 0)
+    fun testList() {
+        val result = subject.list(Request.list)
         assertFalse(result.list.isEmpty())
-        assertNotNull(result.list[0])
+        assertNotEquals(0, result.recordsTotal)
     }
 
     @Test
-    fun testListWithQuery() {
-        val query: String? = "1"
-        val page = 0
-        val limit = 20
-        val orderRequest: String? = null
-        val asc: Boolean? = null
-                
-        val result = subject.list(query, page, limit, orderRequest, asc)
-        assertNotNull(result)
-        assertNotNull(result.list)
-        assertNotEquals(result.recordsTotal.toLong(), 0)
+    fun testListPaginated() {
+        Request.list.page = 0
+        Request.list.limit = 1
+
+        val result = subject.list(Request.list)
         assertFalse(result.list.isEmpty())
-        assertNotNull(result.list[0])
+        assertNotEquals(0, result.recordsTotal)
+        assertTrue(result.list.size <= Request.list.limit ?: 0)
     }
 
     @Test
-    fun testGetOne() {
-        val result = subject.getOne(<%-table.primariesTestValuesByParam()%>)
-        assertNotNull(result)
-        assertNotNull(result.<%-table.instanceName%>)
-<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
-        assertFalse(result.all<%-relation.referencedTableModelName%>!!.isEmpty())
-        assertNotNull(result.all<%-relation.referencedTableModelName%>!![0])
+    fun testGetOneSuccess() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        Request.get.id = id
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        Request.get.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
+<%_ } _%>
+<%_ } _%>
+
+        val result = subject.getOne(Request.get)
+<%_ if (table.idsColumn.length <= 1) { _%>
+        assertNotSame(<%-table.idColumn.isString ? '\"0\"' : '0'%>, result.id)
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        assertNotSame(<%-table.idColumn.isString ? '\"0\"' : '0'%>, result.id<%-(Number(i) + 1)%>)
+<%_ } _%>
+<%_ } _%>
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+        assertNotNull(result.<%-m2m.pivotInstanceName%>)
 <%_ } _%>
     }
-<%_ if (table.hasUnique) { _%>
 
-<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-    @Test(expected = HttpException::class)
-    fun testPersistWithRepeated<%-column.capitalizedName%>() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var col = table.requiredColumns[i] _%>
-<%_ if (column.name !== col.name && !col.isID) { _%>
-        <%-table.instanceName%>.<%-col.name%> = <%-col.testValue%>
+    @Test(expected = NotFoundException::class)
+    fun testGetOneFail() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        Request.get.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        Request.get.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"0\"' : '0'%>
 <%_ } _%>
 <%_ } _%>
 
-        <%-table.instanceName%>.<%-column.name%> = "lorem"
-
-        subject.persist(<%-table.instanceName%>)
+        subject.getOne(Request.get)
     }
-<%_ } _%>
-<%_ } _%>
 <%_ if (table.hasPersist) { _%>
 
     @Test
-    fun testPersist() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
+<%_ if (table.idsColumn.length === 1 && !table.idColumn.isAutoIncrement) { _%>
+    @Ignore
+<%_ } _%>
+    fun testCreateSuccess() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        model.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"' + (Number(i) + 1) + '\"' : '' + (Number(i) + 1)%>
+<%_ } _%>
 <%_ } _%>
 
-        val result = subject.persist(<%-table.instanceName%>)
-        assertNotNull(result)
-        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
+        val result = subject.create(model)
+        assertTrue(result > <%-table.idColumn.isString ? '\"0\"' : '0'%>)
     }
-<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+
+    @Test(expected = BadRequestException::class)
+    fun testCreateFail() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = id
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        model.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
+<%_ } _%>
+<%_ } _%>
+
+        subject.create(model)
+    }
 
     @Test
-    fun testPersistWith<%-m2m.pivotModelName%>() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
+    fun testUpdateSuccess() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = id
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        model.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
 <%_ } _%>
-        <%-table.instanceName%>.<%-m2m.pivotInstanceName%> = ArrayList()
-        val <%-m2m.crossRelationInstanceName%> = <%-m2m.crossRelationModelName%>()
-        <%-m2m.crossRelationInstanceName%>.<%-m2m.crossRelationColumnName%> = 1
-        <%-table.instanceName%>.<%-m2m.pivotInstanceName%>!!.add(<%-m2m.crossRelationInstanceName%>)
-        
-        val result = subject.persist(<%-table.instanceName%>)
-        assertNotNull(result)
-        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
+<%_ } _%>
+
+        val result = subject.update(model)
+        assertTrue(result > <%-table.idColumn.isString ? '\"0\"' : '0'%>)
     }
+
+    @Test(expected = BadRequestException::class)
+    fun testUpdateFail() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        model.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } _%>
 <%_ } _%>
 
-    @Test
-    fun testPersistUpdating() {
-        val <%-table.instanceName%> = <%-table.modelName%>()
-<%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = <%-column.testValue%>
-<%_ } _%>
-
-        val result = subject.persist(<%-table.instanceName%>)
-        assertNotNull(result)
-        assertTrue(result > <%-table.hasID && table.idColumn.isString ? '\"\"' : '0'%>)
+        subject.update(model)
     }
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
 
     @Test
-    fun testRemove() {
-        subject.remove(1L)
+    fun testRemoveSuccess() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        Request.get.id = id
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        Request.get.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
+<%_ } _%>
+<%_ } _%>
+
+        subject.remove(Request.get)
+    }
+
+    @Test(expected = NotFoundException::class)
+    fun testRemoveFail() {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        Request.get.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        Request.get.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ } _%>
+<%_ } _%>
+
+        subject.remove(Request.get)
     }
 <%_ } _%>
 }

@@ -1,20 +1,14 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.exception
 
-import javax.ws.rs.WebApplicationException
-import javax.ws.rs.core.MediaType
+import br.com.simpli.model.RespException
 import javax.ws.rs.core.Response
 
+/**
+ * HttpException
+ * @author Simpli CLI generator
+ */
 open class HttpException(
-        message: kotlin.String,
-        status: Response.Status = Response.Status.BAD_REQUEST
-) : WebApplicationException(
-        Response.status(status)
-                .entity(ExceptionModel(message))
-                .type(MediaType.APPLICATION_JSON)
-                .build()
-) {
-
-    class ExceptionModel(val message: String?)
-}
-
+    message: String,
+    val status: Response.Status = Response.Status.INTERNAL_SERVER_ERROR
+) : RespException(status.statusCode, message)

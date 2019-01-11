@@ -2,151 +2,162 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 package <%-packageAddress%>.<%-moduleName%>.process
 
-import <%-packageAddress%>.model.<%-table.modelName%>
-import <%-packageAddress%>.<%-moduleName%>.response.<%-table.modelName%>Resp
-<%_ for (var i in table.daoModels) { var obj = table.daoModels[i] _%>
-import <%-packageAddress%>.dao.<%-obj.modelName%>Dao
+import <%-packageAddress%>.dao.<%-table.modelName%>Dao
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+<%_ if (m2m.pivotModelName !== table.modelName) { _%>
+import <%-packageAddress%>.dao.<%-m2m.pivotModelName%>Dao
 <%_ } _%>
-import <%-packageAddress%>.exception.HttpException
-import com.google.common.base.Strings
-import br.com.simpli.model.LanguageHolder
+<%_ } _%>
+import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.exception.response.BadRequestException
+import <%-packageAddress%>.exception.response.NotFoundException
+import <%-packageAddress%>.wrapper.ProcessWrapper
 import br.com.simpli.model.PagedResp
-import java.sql.Connection
-import javax.ws.rs.core.Response
 
 /**
  * <%-table.modelName%> business logic
- * @author Simpli© CLI generator
+ * @author Simpli CLI generator
  */
-class <%-table.modelName%>Process(private val con: Connection, private val lang: LanguageHolder) {
+class <%-table.modelName%>Process : ProcessWrapper() {
 
-    fun list(
-        queryP: String?,
-        page: Int?,
-        limit: Int?,
-        orderRequest: String?,
-        asc: Boolean?): PagedResp<<%-table.modelName%>> {
-        //TODO: review generated method
-        var query = queryP
-        
-        if (query != null) {
-            query = query.replace("[.,:\\-\\/]".toRegex(), "")
-        }
+    lateinit var dao: <%-table.modelName%>Dao
 
-        val dao = <%-table.modelName%>Dao(con, lang)
+    override fun onAssign() {
+        dao = <%-table.modelName%>Dao(con, lang)
+    }
 
-        val list<%-table.modelName%> = dao.list(query, page, limit, orderRequest, asc)
+    fun list(request: <%-table.modelName%>.ListParam): PagedResp<<%-table.modelName%>> {
+        // TODO: review generated method
+        val list = dao.list(request.query, request.page, request.limit, request.orderRequest, request.asc)
 
-        val resp = PagedResp(list<%-table.modelName%>)
-
-        if (!Strings.isNullOrEmpty(query)) {
-            dao.count(query)?.let {
-                count -> resp.recordsTotal = count
-            }
-        } else {
-            dao.count()?.let{
-                count -> resp.recordsTotal = count
-            }
-        }
+        val resp = PagedResp(list)
+        resp.recordsTotal = dao.count(request.query)
 
         return resp
     }
 
-    fun getOne(<%-table.primariesByParam(true)%>): <%-table.modelName%>Resp {
-        //TODO: review generated method
-<%_ for (var i in table.daoModels) { var obj = table.daoModels[i] _%>
-        val <%-obj.name%>Dao = <%-obj.modelName%>Dao(con, lang)
-<%_ } _%>
-
-        val resp = <%-table.modelName%>Resp()
-
-        if (<%-table.primariesByConditions()%>) {
-            val <%-table.instanceName%> = <%-table.instanceName%>Dao.getOne(<%-table.primariesByComma(true)%>)
-<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-            if (<%-table.instanceName%> != null) {
-                <%-table.instanceName%>.<%-m2m.pivotInstanceName%> = <%-m2m.pivotInstanceName%>Dao.list<%-m2m.crossRelationModelName%>Of<%-table.modelName%>(<%-table.idColumn.name%>)
-            }
-<%_ } _%>
-            resp.<%-table.instanceName%> = <%-table.instanceName%>
-        }
-
-<%_ for (var i in table.validDistinctRelations) { var relation = table.validDistinctRelations[i] _%>
-<%_ if (!relation.isManyToMany) { _%>
-        resp.all<%-relation.referencedTableModelName%> = <%-relation.referencedTableInstanceName%>Dao.list()
-<%_ } _%>
-<%_ } _%>
-<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-        resp.all<%-m2m.crossRelationModelName%> = <%-m2m.crossRelationInstanceName%>Dao.list()
-<%_ } _%>
-
-        return resp
-    }
-
-<%_ if (table.hasPersist) { _%>
-    fun persist(<%-table.instanceName%>: <%-table.modelName%>): <%-table.hasID && table.idColumn.isString ? 'String' : 'Long'%> {
-        //TODO: review generated method
-        val dao = <%-table.modelName%>Dao(con, lang)
-
-<%_ for (var i in table.softDeleteColumns) { var column = table.softDeleteColumns[i] _%>
-        <%-table.instanceName%>.<%-column.name%> = true
-
-<%_ } _%>
-<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-        if (dao.exist<%-column.capitalizedName%>(<%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-table.idColumn.name%>)) {
-            throw HttpException(lang.alreadyExist("<%-column.name%>"), Response.Status.NOT_ACCEPTABLE)
-        }
-
-<%_ } _%>
-<%_ if (table.hasID) { _%>
-        val id<%-table.modelName%>: <%-table.idColumn.kotlinType%>
-        if (<%-table.instanceName%>.<%-table.idColumn.name%> > <%-table.idColumn.isString ? '\"\"' : '0'%>) {
-            <%-table.instanceName%>.validate(true, lang)
-            id<%-table.modelName%> = <%-table.instanceName%>.<%-table.idColumn.name%>
-            
-            dao.update<%-table.modelName%>(<%-table.instanceName%>)
-        } else {
-            <%-table.instanceName%>.validate(false, lang)
-            id<%-table.modelName%> = dao.insert(<%-table.instanceName%>)<%-table.idColumn.isString ? '.toString()' : ''%>
-            <%-table.instanceName%>.<%-table.idColumn.name%> = id<%-table.modelName%>
-        }
+    @Throws(BadRequestException::class, NotFoundException::class)
+    fun getOne(request: <%-table.modelName%>.GetParam): <%-table.modelName%> {
+        // TODO: review generated method
+<%_ if (table.idsColumn.length <= 1) { _%>
+        val id = request.id ?: throw BadRequestException()
 <%_ } else { _%>
-        val id<%-table.modelName%> = <%-table.instanceName%>.<%-table.foreignColumns[0].name%>
-        val exist = dao.exist<%-table.modelName%>(<%-table.primariesByParamCall(table.instanceName)%>)
-        if (exist) {
-            <%-table.instanceName%>.validate(true, lang)
-            dao.update<%-table.modelName%>(<%-table.instanceName%>)
-        } else {
-            <%-table.instanceName%>.validate(false, lang)
-            dao.insert(<%-table.instanceName%>)
-        }
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        val id<%-(Number(i) + 1)%> = request.id<%-(Number(i) + 1)%> ?: throw BadRequestException()
+<%_ } _%>
 <%_ } _%>
 
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
         val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con, lang)
-    
-        <%-m2m.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(id<%-table.modelName%>)
-        
-        <%-table.instanceName%>.<%-m2m.pivotInstanceName%>?.let { list ->
-            for (<%-m2m.crossRelationInstanceName%> in list) {
-                <%-m2m.pivotInstanceName%>Dao.insert(<%-options.serverSetup.insertPivotByComma(table, m2m)%>)
-            }
+
+<%_ } _%>
+<%_ if (table.manyToMany.length) { _%>
+        val model = dao.getOne(id) ?: throw NotFoundException()
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+        model.<%-m2m.pivotInstanceName%> = <%-m2m.pivotInstanceName%>Dao.list<%-m2m.crossRelationModelName%>Of<%-table.modelName%>(id)
+<%_ } _%>
+
+        return model
+<%_ } else { _%>
+        return dao.getOne(<%-table.primariesByParamCall()%>) ?: throw NotFoundException()
+<%_ } _%>
+    }
+
+<%_ if (table.hasPersist) { _%>
+    @Throws(BadRequestException::class)
+    fun create(model: <%-table.modelName%>): Long {
+        // TODO: review generated method
+        model.validate(false, dao, lang)
+
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = dao.insert(model)
+
+        return model.id
+<%_ } else { _%>
+        dao.insert(model)
+
+        return model.id1
+<%_ } _%>
+    }
+
+    @Throws(BadRequestException::class)
+    fun update(model: <%-table.modelName%>): Long {
+        // TODO: review generated method
+        model.validate(true, dao, lang)
+
+        dao.update(model)
+
+<%_ if (table.idsColumn.length <= 1) { _%>
+        return model.id
+<%_ } else { _%>
+        return model.id1
+<%_ } _%>
+    }
+
+    /**
+     * Use this to handle similarities between create and persist
+     */
+    fun persist(model: <%-table.modelName%>): Long {
+<%_ if (table.idsColumn.length <= 1) { _%>
+        if (model.id > <%-table.idColumn.isString ? '\"\"' : '0'%>) {
+            update(model)
+        } else {
+            create(model)
+        }
+
+<%_ } else { _%>
+        val exist = dao.exist(<%-table.primariesByParamCall('model')%>)
+
+        if (exist) {
+            update(model)
+        } else {
+            create(model)
         }
 
 <%_ } _%>
-        return id<%-table.modelName%>
+<%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con, lang)
+
+        <%-m2m.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(model.id)
+
+        model.<%-m2m.pivotInstanceName%>?.let { list ->
+<%_ if (table.idColumn.name === m2m.crossRelationColumnName) { _%>
+            list.forEach { <%-m2m.pivotInstanceName%>Dao.insert(it.id, model.id) }
+<%_ } else { _%>
+            list.forEach { <%-m2m.pivotInstanceName%>Dao.insert(model.id, it.id) }
+<%_ } _%>
+        }
+
+<%_ } _%>
+<%_ if (table.idsColumn.length <= 1) { _%>
+        return model.id
+<%_ } else { _%>
+        return model.id1
+<%_ } _%>
     }
+
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
+    @Throws(BadRequestException::class, NotFoundException::class)
+    fun remove(request: <%-table.modelName%>.GetParam): Long {
+        // TODO: review generated method
+<%_ if (table.idsColumn.length <= 1) { _%>
+        val id = request.id ?: throw BadRequestException()
+<%_ } else { _%>
+<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
+        val id<%-i%> = request.<%-column.name%> ?: throw BadRequestException()
+<%_ } _%>
+<%_ } _%>
 
-    fun remove(<%-table.primariesByParam(true)%>) {
-        //TODO: review generated method
-        val <%-table.instanceName%>Dao = <%-table.modelName%>Dao(con, lang)
+        val affectedRows = dao.softDelete(<%-table.primariesByParamCall()%>)
+        if (affectedRows == 0) throw NotFoundException()
 
-        if (<%-table.primariesByConditions(true)%>) {
-            throw HttpException(lang.cannotBeNull("id"), Response.Status.NOT_ACCEPTABLE)
-        }
-
-        <%-table.instanceName%>Dao.softDelete(<%-table.primariesByComma(true)%>)
+<%_ if (table.idsColumn.length <= 1) { _%>
+        return id
+<%_ } else { _%>
+        return id1
+<%_ } _%>
     }
+
 <%_ } _%>
 }

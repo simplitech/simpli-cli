@@ -22,7 +22,7 @@
 
     <servlet>
         <servlet-name>SwaggerInit</servlet-name>
-        <servlet-class><%-options.serverSetup.packageAddress%>.SwaggerInit</servlet-class>
+        <servlet-class><%-options.serverSetup.packageAddress%>.app.SwaggerInit</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
 </web-app>

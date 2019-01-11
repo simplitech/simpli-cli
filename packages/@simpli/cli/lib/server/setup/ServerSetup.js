@@ -4,15 +4,16 @@ const Relation = require('./Relation')
 const ManyToMany = require('./ManyToMany')
 const lorem = require('../util/lorem')
 const camelCase = require('lodash.camelcase')
+const kebabCase = require('lodash.kebabcase')
 const uniqBy = require('lodash.uniqby')
 const uuid = require('uuid')
 const faker = require('faker')
 
 module.exports = class ServerSetup {
   constructor () {
-    this.serverName = null
-    this.moduleName = null
-    this.packageAddress = null
+    this.serverName = null // Name of the project
+    this.moduleName = null // Module name of a section (e.g. admin, user, etc.)
+    this.packageAddress = null // Main address of the project classes (e.g. com.example)
     this.connection = {
       host: null,
       port: null,
@@ -20,11 +21,11 @@ module.exports = class ServerSetup {
       password: null,
       database: null
     }
-    this.userTable = new Table()
-    this.accountColumn = new Column()
-    this.passwordColumn = new Column()
-    this.seedSamples = null
-    this.tables = []
+    this.userTable = new Table() // The user table used for authentication (e.g. user)
+    this.accountColumn = new Column() // The account column used for authentication (e.g. email)
+    this.passwordColumn = new Column() // The password column used for authentication (e.g. password)
+    this.seedSamples = null // Number of samples generated in data.sql
+    this.tables = [] // All tables from database
   }
 
   get commonTables () {
@@ -183,8 +184,8 @@ module.exports = class ServerSetup {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
-  randomString (length) {
-    return faker.random.alphaNumeric(length)
+  kebabCase (str = '') {
+    return kebabCase(str)
   }
 
   dataFactory () {
@@ -211,7 +212,7 @@ module.exports = class ServerSetup {
       result += `INSERT INTO \`${table.name}\`\n`
       result += `(`
       table.columns.forEach((column) => {
-        result += `${column.field},`
+        result += `\`${column.field}\`,`
       })
       result = result.slice(0, -1) // remove last comma
       result += `)\n`

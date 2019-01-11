@@ -2,17 +2,21 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 package <%-packageAddress%>.<%-moduleName%>.mail
 
-import <%-packageAddress%>.AppMail
+import <%-packageAddress%>.wrapper.MailWrapper
 import <%-packageAddress%>.model.User
 import br.com.simpli.model.LanguageHolder
 
-class ResetPasswordMail(appUrl: String, lang: LanguageHolder, user: User, hash: String) : AppMail(appUrl, lang) {
+/**
+ * Reset Password E-Mail handle
+ * @author Simpli CLI generator
+ */
+class ResetPasswordMail(lang: LanguageHolder, user: User, hash: String) : MailWrapper(lang) {
     init {
         this.to = user.email!!
         this.subject = "Password Recovery"
 
-        data.put("linkUrl", """$appUrl/#/password/recover/$hash""")
-        data.put("linkUnsubscribeUrl", "#")
+        data["linkUrl"] = """$appUrl/#/password/recover/$hash"""
+        data["linkUnsubscribeUrl"] = "#"
 
         setBodyFromTemplate(this::class.java, data, "forgotPassword.html")
     }
