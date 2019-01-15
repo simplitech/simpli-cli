@@ -1,3 +1,14 @@
+<a name="2.0.0-beta.0"></a>
+# [2.0.0-beta.0](https://github.com/simplitech/simpli-cli/compare/v1.5.2...v2.0.0-beta.0) (2019-01-15)
+
+
+### Features
+
+* **client:** Assigned client into simpli 2.0.0 ([526e8e7](https://github.com/simplitech/simpli-cli/commit/526e8e7))
+* **server:** Assigned server into simpli 2.0.0 ([07f83c5](https://github.com/simplitech/simpli-cli/commit/07f83c5))
+
+
+
 <a name="1.5.2"></a>
 ## [1.5.2](https://github.com/simplitech/simpli-cli/compare/v1.5.1...v1.5.2) (2018-11-17)
 
