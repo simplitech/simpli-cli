@@ -3,19 +3,19 @@
   <div class="verti">
     <section class="header">
       <h1 class="m-0">
-        {{ $t('classes.<%-origin.name%>.title') }}
+        {{ $t('classes.<%-model.name%>.title') }}
       </h1>
     </section>
 
     <section class="container small">
-      <await init name="find<%-origin.name%>Resp" class="my-20">
+      <await init name="find<%-model.name%>" class="my-20">
         <form class="elevated padded" @submit.prevent="$await.run(persist, 'persist')">
 
-          <div v-for="(field, i) in model.<%-model.resp.originAttr%>.fieldsToInput" :key="i">
+          <div v-for="(field, i) in <%-model.attrName%>.fieldsToInput" :key="i">
 <%_ if (model.arrayAtrrs.length) { _%>
-            <resource-input v-model="model.<%-model.resp.originAttr%>" :field="field" :selectItems="resource[field]"/>
+            <resource-input v-model="<%-model.attrName%>" :field="field" :selectItems="resource[field]"/>
 <%_ } else { _%>
-            <resource-input v-model="model.<%-model.resp.originAttr%>" :field="field"/>
+            <resource-input v-model="<%-model.attrName%>" :field="field"/>
 <%_ } _%>
           </div>
 
@@ -34,29 +34,43 @@
 <script lang="ts">
   import {Component, Prop, Watch, Vue} from 'vue-property-decorator'
   <%-model.injectIntoDependence().build()%>
+<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
+  <%-dependence.build()%>
+<%_ } _%>
+<%_ if (model.resolvedPersistDependencies.length) { _%>
+  import All from '@/model/collection/All'
+<%_ } _%>
   import {$, successAndPush} from '@/simpli'
 
   @Component
-  export default class Persist<%-origin.name%>View extends Vue {
+  export default class Persist<%-model.name%>View extends Vue {
     @Prop({type: [String, Number]}) id?: string
-    model = new <%-model.name%>()
+    <%-model.attrName%> = new <%-model.name%>()
 
-<%_ if (model.arrayAtrrs.length) { _%>
+<%_ if (model.resolvedPersistDependencies.length) { _%>
+<%-model.buildPersistResourceInstances()%>
     get resource() {
       return {
-<%-model.buildPersistRespResourceGetter(origin)%>
+<%-model.buildPersistResource()%>
       }
     }
 
 <%_ } _%>
     async mounted() {
-      await this.model.find(this.id || 0)
+<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
+      await this.all<%-dependence.children[0]%>.query()
+<%_ } _%>
+<%_ if (model.resolvedPersistDependencies.length) { _%>
+
+<%_ } _%>
+      if (this.id) await this.<%-model.attrName%>.find(this.id)
+      $.await.done('find<%-model.name%>')
     }
 
     async persist() {
-      await this.model.<%-model.resp.originAttr%>.validate()
-      await this.model.<%-model.resp.originAttr%>.save()
-      successAndPush('system.success.persist', '/<%-kebabCase(origin.name)%>/list')
+      await this.<%-model.attrName%>.validate()
+      await this.<%-model.attrName%>.save()
+      successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
     }
   }
 </script>

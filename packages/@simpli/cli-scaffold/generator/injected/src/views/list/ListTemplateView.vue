@@ -9,7 +9,7 @@
 
         <adap-searchfield :collection="collection" :placeholder="$t('app.search')"/>
 
-        <await name="query"></await>
+        <await name="query<%-model.name%>"></await>
 
         <div class="weight-1"></div>
 
@@ -30,16 +30,14 @@
     </section>
 
     <section>
-      <transition name="fade-up" mode="out-in">
-        <div v-if="!collection.items.length" :key="0">
-          <await name="query" spinner="MoonLoader">
-            <h3 class="p-20 text-center">
-              {{ $t('app.noDataToShow') }}
-            </h3>
-          </await>
-        </div>
+      <await init name="query" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+        <template v-if="!collection.items.length">
+          <h3 class="p-20 text-center">
+            {{ $t('app.noDataToShow') }}
+          </h3>
+        </template>
 
-        <div v-else :key="1">
+        <template v-else>
           <div class="elevated square intense x-scroll">
             <table>
               <thead>
@@ -70,8 +68,8 @@
           </div>
 
           <adap-pagination :collection="collection"/>
-        </div>
-      </transition>
+        </template>
+      </await>
     </section>
 <%_ if (model.resource.deletable) { _%>
 
@@ -124,7 +122,7 @@
     }
 
     async mounted() {
-      await this.collection.search()
+      await this.query()
     }
   }
 </script>

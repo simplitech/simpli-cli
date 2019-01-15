@@ -40,7 +40,7 @@ module.exports = class Swagger {
 
     scaffoldSetup.injectSwagger(definitions, paths)
 
-    const availableModels = scaffoldSetup.exceptPagedRespModels
+    const availableModels = scaffoldSetup.availableModels
     const allModels = scaffoldSetup.models
 
     if (availableModels.length === 0) {
@@ -209,14 +209,17 @@ module.exports = class Swagger {
 
     const loginHolderModel = availableModels.find((model) => model.name === signInApi.body.model)
     const loginRespModel = availableModels.find((model) => model.name === signInApi.respModel)
+    const resetPasswordRequestModel = availableModels.find((model) => model.name === 'ResetPasswordRequest')
+    const recoverPasswordRequestModel = availableModels.find((model) => model.name === 'RecoverPasswordRequest')
+    const changePasswordRequestModel = availableModels.find((model) => model.name === 'ChangePasswordRequest')
 
     // Validation
     if (!loginHolderModel) {
-      error('Sign-in API must have a body model (e.g. LoginHolder)')
+      error('Sign-in API must have a request model (e.g. AuthRequest)')
       process.exit(1)
     }
     if (!loginRespModel) {
-      error('Sign-in API must have a resp model (e.g. LoginResp)')
+      error('Sign-in API must have a response model (e.g. AuthResponse)')
       process.exit(1)
     }
 
@@ -245,6 +248,9 @@ module.exports = class Swagger {
     auth.api.auth = authApi
     auth.model.loginHolder = loginHolderModel
     auth.model.loginResp = loginRespModel
+    auth.model.resetPasswordRequest = resetPasswordRequestModel
+    auth.model.recoverPasswordRequest = recoverPasswordRequestModel
+    auth.model.changePasswordRequest = changePasswordRequestModel
     auth.setDependencies()
 
     const exists = (name) => !!filteredModels.find((model) => model.name === name)

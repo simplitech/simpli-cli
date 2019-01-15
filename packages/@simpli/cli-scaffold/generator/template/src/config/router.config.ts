@@ -23,13 +23,8 @@ import RecoverPasswordView from '@/views/RecoverPasswordView.vue'
 import List<%-resource.name%>View from '@/views/list/List<%-resource.name%>View.vue'
 <%_ } _%>
 
-<%_ } _%>
-<%_ var respResourceModels = rootOptions.scaffoldSetup.respResourceModels _%>
-<%_ if (respResourceModels.length) { _%>
-<%_ for (var i in respResourceModels) { var resource = respResourceModels[i] _%>
-<%_ if (resource.resp.origin) { _%>
-import Persist<%-resource.resp.origin%>View from '@/views/persist/Persist<%-resource.resp.origin%>View.vue'
-<%_ } _%>
+<%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
+import Persist<%-resource.name%>View from '@/views/persist/Persist<%-resource.name%>View.vue'
 <%_ } _%>
 
 <%_ } _%>
@@ -40,7 +35,7 @@ export const router = {
   routes: [
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     {
-      path: '/signIn',
+      path: '/sign-in',
       name: 'signIn',
       component: SignInView,
     },
@@ -66,24 +61,20 @@ export const router = {
           component: DashboardView,
         },
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
-        {path: '/<%-kebabCase(resource.name)%>/list', component: List<%-resource.name%>View},
-<%_ } _%>
-<%_ for (var i in respResourceModels) { var resource = respResourceModels[i] _%>
-<%_ if (resource.resp.origin) { _%>
 
-        {path: '/<%-kebabCase(resource.resp.origin)%>/new', component: Persist<%-resource.resp.origin%>View},
+        {path: '/<%-kebabCase(resource.name)%>/list', component: List<%-resource.name%>View},
+        {path: '/<%-kebabCase(resource.name)%>/new', component: Persist<%-resource.name%>View},
         {
-          path: '/<%-kebabCase(resource.resp.origin)%>/edit<%-resource.resource.endpointParamsImploded%>',
-          name: 'edit<%-resource.resp.origin%>',
-          component: Persist<%-resource.resp.origin%>View,
+          path: '/<%-kebabCase(resource.name)%>/edit<%-resource.resource.endpointParamsImploded%>',
+          name: 'edit<%-resource.name%>',
+          component: Persist<%-resource.name%>View,
           props: true,
         },
-<%_ } _%>
 <%_ } _%>
       ],
     },
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    {path: '/', redirect: '/signIn'},
+    {path: '/', redirect: '/sign-in'},
 <%_ } else { _%>
     {path: '/', redirect: '/dashboard'},
 <%_ } _%>

@@ -11,7 +11,7 @@ import javax.ws.rs.BadRequestException
  * @author Simpli CLI generator
  */
 @ApiModel(value = "RecoverPasswordRequest")
-class RecoverPasswordRequest(val newPassword: String?, private val confirmPassword: String?, val hash: String?) {
+class RecoverPasswordRequest(val newPassword: String?, val confirmPassword: String?, val hash: String?) {
     fun validate(lang: LanguageHolder) {
         if (newPassword.isNullOrEmpty()) {
             throw BadRequestException(lang.cannotBeNull("New Password"))

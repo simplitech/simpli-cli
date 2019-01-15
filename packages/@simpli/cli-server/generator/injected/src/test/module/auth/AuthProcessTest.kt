@@ -1,5 +1,7 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 <%_ var moduleName = options.serverSetup.moduleName _%>
+<%_ var userTable = options.serverSetup.userTable _%>
+<%_ var accountColumn = options.serverSetup.accountColumn _%>
 package <%-packageAddress%>.<%-moduleName%>.auth
 
 import <%-packageAddress%>.<%-moduleName%>.ProcessTest
@@ -90,18 +92,18 @@ class AuthProcessTest : ProcessTest() {
     @Test
     fun testGetId() {
         val result = subject.getId(authRequest)
-        assertEquals(user.idUserPk, result)
+        assertEquals(<%-userTable.instanceName%>.id, result)
     }
 
     @Test(expected = NotFoundException::class)
-    fun testGetUserNotFound() {
-        subject.getUser(0)
+    fun testGet<%-userTable.modelName%>NotFound() {
+        subject.get<%-userTable.modelName%>(0)
     }
 
     @Test
-    fun testGetUser() {
-        val result = subject.getUser(user.idUserPk)
-        assertEquals(user.email, result.email)
+    fun testGet<%-userTable.modelName%>() {
+        val result = subject.get<%-userTable.modelName%>(<%-userTable.instanceName%>.id)
+        assertEquals(<%-userTable.instanceName%>.<%-accountColumn.name%>, result.<%-accountColumn.name%>)
     }
 
     @Test
@@ -113,6 +115,6 @@ class AuthProcessTest : ProcessTest() {
     @Test
     fun testTokenToRequest() {
         val result = AuthProcess.tokenToRequest(token)
-        assertEquals(user.email, result.email)
+        assertEquals(<%-userTable.instanceName%>.<%-accountColumn.name%>, result.<%-accountColumn.name%>)
     }
 }

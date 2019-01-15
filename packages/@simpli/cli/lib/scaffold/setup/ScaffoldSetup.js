@@ -1,5 +1,6 @@
 const map = require('lodash.map')
 const Model = require('./Model')
+const ModelType = require('./ModelType')
 const Api = require('./Api')
 const Auth = require('./Auth')
 const camelCase = require('lodash.camelcase')
@@ -21,7 +22,10 @@ module.exports = class ScaffoldSetup {
     this.models = []
   }
 
-  // Remove CRUD APIs
+  /**
+   * Filter APIs in order to get non CRUD APIs
+   * @returns Api[]
+   */
   get simpleAPIs () {
     return this.apis.filter((api) => {
       let isResource = false
@@ -33,89 +37,30 @@ module.exports = class ScaffoldSetup {
     })
   }
 
-  /**
-   * Filter simple models: 000
-   */
-  get simpleModels () {
-    return this.models.filter((resource) =>
-      !resource.isResource &&
-      !resource.isResp &&
-      !resource.isPagedResp
-    )
+  get standardModels () {
+    return this.modelsByType(ModelType.STANDARD)
   }
-
-  /**
-   * Filter simple resp models: 010
-   */
-  get simpleRespModels () {
-    return this.models.filter((resource) =>
-      !resource.isResource &&
-      resource.isResp &&
-      !resource.isPagedResp
-    )
-  }
-
-  /**
-   * Filter resource models: 100
-   */
   get resourceModels () {
-    return this.models.filter((resource) =>
-      resource.isResource &&
-      !resource.isResp &&
-      !resource.isPagedResp
-    )
+    return this.modelsByType(ModelType.RESOURCE)
+  }
+  get requestModels () {
+    return this.modelsByType(ModelType.REQUEST)
+  }
+  get responseModels () {
+    return this.modelsByType(ModelType.RESPONSE)
+  }
+  get paginatedModels () {
+    return this.modelsByType(ModelType.PAGINATED)
   }
 
-  /**
-   * Filter resp resource models: 110
-   */
-  get respResourceModels () {
-    return this.models.filter((resource) =>
-      resource.isResource &&
-      resource.isResp &&
-      !resource.isPagedResp
-    )
+  get availableModels () {
+    return [...this.standardModels, ...this.resourceModels, ...this.requestModels, ...this.responseModels]
   }
 
-  /**
-   * Filter paged resp resource models: 101
-   */
-  get pagedRespResourceModels () {
-    return this.models.filter((resource) =>
-      resource.isResource &&
-      !resource.isResp &&
-      resource.isPagedResp
-    )
+  modelsByType (type) {
+    return this.models.filter((model) => model.type === type)
   }
 
-  /**
-   * Filter simple and resource models: 000 & 100
-   */
-  get exceptRespModels () {
-    return this.models.filter((resource) =>
-      !resource.isResp &&
-      !resource.isPagedResp
-    )
-  }
-
-  /**
-   * Filter all except paged resp models
-   */
-  get exceptPagedRespModels () {
-    return this.models.filter((resource) =>
-      !resource.isPagedResp
-    )
-  }
-
-  /**
-   * Get origin model
-   */
-  findOriginModel (target = new Model()) {
-    if (!target.isResp) return null
-    return this.models.find((model) => model.name === target.resp.origin) || null
-  }
-
-  // Helpers
   camelCase (prop) {
     return camelCase(prop)
   }
@@ -129,7 +74,6 @@ module.exports = class ScaffoldSetup {
   injectSwagger (definition, path) {
     this.setApis(path)
     this.setModels(definition, path)
-    this.models.forEach((model) => model.resolveModule())
   }
 
   /**

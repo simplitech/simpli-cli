@@ -11,7 +11,7 @@ import <%-packageAddress%>.wrapper.ProcessWrapper
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.exception.response.UnauthorizedException
-import <%-packageAddress%>.model.User
+import <%-packageAddress%>.model.<%-userTable.modelName%>
 import <%-packageAddress%>.app.Cast.classToJson
 import <%-packageAddress%>.app.Cast.jsonToClass
 import <%-packageAddress%>.<%-moduleName%>.mail.ResetPasswordMail
@@ -120,7 +120,7 @@ class AuthProcess : ProcessWrapper() {
     fun changePassword(request: ChangePasswordRequest, auth: AuthResponse): Long {
         val id = auth.id
         val <%-userTable.instanceName%> = auth.<%-userTable.instanceName%>
-        val <%-accountColumn.name%> = user.<%-accountColumn.name%> ?: throw BadRequestException(lang.cannotBeNull("<%-accountColumn.name%>"))
+        val <%-accountColumn.name%> = <%-userTable.instanceName%>.<%-accountColumn.name%> ?: throw BadRequestException(lang.cannotBeNull("<%-accountColumn.name%>"))
 
         request.validate(lang)
 

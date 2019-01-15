@@ -5,16 +5,22 @@ package <%-packageAddress%>.dao
 import <%-packageAddress%>.model.<%-table.modelName%>
 import java.sql.Connection
 import java.util.ArrayList
+import java.util.Date
 import java.util.HashMap
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
 <%_ } else { _%>
+<%_ var cache = [] _%>
 <%_ for (var i in table.foreignColumns) { var column = table.foreignColumns[i] _%>
+<%_ if (!cache.includes(column.foreign.referencedTableModelName)) { _%>
 import <%-packageAddress%>.model.<%-column.foreign.referencedTableModelName%>
+<%_ cache.push(column.foreign.referencedTableModelName) _%>
+<%_ } _%>
 <%_ } _%>
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
 import java.sql.Connection
+import java.util.Date
 <%_ } _%>
 
 /**
@@ -128,29 +134,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         return update("""
             UPDATE <%-table.name%>
             SET
-<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
-<%_ if (column.isPassword) { _%>
-            <%-column.field%> = IF(? IS NOT NULL, SHA2(?, 256), <%-column.field%>)<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
-<%_ } else if (column.isUpdatedAt) { _%>
-            <%-column.field%> = NOW()<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
-<%_ } else if (!column.isCreatedAt) { _%>
-            <%-column.field%> = ?<%-i < table.exceptIDColumns.length - 1 ? ',' : ''%>
-<%_ } _%>
-<%_ } _%>
+<%-table.buildDaoUpdateQuery()-%>
             WHERE 1 = 1
             <%-table.primariesByWhere()%>
             """,
-<%_ for (var i in table.exceptIDColumns) { var column = table.exceptIDColumns[i] _%>
-<%_ if (column.isPassword) { _%>
-            <%-table.instanceName%>.<%-column.name%>, <%-table.instanceName%>.<%-column.name%>,
-<%_ } else if (column.isUpdatedAt) { _%>
-<%_ } else if (!column.isCreatedAt) { _%>
-            <%-table.instanceName%>.<%-column.name%>,
-<%_ } _%>
-<%_ } _%>
-<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-            <%-table.instanceName%>.<%-column.name%><%-i < table.idsColumn.length - 1 ? ',' : ''%>
-<%_ } _%>
+<%-table.buildDaoUpdateParams()-%>
         ).affectedRows
     }
 
@@ -158,27 +146,10 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         // TODO: review generated method
         return update("""
             INSERT INTO <%-table.name%> (
-<%_ for (var i in table.exceptAutoIncrementColumns) { var column = table.exceptAutoIncrementColumns[i] _%>
-<%_ if (!column.isUpdatedAt) { _%>
-            <%-column.field%><%-i < table.exceptAutoIncrementColumns.length - 1 ? ',' : ''%>
-<%_ } _%>
-<%_ } _%>
-            ) VALUES (<%_ for (var i in table.exceptAutoIncrementColumns) { var column = table.exceptAutoIncrementColumns[i] _%>
-<%_ if (column.isPassword) { _%>
-<%- 'SHA2(?, 256)' + (i < table.exceptAutoIncrementColumns.length - 1 ? ',' : '') -%>
-<%_ } else if (column.isCreatedAt) { _%>
-<%- 'NOW()' + (i < table.exceptAutoIncrementColumns.length - 1 ? ',' : '') -%>
-<%_ } else if (!column.isUpdatedAt) { _%>
-<%- '?' + (i < table.exceptAutoIncrementColumns.length - 1 ? ',' : '') -%>
-<%_ } _%>
-<%_ } _%>)
+<%-table.buildDaoInsertQuery()-%>
+            ) VALUES (<%-table.buildDaoInsertValues()-%>)
             """,
-<%_ for (var i in table.exceptAutoIncrementColumns) { var column = table.exceptAutoIncrementColumns[i] _%>
-<%_ if (column.isCreatedAt) { _%>
-<%_ } else if (!column.isUpdatedAt) { _%>
-            <%-table.instanceName%>.<%-column.name%><%-i < table.exceptAutoIncrementColumns.length - 1 ? ',' : ''%>
-<%_ } _%>
-<%_ } _%>
+<%-table.buildDaoInsertParams()-%>
         ).key
     }
 
@@ -236,9 +207,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         ).affectedRows
     }
 
+<%_ var cache = [] _%>
 <%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
 <%_ var columnRef = column.name === columnRef1.name ? columnRef2 : columnRef1 _%>
 <%_ var columnCross = column.name === columnRef2.name ? columnRef2 : columnRef1 _%>
+<%_ if (!cache.includes(columnRef.foreign.referencedTableModelName)) { _%>
     fun removeAllFrom<%-columnRef.foreign.referencedTableModelName%>(<%-columnRef.name%>: <%-columnRef.kotlinType%>): Int {
         // TODO: review generated method
         return update("DELETE FROM <%-table.name%> WHERE <%-columnRef.field%> = ? ",
@@ -255,6 +228,8 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             """, { rs -> <%-columnRef.foreign.referencedTableModelName%>(rs) }, <%-columnCross.name%>)
     }
 
+<%_ cache.push(columnRef.foreign.referencedTableModelName) _%>
+<%_ } _%>
 <%_ } _%>
 <%_ } _%>
 }

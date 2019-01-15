@@ -240,6 +240,96 @@ module.exports = class Table {
     return uniqBy(instances, 'modelName')
   }
 
+  buildDaoUpdateQuery () {
+    let result = ''
+
+    this.exceptIDColumns.forEach((column) => {
+      if (column.isPassword) {
+        result += `\t\t\t${column.field} = IF(? IS NOT NULL, SHA2(?, 256), ${column.field}),\n`
+      } else if (column.isUpdatedAt) {
+        result += `\t\t\t${column.field} = NOW(),\n`
+      } else if (!column.isCreatedAt) {
+        result += `\t\t\t${column.field} = ?,\n`
+      }
+    })
+
+    result = result.slice(0, -2) // remove last line
+    result += `\n`
+
+    return result
+  }
+
+  buildDaoUpdateParams () {
+    let result = ''
+
+    this.exceptIDColumns.forEach((column) => {
+      if (column.isPassword) {
+        result += `\t\t\t${this.instanceName}.${column.name}, ${this.instanceName}.${column.name},\n`
+      } else if (column.isUpdatedAt) {
+      } else if (!column.isCreatedAt) {
+        result += `\t\t\t${this.instanceName}.${column.name},\n`
+      }
+    })
+
+    this.idsColumn.forEach((column) => {
+      result += `\t\t\t${this.instanceName}.${column.name},\n`
+    })
+
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n`
+
+    return result
+  }
+
+  buildDaoInsertQuery () {
+    let result = ''
+
+    this.exceptAutoIncrementColumns.forEach((column) => {
+      if (!column.isUpdatedAt) {
+        result += `\t\t\t${column.field},\n`
+      }
+    })
+
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n`
+
+    return result
+  }
+
+  buildDaoInsertValues () {
+    let result = ''
+
+    this.exceptAutoIncrementColumns.forEach((column) => {
+      if (column.isPassword) {
+        result += `SHA2(?, 256),`
+      } else if (column.isCreatedAt) {
+        result += `NOW(),`
+      } else if (!column.isUpdatedAt) {
+        result += `?,`
+      }
+    })
+
+    result = result.slice(0, -1) // remove last comma
+
+    return result
+  }
+
+  buildDaoInsertParams () {
+    let result = ''
+
+    this.exceptAutoIncrementColumns.forEach((column) => {
+      if (column.isCreatedAt) {
+      } else if (!column.isUpdatedAt) {
+        result += `\t\t\t${this.instanceName}.${column.name},\n`
+      }
+    })
+
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n`
+
+    return result
+  }
+
   buildValidate () {
     let result = ''
 

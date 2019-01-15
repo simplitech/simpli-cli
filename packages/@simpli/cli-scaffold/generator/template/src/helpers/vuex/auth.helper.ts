@@ -6,7 +6,6 @@ import {store} from '@/store'
 export const isLogged = () => store.getters['auth/isLogged']
 <%-rootOptions.scaffoldSetup.auth.buildExport()-%>
 export const auth = () => store.dispatch('auth/auth')
-export const signIn = (model: <%-loginHolderModel.name%>) => store.dispatch('auth/signIn', model)
-export const signOut = () => store.dispatch('auth/signOut', false)
-export const signOutWithError = () => store.dispatch('auth/signOut', true)
+export const signIn = (request: <%-loginHolderModel.name%>) => store.dispatch('auth/signIn', request)
+export const signOut = () => store.dispatch('auth/signOut')
 <%_ } _%>

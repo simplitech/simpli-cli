@@ -1,15 +1,20 @@
 const map = require('lodash.map')
+const ModelType = require('./ModelType')
 const Attr = require('./Attr')
 const Resource = require('./Resource')
-const Resp = require('./Resp')
 const Dependence = require('./Dependence')
 const startCase = require('lodash.startcase')
+const camelCase = require('lodash.camelcase')
+const kebabCase = require('lodash.kebabcase')
 const uniqBy = require('lodash.uniqby')
 
 module.exports = class Model {
   constructor (name, definition, path, apis) {
     // Model name //e.g User
     this.name = name || ''
+
+    // Attribute name //e.g user
+    this.attrName = camelCase(name || '')
 
     // Model description (not mandatory)
     this.description = definition.description || null
@@ -20,26 +25,11 @@ module.exports = class Model {
     // Attributes
     this.attrs = []
 
-    /**
-     * ############# *** MODEL DEFINITION *** #############
-     * -- Possible scenarios
-     * Simple Model: 000                 //e.g. LoginHolder
-     * Simple Resp Model: 010            //e.g. LoginResp
-     * Resource Models: 100              //e.g. User
-     * Resp Resource Models: 110         //e.g. UserResp
-     * Paged Resp Resource Model: 101    //e.g. PagedRespUser
-     *
-     * -- Impossible scenarios: 001, 011, 111
-     * ####################################################
-     */
-    this.isResource = null
-    this.isResp = null
-    this.isPagedResp = null
+    // Model type
+    this.type = ModelType.STANDARD
 
     // only for resource
     this.resource = new Resource()
-    // only for resp
-    this.resp = new Resp()
 
     // APIs
     this.apis = []
@@ -47,12 +37,15 @@ module.exports = class Model {
     // Dependencies to import
     this.dependencies = []
     this.schemaDependencies = []
+    this.persistDependencies = []
 
     this.setAttr(name, definition.properties, definition.required)
-    this.setDefinition(path)
+    this.setType(path)
     this.setAPIs(apis)
+    this.resolveModule()
     this.setDependencies()
     this.setSchemaDependencies()
+    this.setPersistDependencies()
   }
 
   /**
@@ -91,42 +84,43 @@ module.exports = class Model {
   }
 
   /**
+   * Only resolved persist dependencies
+   */
+  get resolvedPersistDependencies () {
+    return this.persistDependencies.filter((dep) => dep.resolved)
+  }
+
+  /**
    * Only non-resolved dependencies
    */
   get notResolvedDependencies () {
-    return this.dependencies.filter((dep) => !dep.resolved)
-  }
-
-  /**
-   * Has reset password API
-   */
-  get hasResetPassword () {
-    return !!this.apis.find((api) => api.name === 'resetPassword')
-  }
-
-  /**
-   * Has Hash Attr
-   */
-  get hasHashAttr () {
-    return !!this.attrs.find((attr) => attr.name === 'hash')
-  }
-
-  /**
-   * Has recover password API
-   */
-  get hasRecoverPassword () {
-    return !!this.apis.find((api) => api.name === 'recoverPassword')
+    const notResolvedDependencies = this.dependencies.filter((dep) => !dep.resolved)
+    const notResolvedSchemaDependencies = this.schemaDependencies.filter((dep) => !dep.resolved)
+    const notResolvedPersistDependencies = this.persistDependencies.filter((dep) => !dep.resolved)
+    return [...notResolvedDependencies, ...notResolvedSchemaDependencies, ...notResolvedPersistDependencies]
   }
 
   /**
    * Set module
    */
   resolveModule () {
-    if (!this.isResource && !this.isResp && !this.isPagedResp) this.module = `@/model/${this.name}`
-    if (!this.isResource && this.isResp && !this.isPagedResp) this.module = `@/model/response/${this.name}`
-    if (this.isResource && !this.isResp && !this.isPagedResp) this.module = `@/model/resource/${this.name}`
-    if (this.isResource && this.isResp && !this.isPagedResp) this.module = `@/model/resource/response/${this.name}`
-    if (this.isResource && !this.isResp && this.isPagedResp) this.module = `@/model/collection/${this.name}`
+    switch (this.type) {
+    case ModelType.RESOURCE:
+      this.module = `@/model/resource/${this.name}`
+      break
+    case ModelType.REQUEST:
+      this.module = `@/model/request/${this.name}`
+      break
+    case ModelType.RESPONSE:
+      this.module = `@/model/response/${this.name}`
+      break
+    case ModelType.PAGINATED:
+      this.module = `@/model/paginated/${this.name}`
+      break
+    default:
+      this.module = `@/model/${this.name}`
+      break
+    }
   }
 
   /**
@@ -162,80 +156,89 @@ module.exports = class Model {
   }
 
   /**
-   * -- Set if model is:
-   * Simple Model
-   * Simple Resp Model
-   * Resource Models
-   * Resp Resource Models
-   * Paged Resp Resource Model
+   * Set if model is:
+   * STANDARD
+   * RESOURCE
+   * REQUEST
+   * RESPONSE
+   * PAGINATED
    * @param path Path from swagger
    */
-  setDefinition (path) {
-    this.isResource = false
-    this.isResp = false
-    this.isPagedResp = false
+  setType (path) {
+    this.defineRequest()
+    this.defineResponse()
+    this.definePaginated()
+    this.defineResource(path)
+  }
 
-    if (this.name.match(/^\w+(Resp)$/)) this.defineResp()
-
-    else if (this.name.match(/^(PagedResp)\w+$/)) this.definePagedResp()
-
-    // Get WS endpoint
-    const wsEndpoint = Object.keys(path).find((endpoint) => {
-      // Find any endpoint with this format: /###/[name]/{###}
-      const regex = new RegExp(`^(?:\\/\\w+)*\\/${this.resp.origin || this.name}(?:\\/\\{\\w+\\})+$`, 'gi')
+  /**
+   * Get WS endpoint and define if the model is a resource
+   */
+  findWsEndpoint (path) {
+    return Object.keys(path).find((endpoint) => {
+      // Find any endpoint with this format: /###/[name]/{###}/{###}/...
+      const regex = new RegExp(`^(?:\\/\\w+)*\\/${kebabCase(this.name)}(?:\\/{\\w+})+$`, 'gi')
+      // e.g /admin/model/{id} -> resource detected!
       return endpoint.match(regex)
     })
-
-    if (wsEndpoint) this.defineResource(wsEndpoint)
   }
 
-  defineResp () {
-    this.isResp = true
-    this.isPagedResp = false
+  defineResource (path) {
+    const wsEndpoint = this.findWsEndpoint(path)
+    if (!wsEndpoint) return
 
-    const pattern = /(\w+)(?:Resp)/g
-    const match = pattern.exec(this.name)
-    const attr = this.attrs.find((attr) => attr.type === (match && match[1]))
-    this.resp.setOrigin(attr && attr.type)
-    this.resp.setOriginAttr(attr && attr.name)
-
-    // Set fromResp
-    this.attrs.forEach((attr) => {
-      attr.fromResp = true
-    })
-  }
-
-  definePagedResp () {
-    this.isResource = true
-    this.isResp = false
-    this.isPagedResp = true
-
-    const pattern = /(?:PagedResp)(\w+)/g
-    const match = pattern.exec(this.name)
-    const attr = this.attrs.find((attr) => attr.type === (match && match[1]))
-    this.resp.setOrigin(attr && attr.type)
-  }
-
-  defineResource (wsEndpoint) {
-    this.isResource = true
+    this.type = ModelType.RESOURCE
     this.resource.setEndpoint(wsEndpoint)
 
-    let keyID, keyTAG
-    if (!this.resp.origin) {
-      const attrID = this.attrs.find((attr) => attr.type === 'ID')
-      const attrTAG = this.attrs.find((attr) => attr.type === 'TAG')
-      keyID = attrID && attrID.name
-      keyTAG = attrTAG && attrTAG.name
-    } else {
-      const attr = this.attrs.find((attr) => attr.type === this.resp.origin)
-      keyID = `${attr && attr.name}`
-      keyTAG = `${attr && attr.name}`
-    }
+    const attrID = this.attrs.find((attr) => attr.type === 'ID')
+    const attrTAG = this.attrs.find((attr) => attr.type === 'TAG')
 
-    this.resource.setKeys(keyID, keyTAG)
+    this.resource.setKeys(attrID && attrID.name, attrTAG && attrTAG.name)
 
     const deletable = !!this.attrs.find((attr) => attr.isSoftDelete)
     this.resource.setDeletable(deletable)
+  }
+
+  defineRequest () {
+    if (this.name.match(/^\w+(Request)$/)) {
+      this.type = ModelType.REQUEST
+    }
+  }
+
+  defineResponse () {
+    if (this.name.match(/^\w+(Response)$/)) {
+      this.type = ModelType.RESPONSE
+    }
+  }
+
+  definePaginated () {
+    if (this.name.match(/^(PagedResp)\w+$/)) {
+      this.type = ModelType.PAGINATED
+    }
+  }
+
+  is (type) {
+    return this.type === type
+  }
+
+  get isStandard () {
+    return this.is(ModelType.STANDARD)
+  }
+
+  get isResource () {
+    return this.is(ModelType.RESOURCE)
+  }
+
+  get isRequest () {
+    return this.is(ModelType.REQUEST)
+  }
+
+  get isResponse () {
+    return this.is(ModelType.RESPONSE)
+  }
+
+  get isPaginated () {
+    return this.is(ModelType.PAGINATED)
   }
 
   /**
@@ -269,7 +272,7 @@ module.exports = class Model {
     dependencies.push(...this.generateModelResources())
 
     // Add Schema
-    if (this.isResource && !this.isResp && !this.isPagedResp) {
+    if (this.isResource) {
       const modelResource = new Dependence(`@/schema/${this.name}.schema`, true, false)
       modelResource.addChild(`${this.name}Schema`)
       dependencies.push(modelResource)
@@ -295,13 +298,36 @@ module.exports = class Model {
     if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
 
     // Add this model
-    if (this.isResource && !this.isResp && !this.isPagedResp) {
+    if (this.isResource) {
       const modelResource = new Dependence(`@/model/resource/${this.name}`, true, false)
       modelResource.addChild(this.name)
       dependencies.push(modelResource)
     }
 
     this.schemaDependencies = dependencies
+  }
+
+  /**
+   * Populates all dependencies of Persist View
+   */
+  setPersistDependencies () {
+    const dependencies = []
+
+    this.objectAtrrs.forEach((attr) => {
+      const modelResource = new Dependence(attr.type, true, false)
+      modelResource.resolved = false
+      modelResource.addChild(attr.type)
+      if (attr.type !== this.name) dependencies.push(modelResource)
+    })
+
+    this.arrayAtrrs.forEach((attr) => {
+      const modelResource = new Dependence(attr.type, true, false)
+      modelResource.resolved = false
+      modelResource.addChild(attr.type)
+      if (attr.type !== this.name) dependencies.push(modelResource)
+    })
+
+    this.persistDependencies = uniqBy(dependencies, 'module') || []
   }
 
   populateSimpliCommons (dep = new Dependence()) {
@@ -406,14 +432,11 @@ module.exports = class Model {
     const attrFromID = this.attrs.find((attr) => attr.name === this.resource.keyID)
     const attrFromTAG = this.attrs.find((attr) => attr.name === this.resource.keyTAG)
 
-    result += `  readonly $name: string = '${this.name}'\n`
     result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n\n`
 
-    if (!this.isResp) {
-      result += `  get $schema() {\n`
-      result += `    return ${this.name}Schema(this)\n`
-      result += `  }\n\n`
-    }
+    result += `  get $schema() {\n`
+    result += `    return ${this.name}Schema(this)\n`
+    result += `  }\n\n`
 
     result += `  get $id() {\n`
     if (attrFromID && !attrFromID.isArrayOrigin) {
@@ -659,18 +682,28 @@ module.exports = class Model {
     return result
   }
 
-  buildPersistRespResourceGetter (origin = new Model()) {
+  buildPersistResourceInstances () {
     let result = ''
 
-    this.arrayAtrrs.forEach((attr) => {
-      const attrs = origin.attrs.filter((attrOrigin) => attrOrigin.type === attr.type)
-
-      attrs.forEach((attrResource) => {
-        result += `        ${attrResource.name}: this.model.${attr.name},\n`
-      })
+    this.persistDependencies.forEach((dep) => {
+      result += `    all${dep.children[0]} = new All(${dep.children[0]})\n`
     })
 
-    result = result.slice(0, -2) // remove last line
+    return result
+  }
+
+  buildPersistResource () {
+    let result = ''
+
+    this.objectAtrrs.forEach((attr) => {
+      result += `        ${attr.name}: this.all${attr.type}.items as ${attr.type}[],\n`
+    })
+
+    this.arrayAtrrs.forEach((attr) => {
+      result += `        ${attr.name}: this.all${attr.type}.items as ${attr.type}[],\n`
+    })
+
+    result = result.slice(0, -1) // remove last line
 
     return result
   }

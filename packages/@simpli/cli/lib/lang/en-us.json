@@ -22,6 +22,9 @@
     ],
     "password": [
       "password",
+      "currentPassword",
+      "newPassword",
+      "confirmPassword",
       "secret"
     ],
     "email": [

@@ -6,6 +6,7 @@ const resolve = require('resolve')
 const inquirer = require('inquirer')
 const Generator = require('../Generator')
 const ScaffoldSetup = require('./setup/ScaffoldSetup')
+const Auth = require('./setup/Auth')
 const Swagger = require('./Swagger')
 const cloneDeep = require('lodash.clonedeep')
 const sortObject = require('../util/sortObject')
@@ -104,32 +105,37 @@ module.exports = class Scaffold {
 
     this.scaffoldSetup.injectSwagger(definitions, paths)
 
-    const signInApi = this.scaffoldSetup.apis.find((api) => api.name === 'signIn')
-    const authApi = this.scaffoldSetup.apis.find((api) => api.name === 'auth')
-    const loginHolderModel = this.scaffoldSetup.models.find((model) => model.name === 'LoginHolder')
-    const loginRespModel = this.scaffoldSetup.models.find((model) => model.name === 'LoginResp')
+    const apis = this.scaffoldSetup.apis
     const models = this.scaffoldSetup.models
 
     // Resolve dependencies of each model
     models.forEach((model) => model.notResolvedDependencies.forEach((dep) => dep.resolve(models)))
 
-    this.scaffoldSetup.appName = info && info.title
+    const auth = new Auth()
+
+    auth.accountAttrName = 'email'
+    auth.passwordAttrName = 'password'
+    auth.api.signIn = apis.find((api) => api.name === 'signIn')
+    auth.api.auth = apis.find((api) => api.name === 'authenticate')
+    auth.model.loginHolder = models.find((model) => model.name === 'AuthRequest')
+    auth.model.loginResp = models.find((model) => model.name === 'AuthResponse')
+    auth.model.resetPasswordRequest = models.find((model) => model.name === 'ResetPasswordRequest')
+    auth.model.recoverPasswordRequest = models.find((model) => model.name === 'RecoverPasswordRequest')
+    auth.model.changePasswordRequest = models.find((model) => model.name === 'ChangePasswordRequest')
+
+    auth.setDependencies()
+    // Resolve dependencies from auth
+    auth.notResolvedDependencies.forEach((dep) => dep.resolve(models))
+
+    //
+    this.scaffoldSetup.appName = info && info.title || 'App'
 
     this.scaffoldSetup.swaggerUrl = ''
     this.scaffoldSetup.apiUrlDev = 'http://localhost/api/'
     this.scaffoldSetup.apiUrlProd = 'http://localhost/api/'
 
     this.scaffoldSetup.useAuth = true
-    this.scaffoldSetup.auth.accountAttrName = 'email'
-    this.scaffoldSetup.auth.passwordAttrName = 'password'
-    this.scaffoldSetup.auth.api.signIn = signInApi
-    this.scaffoldSetup.auth.api.auth = authApi
-    this.scaffoldSetup.auth.model.loginHolder = loginHolderModel
-    this.scaffoldSetup.auth.model.loginResp = loginRespModel
-    this.scaffoldSetup.auth.setDependencies()
-
-    // Resolve dependencies from auth
-    this.scaffoldSetup.auth.notResolvedDependencies.forEach((dep) => dep.resolve(models))
+    this.scaffoldSetup.auth = auth
 
     this.scaffoldSetup.availableLanguages = ['en-US']
     this.scaffoldSetup.defaultLanguage = 'en-US'

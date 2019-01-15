@@ -1,7 +1,7 @@
 <%_ if (model.isResource) { _%>
 /**
  * Schema of <%-model.name%>
- * @author Simpli© CLI generator
+ * @author Simpli CLI generator
  */
 <%_ for (var i in model.resolvedSchemaDependencies) { var dependence = model.resolvedSchemaDependencies[i] _%>
 <%-dependence.build()%>

@@ -211,7 +211,7 @@ export default {
   },
 
   classes: {
-<%_ var resources = rootOptions.scaffoldSetup.exceptRespModels _%>
+<%_ var resources = rootOptions.scaffoldSetup.resourceModels _%>
 <%_ for (var i in resources) { var resource = resources[i] _%>
 <%- resource.buildLocale() -%>
 <%_ } _%>

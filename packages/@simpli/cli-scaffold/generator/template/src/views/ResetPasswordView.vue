@@ -1,4 +1,4 @@
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
+<%_ if (rootOptions.scaffoldSetup.useAuth && rootOptions.scaffoldSetup.auth.model.resetPasswordRequest) { _%>
 <template>
   <div class="contrast verti w-window h-window items-center">
     <form @submit.prevent="resetPassword(model)" class="des-w-300 tab-w-400 mob-w-full">
@@ -7,10 +7,10 @@
           {{ $t('view.resetPassword.title') }}
         </h2>
 
-        <input-text v-model="model.<%-rootOptions.scaffoldSetup.auth.accountAttrName%>" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
+        <input-text v-model="request.email" type="text" class="contrast" :placeholder="$t('view.resetPassword.account')"/>
 
         <div class="horiz items-space-between">
-          <router-link to="/signIn" class="text-link contrast">
+          <router-link to="/sign-in" class="text-link contrast">
             {{ $t('view.resetPassword.signIn') }}
           </router-link>
         </div>
@@ -26,13 +26,13 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import { State, Action, Getter } from 'vuex-class'
-<%_ var loginHolderModel = rootOptions.scaffoldSetup.auth.model.loginHolder _%>
-  <%-loginHolderModel.injectIntoDependence().build()%>
+  <%_ var resetPasswordRequestModel = rootOptions.scaffoldSetup.auth.model.resetPasswordRequest _%>
+  <%-resetPasswordRequestModel.injectIntoDependence().build()%>
 
   @Component
   export default class ResetPasswordView extends Vue {
-    @Action('auth/resetPassword') resetPassword?: Function
-    model = new <%-loginHolderModel.name%>()
+    @Action('auth/resetPassword') resetPassword!: Function
+    request = new <%-resetPasswordRequestModel.name%>()
   }
 </script>
 <%_ } _%>

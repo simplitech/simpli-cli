@@ -1,15 +1,26 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
-import * as types from '@/store/mutation-types'
 import {AuthState, RootState} from '@/types/store'
-import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
+import {$, push, success, error, successAndPush, infoAndPush} from '@/simpli'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
 <%_ var loginHolderModel = auth.model.loginHolder _%>
 <%_ var loginRespModel = auth.model.loginResp _%>
+<%_ var resetPasswordRequestModel = auth.model.resetPasswordRequest _%>
+<%_ var recoverPasswordRequestModel = auth.model.recoverPasswordRequest _%>
+<%_ var changePasswordRequestModel = auth.model.changePasswordRequest _%>
 <%-loginHolderModel.injectIntoDependence().build()%>
 <%-loginRespModel.injectIntoDependence().build()%>
+<%_ if (resetPasswordRequestModel) { _%>
+<%-resetPasswordRequestModel.injectIntoDependence().build()%>
+<%_ } _%>
+<%_ if (recoverPasswordRequestModel) { _%>
+<%-recoverPasswordRequestModel.injectIntoDependence().build()%>
+<%_ } _%>
+<%_ if (changePasswordRequestModel) { _%>
+<%-changePasswordRequestModel.injectIntoDependence().build()%>
+<%_ } _%>
 <%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
 <%-dependence.build()%>
 <%_ } _%>
@@ -17,7 +28,7 @@ import {$, push, successAndPush, errorAndPush, infoAndPush} from '@/simpli'
 // initial state
 const state: AuthState = {
 <%-rootOptions.scaffoldSetup.auth.buildState()-%>
-  unauthenticatedPath: undefined,
+  cachePath: null,
   eventListener: {
     signIn: [],
     auth: [],
@@ -27,9 +38,9 @@ const state: AuthState = {
 
 // getters
 const getters: GetterTree<AuthState, RootState> = {
-  isLogged: ({id, token}) => !!id && !!token,
+  isLogged: ({token}) => !!token,
 <%-rootOptions.scaffoldSetup.auth.buildGetter()-%>
-  unauthenticatedPath: ({unauthenticatedPath}) => unauthenticatedPath,
+  cachePath: ({cachePath}) => cachePath,
 }
 
 // actions
@@ -39,25 +50,23 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param state
    * @param commit
    * @param getters
-   * @param model format => model: { account, password } (non-encrypted)
+   * @param request
+   * @param welcome
    */
-  signIn: async ({state, commit, getters}, model: <%-loginHolderModel.name%>) => {
-    const loginResp = new <%-loginRespModel.name%>()
+  signIn: async ({state, commit, getters}, request: <%-loginHolderModel.name%>) => {
+    const authResponse = new <%-loginRespModel.name%>()
 
-    await loginResp.<%-signInApi.name%>(model, 'signIn', 1000)
-
+    await authResponse.<%-signInApi.name%>(request)
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
-    commit(types.POPULATE)
+    commit('POPULATE_TOKEN')
 
-    if (getters!.unauthenticatedPath && $.route.name !== 'signIn') {
-      infoAndPush('system.info.welcome', getters!.unauthenticatedPath)
-    } else {
-      infoAndPush('system.info.welcome', '/dashboard')
-    }
-    commit(types.SET_UNAUTHENTICATED_PATH, undefined)
+    const uri = getters.cachePath && $.route.name !== 'signIn' ? getters.cachePath : '/dashboard'
+    infoAndPush('system.info.welcome', uri)
 
-    state.eventListener.signIn.forEach((item) => item(loginResp))
+    commit('SET_CACHE_PATH', null)
+
+    state.eventListener.signIn.forEach((item) => item(authResponse))
   },
 
   /**
@@ -68,19 +77,22 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param getters
    */
   auth: async ({dispatch, commit, getters}) => {
-    commit(types.POPULATE)
+    commit('POPULATE_TOKEN')
 
-    if (getters.isLogged) {
-      const loginResp = new <%-loginRespModel.name%>()
+    if (!getters.isLogged) {
+      commit('SET_CACHE_PATH', $.route.path)
 
-      await loginResp.<%-authApi.name%>()
-
-      dispatch('refresh', loginResp)
-      state.eventListener.auth.forEach((item) => item(loginResp))
-    } else {
-      commit(types.SET_UNAUTHENTICATED_PATH, $.route.path)
-      dispatch('signOut', true)
+      error('system.error.unauthorized')
+      dispatch('signOut')
+      return
     }
+
+    const authResponse = new <%-loginRespModel.name%>()
+
+    await authResponse.<%-authApi.name%>()
+
+    commit('POPULATE', authResponse)
+    state.eventListener.auth.forEach((item) => item(authResponse))
   },
 
   /**
@@ -89,53 +101,56 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param commit
    * @param showError
    */
-  signOut: ({state, commit}, showError: boolean = false) => {
-    if (showError) errorAndPush('system.error.unauthorized', '/signIn')
-    else push('/signIn')
+  signOut: ({state, commit}) => {
+    push('/sign-in')
 
-    commit(types.FORGET)
+    commit('FORGET')
     state.eventListener.signOut.forEach((item) => item())
   },
 
+<%_ if (resetPasswordRequestModel) { _%>
   /**
    * Reset password
    * @param context
-   * @param model
+   * @param request
    */
-  resetPassword: async (context, model: <%-loginHolderModel.name%>) => {
-<%_ if (loginRespModel.hasResetPassword) { _%>
-    await new <%-loginRespModel.name%>(Number).resetPassword(model)
-    successAndPush('system.success.resetPassword', '/signIn')
-<%_ } else { _%>
-      /**/
-<%_ } _%>
+  resetPassword: async (context, request: <%-resetPasswordRequestModel.name%>) => {
+    await new <%-loginRespModel.name%>().resetPassword(request)
+    successAndPush('system.success.resetPassword', '/sign-in')
   },
 
+<%_ } _%>
+<%_ if (recoverPasswordRequestModel) { _%>
   /**
    * Recover password
    * @param context
-   * @param model
+   * @param request
    */
-  recoverPassword: async (context, model: <%-loginHolderModel.name%>) => {
-<%_ if (loginRespModel.hasRecoverPassword) { _%>
-    await new <%-loginRespModel.name%>(String).recoverPassword(model)
-    successAndPush('system.success.recoverPassword', '/signIn')
-<%_ } else { _%>
-    /**/
+  recoverPassword: async (context, request: <%-recoverPasswordRequestModel.name%>) => {
+    await new <%-loginRespModel.name%>().recoverPassword(request)
+    successAndPush('system.success.recoverPassword', '/sign-in')
+  },
+
 <%_ } _%>
-  },
-
+<%_ if (changePasswordRequestModel) { _%>
   /**
-   * Refresh user info
-   * @param commit
-   * @param data
+   * Change password
+   * @param context
+   * @param request
    */
-  refresh: ({commit}, data: <%-loginRespModel.name%>) => {
-<%-rootOptions.scaffoldSetup.auth.buildSetItem('data')-%>
+  changePassword: async ({dispatch, getters}, request: <%-changePasswordRequestModel.name%>) => {
+    await new <%-loginRespModel.name%>().changePassword(request)
 
-    commit(types.POPULATE)
+    success('system.success.recoverPassword')
+
+    const authRequest = new <%-loginHolderModel.name%>()
+    authRequest.<%-auth.accountAttrName%> = getters.user.<%-auth.accountAttrName%>
+    authRequest.<%-auth.passwordAttrName%> = request.newPassword
+
+    dispatch('signIn', authRequest)
   },
 
+<%_ } _%>
   /**
    * On SignIn Event
    * @param dispatch
@@ -162,40 +177,47 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param commit
    * @param payload {name, callback}
    */
-  addEventListener: ({commit}, payload) => commit(types.ADD_EVENT_LISTENER, payload),
+  addEventListener: ({commit}, payload) => commit('ADD_EVENT_LISTENER', payload),
 
   /**
    * Remove event listener
    * @param commit
    * @param payload
    */
-  removeEventListener: ({commit}, payload) => commit(types.REMOVE_EVENT_LISTENER, payload),
+  removeEventListener: ({commit}, payload) => commit('REMOVE_EVENT_LISTENER', payload),
 }
 
 // mutations
 const mutations: MutationTree<AuthState> = {
-  // Populate mutation
-  [types.POPULATE](state) {
-<%-rootOptions.scaffoldSetup.auth.buildGetItem()-%>
+  // Populate token mutation
+  POPULATE_TOKEN(state) {
+    state.token = localStorage.getItem('token') || null
+  },
 
+  // Populate user and plan mutation
+  POPULATE(state, response: <%-loginRespModel.name%>) {
 <%-rootOptions.scaffoldSetup.auth.buildPopulate()-%>
   },
+
   // Forget mutation
-  [types.FORGET](state) {
+  FORGET(state) {
 <%-rootOptions.scaffoldSetup.auth.buildForget()-%>
 
-<%-rootOptions.scaffoldSetup.auth.buildRemoveItem()-%>
+    localStorage.removeItem('token')
   },
-  // Set UnauthenticatedPath mutation
-  [types.SET_UNAUTHENTICATED_PATH](state, val) {
-    state.unauthenticatedPath = val
+
+  // Set Cache Path mutation
+  SET_CACHE_PATH(state, val) {
+    state.cachePath = val
   },
+
   // Add Event Listener mutation
-  [types.ADD_EVENT_LISTENER](state, {name, callback}) {
+  ADD_EVENT_LISTENER(state, {name, callback}) {
     state.eventListener[name].push(callback)
   },
+
   // Remove Event Listener mutation
-  [types.REMOVE_EVENT_LISTENER](state, {name, callback}) {
+  REMOVE_EVENT_LISTENER(state, {name, callback}) {
     if (callback) {
       const index = state.eventListener[name].findIndex((item) => item === callback)
       state.eventListener[name].splice(index, 1)

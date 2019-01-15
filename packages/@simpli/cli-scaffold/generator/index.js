@@ -3,17 +3,22 @@ module.exports = (api, options) => {
     api.render('./template')
   }
 
-  const simpleModels = options.scaffoldSetup.simpleModels
-  const simpleRespModels = options.scaffoldSetup.simpleRespModels
+  const standardModels = options.scaffoldSetup.standardModels
+  const requestModels = options.scaffoldSetup.requestModels
+  const responseModels = options.scaffoldSetup.responseModels
   const resourceModels = options.scaffoldSetup.resourceModels
-  const respResourceModels = options.scaffoldSetup.respResourceModels
 
-  simpleModels.forEach((resource) => {
+  standardModels.forEach((resource) => {
     const data = { model: resource }
     api.renderFrom('./injected', 'src/model/Template.ts', `./${resource.name}.ts`, data)
   })
 
-  simpleRespModels.forEach((resource) => {
+  requestModels.forEach((resource) => {
+    const data = { model: resource }
+    api.renderFrom('./injected', 'src/model/Template.ts', `./request/${resource.name}.ts`, data)
+  })
+
+  responseModels.forEach((resource) => {
     const data = { model: resource }
     api.renderFrom('./injected', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
   })
@@ -23,15 +28,7 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
     api.renderFrom('./injected', 'src/schema/Template.schema.ts', `./${resource.name}.schema.ts`, data)
     api.renderFrom('./injected', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
-  })
-
-  respResourceModels.forEach((resource) => {
-    const origin = options.scaffoldSetup.findOriginModel(resource)
-    const data = { model: resource, origin }
-    api.renderFrom('./injected', 'src/model/Template.ts', `./resource/response/${resource.name}.ts`, data)
-    if (origin) {
-      api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${origin.name}View.vue`, data)
-    }
+    api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
   })
 
   if (options.sync) return

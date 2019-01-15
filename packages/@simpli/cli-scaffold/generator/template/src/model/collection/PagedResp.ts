@@ -1,6 +1,7 @@
 /**
  * PagedResp
- * @author Simpli© CLI generator
+ * Alias of PageCollection class adapted to server response
+ * @author Simpli CLI generator
  */
 import {PageCollection, Resource, ResponseFill} from '@/simpli'
 import {Type} from 'class-transformer'

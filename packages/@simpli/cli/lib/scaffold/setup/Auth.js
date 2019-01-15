@@ -11,7 +11,10 @@ module.exports = class Auth {
     }
     this.model = {
       loginHolder: null,
-      loginResp: null
+      loginResp: null,
+      resetPasswordRequest: null,
+      recoverPasswordRequest: null,
+      changePasswordRequest: null
     }
     this.dependencies = []
   }
@@ -57,7 +60,7 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `  ${attr.name}?: ${attr.typeBuild},\n`
+        result += `  ${attr.name}: ${attr.typeBuild} | null,\n`
       } else if (attr.isObjectOrigin) {
         result += `  ${attr.name}: ${attr.typeBuild},\n`
       } else if (attr.isArrayOrigin) {
@@ -90,7 +93,7 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `  ${attr.name}: undefined,\n`
+        result += `  ${attr.name}: null,\n`
       } else if (attr.isObjectOrigin) {
         result += `  ${attr.name}: new ${attr.type}(),\n`
       } else if (attr.isArrayOrigin) {
@@ -129,20 +132,16 @@ module.exports = class Auth {
     return result
   }
 
-  buildSetItem (objName) {
+  buildSetItem () {
     let result = ''
     if (!this.model.loginResp) return result
 
-    this.model.loginResp.attrs.forEach((attr) => {
-      const asString = (attr.isID || attr.isInteger || attr.isDouble) ? ' as string' : ''
-      if (attr.isPrimaryOrigin) {
-        result += `    if (${objName}.${attr.name}) `
-        result += `localStorage.setItem('${attr.name}', ${objName}.${attr.name + asString})\n`
-      } else if (attr.isObjectOrigin) {
-        result += `    if (${objName}.${attr.name}) `
-        result += `localStorage.setItem('${attr.name}', JSON.stringify(${objName}.${attr.name}))\n`
-      }
-    })
+    if (this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
+      result += `    if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
+    } else {
+      result += `    // TODO: define the token attribute\n`
+      result += `    // if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
+    }
 
     return result
   }
@@ -178,7 +177,9 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     this.model.loginResp.attrs.forEach((attr) => {
-      result += `    state.${attr.name} = ${attr.name}\n`
+      if (attr.name !== 'token') {
+        result += `    state.${attr.name} = response.${attr.name}\n`
+      }
     })
 
     return result
@@ -190,7 +191,7 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `    state.${attr.name} = undefined\n`
+        result += `    state.${attr.name} = null\n`
       } else if (attr.isObjectOrigin) {
         result += `    state.${attr.name} = new ${attr.type}()\n`
       }

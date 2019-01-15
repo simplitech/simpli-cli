@@ -1,5 +1,5 @@
 <template>
-  <await name="auth" spinner="FadeLoader">
+  <await name="authenticate" spinner="FadeLoader">
     <main>
       <sidebar/>
       <transition name="fade-down" mode="out-in">

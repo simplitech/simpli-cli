@@ -7,7 +7,8 @@ package <%-packageAddress%>.app
 import io.swagger.jaxrs.config.SwaggerContextService
 import io.swagger.models.Info
 import io.swagger.models.Swagger
-import io.swagger.models.auth.OAuth2Definition
+import io.swagger.models.auth.ApiKeyAuthDefinition
+import io.swagger.models.auth.In
 import javax.servlet.ServletConfig
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServlet
@@ -27,7 +28,7 @@ class SwaggerInit : HttpServlet() {
 
         val swagger = Swagger().info(info)
 
-        swagger.securityDefinition("Authorization", OAuth2Definition().implicit("<%-moduleName%>/auth"))
+        swagger.securityDefinition("Authorization", ApiKeyAuthDefinition("Authorization", In.HEADER))
     
         SwaggerContextService().withServletConfig(config).updateSwagger(swagger)
     }

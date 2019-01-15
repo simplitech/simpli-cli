@@ -43,7 +43,7 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
           <li>
-            <a @click="signOut(false)" class="btn fluid flat contrast">
+            <a @click="signOut()" class="btn fluid flat contrast">
               <i class="icon icon-logout"/>
               {{$t('app.logout')}}
             </a>
