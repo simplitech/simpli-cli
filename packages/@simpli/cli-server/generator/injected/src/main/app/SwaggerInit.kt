@@ -26,7 +26,10 @@ class SwaggerInit : HttpServlet() {
                 .title("<%-serverName%>")
                 .description("Welcome to <%-serverName%> API documentation.")
 
-        val swagger = Swagger().info(info)
+        val swagger = Swagger()
+                .info(info)
+                .host("localhost:8080")
+                .basePath("/<%-serverName%>/api")
 
         swagger.securityDefinition("Authorization", ApiKeyAuthDefinition("Authorization", In.HEADER))
     

@@ -17,7 +17,7 @@ open class DefaultParam {
     var lang: String = Lang.EN_US.toString()
 
     @HeaderParam("X-Client-Version")
-    @ApiParam(defaultValue = "w1.1.0")
+    @ApiParam(defaultValue = "w1.0.0")
     var clientVersion: String = "w1.0.0"
 
     open class Paged : DefaultParam() {

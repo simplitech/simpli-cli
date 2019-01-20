@@ -50,4 +50,7 @@ declare module 'vue/types/vue' {
   interface VueConstructor {
     http: Http
   }
+  interface ComponentOptions<V extends Vue> {
+    metaInfo?: any
+  }
 }

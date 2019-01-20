@@ -10,6 +10,16 @@ import br.com.simpli.model.PortugueseLanguage
 class PtBr : PortugueseLanguage() {
     init {
         dictionary = hashMapOf(
+                "email_sender_name" to "Equipe Usecase",
+                "email_contact" to "contact@usecase.org",
+
+                "email_reset_password_subject" to "Esqueci minha senha",
+                "email_reset_password_title" to "Esqueci minha senha",
+                "email_reset_password_subtitle" to "As vezes isso pode acontecer. Não tem problema!",
+                "email_reset_password_body" to "",
+                "email_reset_password_text_button" to "Se você solicitou o esqueci senha, clique no botão abaixo para criar uma nova.",
+                "email_reset_password_label_button" to "Criar nova senha",
+
                 "access_denied" to "Acesso Negado",
                 "already_exists" to "Não é possível criar um item já existente",
                 "does_not_exist" to "Não é possível editar um item não existente",

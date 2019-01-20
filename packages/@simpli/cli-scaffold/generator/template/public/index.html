@@ -4,14 +4,23 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="<%%= BASE_URL %%>preloader/please-wait.css" rel="stylesheet">
     <link rel="shortcut icon" href="<%%= BASE_URL %%>favicon.ico">
-    <title><%- rootOptions.scaffoldSetup.appName || 'Webapp' %></title>
+    <title>Loading Application...</title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but vue-sandbox doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
+    <script type="text/javascript" src="<%%= BASE_URL %%>preloader/please-wait.min.js"></script>
+    <script type="text/javascript">
+      window.appLoader = window.pleaseWait({
+        logo: '<%%= BASE_URL %%>img/image-loader.png', // leave empty string to disable image
+        backgroundColor: '#221A2A',
+        loadingHtml: '<div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>',
+      });
+    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>

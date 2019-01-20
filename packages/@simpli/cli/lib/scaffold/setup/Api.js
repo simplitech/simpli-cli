@@ -278,7 +278,7 @@ module.exports = class Api {
     result += `    const model = new ${this.body.model}()\n\n`
 
     result += `    model.newPassword = encrypt(request.newPassword || '')\n`
-    result += `    model.confirmPassword = encrypt(request.confirmPassword || '')\n`
+    result += `    model.confirmPassword = encrypt(request.confirmPassword || '')\n\n`
 
     result += `    const fetch = async () => {\n`
     result += `      await request.validate()\n`
@@ -301,7 +301,7 @@ module.exports = class Api {
     result += `    const model = new ${this.body.model}()\n\n`
 
     result += `    model.currentPassword = encrypt(request.currentPassword || '')\n`
-    result += `    model.newPassword = encrypt(request.newPassword || '')\n`
+    result += `    model.newPassword = encrypt(request.newPassword || '')\n\n`
 
     result += `    const fetch = async () => {\n`
     result += `      await request.validate()\n`

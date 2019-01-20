@@ -83,6 +83,7 @@ export default {
 
   app: {
     title: '<%- rootOptions.scaffoldSetup.appName || 'Webapp' %>',
+    subtitle: 'Painel Admin',
     logout: 'Sair',
     menu: 'Menu',
     add: 'Cadastrar',

@@ -6,7 +6,7 @@ module.exports = {
   // sub-path here. For example, if your app is deployed at
   // https://www.foobar.com/my-app/
   // then change this to '/my-app/'
-  baseUrl: process.env.BASE_URL || '/',
+  publicPath: process.env.BASE_URL || '/',
 
   // where to output built files
   outputDir: process.env.OUTPUT_DIR || 'dist',

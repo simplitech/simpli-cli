@@ -12,11 +12,16 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import {Component, Vue} from 'vue-property-decorator'
 import {Action, Getter} from 'vuex-class'
-import {ToastDefaultConfig, ToastDefaultStyle, ToastGlobalConfig, ToastStyle} from '@/simpli'
+import {$, ToastDefaultConfig, ToastDefaultStyle, ToastGlobalConfig, ToastStyle} from '@/simpli'
 
-@Component
+const metaInfo = () => ({
+  title: $.t('app.subtitle'),
+  titleTemplate: `%s | ${$.t('app.title')}`,
+})
+
+@Component({metaInfo})
 export default class App extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
   @Action('auth/onSignIn') onSignIn!: Function

@@ -8,6 +8,8 @@
  * This configuration will be set in @/bootstrap/app.ts
  */
 
+import {RouterOptions} from 'vue-router'
+
 import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
@@ -31,7 +33,7 @@ import Persist<%-resource.name%>View from '@/views/persist/Persist<%-resource.na
 /**
  * VUE Router Configuration
  */
-export const router = {
+export const router: RouterOptions = {
   routes: [
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     {

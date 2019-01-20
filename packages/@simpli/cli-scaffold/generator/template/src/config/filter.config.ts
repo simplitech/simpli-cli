@@ -8,8 +8,10 @@
  * This configuration will be set in @/bootstrap/app.ts
  */
 
+import {FilterOptions} from '@/simpli'
+
 /**
  * VUE Filters
  */
-export const filters = {
+export const filters: FilterOptions = {
 }

@@ -14,12 +14,16 @@ import br.com.simpli.model.LanguageHolder
  */
 class ResetPasswordMail(lang: LanguageHolder, <%-userTable.instanceName%>: <%-userTable.modelName%>, hash: String) : MailWrapper(lang) {
     init {
-        this.to = <%-userTable.instanceName%>.<%-accountColumn.name%>!!
-        this.subject = "Password Recovery"
+        to = <%-userTable.instanceName%>.<%-accountColumn.name%>!!
+        subject = lang["email_reset_password_subject"]
 
-        data["linkUrl"] = """$appUrl/#/password/recover/$hash"""
-        data["linkUnsubscribeUrl"] = "#"
+        data["title"] = lang["email_reset_password_title"]
+        data["subtitle"] = lang["email_reset_password_subtitle"]
+        data["body"] = lang["email_reset_password_body"]
+        data["textButton"] = lang["email_reset_password_text_button"]
+        data["labelButton"] = lang["email_reset_password_label_button"]
+        data["linkButton"] = """$appUrl/#/password/recover/$hash"""
 
-        setBodyFromTemplate(this::class.java, data, "forgotPassword.html")
+        setBodyFromTemplate(this::class.java, data, "template.html")
     }
 }

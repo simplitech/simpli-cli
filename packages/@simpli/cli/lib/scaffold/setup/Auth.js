@@ -76,12 +76,12 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     if (!this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `export const getToken = () => store.getters['auth/token']\n`
+      result += `export const getToken = () => store.getters['auth/token'] as string\n`
     }
 
     this.model.loginResp.attrs.forEach((attr) => {
       result += `export const ${camelCase('get-' + attr.name)} = () `
-      result += `=> store.getters['auth/${attr.name}']\n`
+      result += `=> store.getters['auth/${attr.name}'] as ${attr.type}\n`
     })
 
     return result

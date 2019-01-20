@@ -51,7 +51,6 @@ object Env {
      * Go to AwsCredentials.properties to set your AWS credentials
      */
     const val EMAIL_SENDER_PROVIDER = "no-reply@<%-projectDomain%>"
-    const val EMAIL_SENDER_NAME = "<%-serverName%>"
     val EMAIL_AWS_REGION get() = Regions.US_EAST_1
 
     /**

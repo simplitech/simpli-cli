@@ -1,7 +1,7 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth && rootOptions.scaffoldSetup.auth.model.resetPasswordRequest) { _%>
 <template>
   <div class="contrast verti w-window h-window items-center">
-    <form @submit.prevent="resetPassword(model)" class="des-w-300 tab-w-400 mob-w-full">
+    <form @submit.prevent="resetPassword(request)" class="des-w-300 tab-w-400 mob-w-full">
       <await name="resetPassword" :spinnerScale="1.5">
         <h2 class="text-center text-uppercase contrast">
           {{ $t('view.resetPassword.title') }}
