@@ -1,3 +1,8 @@
+<a name="2.0.0-beta.1"></a>
+# [2.0.0-beta.1](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.0...v2.0.0-beta.1) (2019-01-20)
+
+
+
 <a name="2.0.0-beta.0"></a>
 # [2.0.0-beta.0](https://github.com/simplitech/simpli-cli/compare/v1.5.2...v2.0.0-beta.0) (2019-01-15)
 
@@ -187,8 +192,8 @@
 
 ### Features
 
-* added commands new:seed & server:seed ([16d0754](https://github.com/simplitech/simpli-cli/commit/16d0754))
 * **server:** Introduced seeding (fake data) ([62a8541](https://github.com/simplitech/simpli-cli/commit/62a8541))
+* added commands new:seed & server:seed ([16d0754](https://github.com/simplitech/simpli-cli/commit/16d0754))
 
 
 
