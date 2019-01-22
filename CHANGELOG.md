@@ -1,3 +1,13 @@
+<a name="2.0.0-beta.2"></a>
+# [2.0.0-beta.2](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2019-01-22)
+
+
+### Bug Fixes
+
+* fixed issue ([8f6a228](https://github.com/simplitech/simpli-cli/commit/8f6a228))
+
+
+
 <a name="2.0.0-beta.1"></a>
 # [2.0.0-beta.1](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.0...v2.0.0-beta.1) (2019-01-20)
 
