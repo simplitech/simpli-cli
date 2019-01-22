@@ -233,7 +233,7 @@ module.exports = class Api {
   buildSignIn (auth = new Auth()) {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}') {\n`
+    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
     result += `    const model = new ${this.body.model}()\n\n`
 
     result += `    model.${auth.accountAttrName} = request.${auth.accountAttrName}\n`
@@ -244,7 +244,7 @@ module.exports = class Api {
     result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, model)\n`
     result += `    }\n\n`
 
-    result += `    return await $.await.run(fetch, spinner)\n`
+    result += `    return await $.await.run(fetch, spinner, delay)\n`
     result += `  }\n`
 
     return result
@@ -256,13 +256,13 @@ module.exports = class Api {
   buildResetPassword () {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}') {\n`
+    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
     result += `    const fetch = async () => {\n`
     result += `      await request.validate()\n`
     result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
     result += `    }\n\n`
 
-    result += `    return await $.await.run(fetch, spinner)\n`
+    result += `    return await $.await.run(fetch, spinner, delay)\n`
     result += `  }\n`
 
     return result
@@ -274,7 +274,7 @@ module.exports = class Api {
   buildRecoverPassword () {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}') {\n`
+    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
     result += `    const model = new ${this.body.model}()\n\n`
 
     result += `    model.newPassword = encrypt(request.newPassword || '')\n`
@@ -285,7 +285,7 @@ module.exports = class Api {
     result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
     result += `    }\n\n`
 
-    result += `    return await $.await.run(fetch, spinner)\n`
+    result += `    return await $.await.run(fetch, spinner, delay)\n`
     result += `  }\n`
 
     return result
@@ -297,7 +297,7 @@ module.exports = class Api {
   buildChangePassword () {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}') {\n`
+    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
     result += `    const model = new ${this.body.model}()\n\n`
 
     result += `    model.currentPassword = encrypt(request.currentPassword || '')\n`
@@ -308,7 +308,7 @@ module.exports = class Api {
     result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
     result += `    }\n\n`
 
-    result += `    return await $.await.run(fetch, spinner)\n`
+    result += `    return await $.await.run(fetch, spinner, delay)\n`
     result += `  }\n`
 
     return result

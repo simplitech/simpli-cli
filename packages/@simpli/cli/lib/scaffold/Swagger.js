@@ -199,7 +199,7 @@ module.exports = class Swagger {
         name: 'authApiName',
         type: 'list',
         choices: apis.map((api) => api.name),
-        default: apis.findIndex((api) => api.name === 'auth') || 0,
+        default: apis.findIndex((api) => api.name === 'authenticate') || 0,
         message: 'Which API is the authentication?'
       }
     ])
