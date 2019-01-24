@@ -1,7 +1,7 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import {AuthState, RootState} from '@/types/store'
-import {$, push, success, error, successAndPush, infoAndPush} from '@/simpli'
+import {$, SocketConnection, push, success, error, successAndPush, infoAndPush} from '@/simpli'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
@@ -21,13 +21,11 @@ import {$, push, success, error, successAndPush, infoAndPush} from '@/simpli'
 <%_ if (changePasswordRequestModel) { _%>
 <%-changePasswordRequestModel.injectIntoDependence().build()%>
 <%_ } _%>
-<%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
-<%-dependence.build()%>
-<%_ } _%>
 
 // initial state
 const state: AuthState = {
 <%-rootOptions.scaffoldSetup.auth.buildState()-%>
+  notification: null,
   cachePath: null,
   eventListener: {
     signIn: [],
@@ -40,6 +38,7 @@ const state: AuthState = {
 const getters: GetterTree<AuthState, RootState> = {
   isLogged: ({token}) => !!token,
 <%-rootOptions.scaffoldSetup.auth.buildGetter()-%>
+  notification: ({notification}) => notification,
   cachePath: ({cachePath}) => cachePath,
 }
 
@@ -143,8 +142,11 @@ const actions: ActionTree<AuthState, RootState> = {
 
     success('system.success.recoverPassword')
 
+<%_ var userAttr = loginRespModel.objectAtrrs[0] _%>
     const authRequest = new <%-loginHolderModel.name%>()
-    authRequest.<%-auth.accountAttrName%> = getters.user.<%-auth.accountAttrName%>
+<%_ if (userAttr) { _%>
+    authRequest.<%-auth.accountAttrName%> = getters.<%-userAttr.name%>.<%-auth.accountAttrName%>
+<%_ } _%>
     authRequest.<%-auth.passwordAttrName%> = request.newPassword
 
     dispatch('signIn', authRequest)
@@ -197,11 +199,29 @@ const mutations: MutationTree<AuthState> = {
   // Populate user and plan mutation
   POPULATE(state, response: <%-loginRespModel.name%>) {
 <%-rootOptions.scaffoldSetup.auth.buildPopulate()-%>
+    state.notification = new SocketConnection(String, `/admin/notification/${response.token}`)
+
+    state.notification.onOpen(() => {
+      console.info(`Socket connection with client id=${id} established`)
+    })
+
+    state.notification.onClose(() => {
+      console.info(`Socket connection with client id=${id} lost`)
+    })
+
+    state.notification.onError(() => {
+      console.error(`Error with socket connection(client id=${id})`)
+    })
   },
 
   // Forget mutation
   FORGET(state) {
 <%-rootOptions.scaffoldSetup.auth.buildForget()-%>
+
+    if (state.notification) {
+      state.notification.disconnect()
+      state.notification = null
+    }
 
     localStorage.removeItem('token')
   },

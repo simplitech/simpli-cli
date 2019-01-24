@@ -7,16 +7,17 @@
 
 import Simpli from 'simpli-web-sdk'
 
-import {apiURL, httpInterceptor} from '@/config/http.config'
-import {defaultCurrency as currency, defaultLang as lang, locale} from '@/config/locale.config'
+import {apiURL, socketURL, httpInterceptor} from '@/config/http.config'
+import {defaultCurrency, defaultLang, locale} from '@/config/locale.config'
 import {components} from '@/config/component.config'
 import {filters} from '@/config/filter.config'
 import {router} from '@/config/router.config'
 
 Simpli.apiURL = apiURL
+Simpli.socketURL = socketURL
 Simpli.httpInterceptor = httpInterceptor
-Simpli.lang = lang
-Simpli.currency = currency
+Simpli.lang = defaultLang
+Simpli.currency = defaultCurrency
 Simpli.components = components
 Simpli.filters = filters
 Simpli.locale = locale

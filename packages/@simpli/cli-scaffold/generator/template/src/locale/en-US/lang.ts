@@ -212,8 +212,16 @@ export default {
   },
 
   classes: {
-<%_ var resources = rootOptions.scaffoldSetup.resourceModels _%>
-<%_ for (var i in resources) { var resource = resources[i] _%>
+<%_ var requestModels = rootOptions.scaffoldSetup.requestModels _%>
+<%_ var responseModels = rootOptions.scaffoldSetup.responseModels _%>
+<%_ var resourceModels = rootOptions.scaffoldSetup.resourceModels _%>
+<%_ for (var i in requestModels) { var resource = requestModels[i] _%>
+<%- resource.buildLocale() -%>
+<%_ } _%>
+<%_ for (var i in responseModels) { var resource = responseModels[i] _%>
+<%- resource.buildLocale() -%>
+<%_ } _%>
+<%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
 <%- resource.buildLocale() -%>
 <%_ } _%>
   },

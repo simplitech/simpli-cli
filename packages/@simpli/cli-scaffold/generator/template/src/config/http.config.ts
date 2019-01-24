@@ -22,6 +22,12 @@ import {$, getVersion, getLanguage, HttpStatus, error} from '@/simpli'
 export const apiURL = process.env.VUE_APP_API_URL || 'http://localhost/api'
 
 /**
+ * Base URL of the Socket server
+ * @type {string}
+ */
+export const socketURL = process.env.VUE_APP_SOCKET_URL || 'ws://localhost/ws'
+
+/**
  * Standard behavior during a request
  * @param {VueResource.HttpOptions} request
  * @param {Function} next

@@ -67,6 +67,7 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/wrapper/ModelWrapper.kt', `../java/${dir}/wrapper/ModelWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/ProcessWrapper.kt', `../java/${dir}/wrapper/ProcessWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/RouterWrapper.kt', `../java/${dir}/wrapper/RouterWrapper.kt`)
+    api.renderFrom('./injected', 'src/main/wrapper/SocketWrapper.kt', `../java/${dir}/wrapper/SocketWrapper.kt`)
 
     // main/module/auth
     api.renderFrom('./injected', 'src/main/module/auth/AuthDao.kt', `../../java/${dir}/${moduleName}/auth/AuthDao.kt`)
@@ -88,6 +89,9 @@ module.exports = (api, options) => {
 
     // main/module/response
     api.renderFrom('./injected', 'src/main/module/response/AuthResponse.kt', `../../java/${dir}/${moduleName}/response/AuthResponse.kt`)
+
+    // main/module/socket
+    api.renderFrom('./injected', 'src/main/module/socket/NotificationSocket.kt', `../../java/${dir}/${moduleName}/socket/NotificationSocket.kt`)
 
     // test
     api.renderFrom('./injected', 'src/test/AppTest.kt', `./java/${dir}/AppTest.kt`)

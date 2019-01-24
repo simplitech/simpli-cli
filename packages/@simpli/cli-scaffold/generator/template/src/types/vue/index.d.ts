@@ -15,6 +15,7 @@ declare module 'vue/types/vue' {
   interface Vue {
     // simpli-web-sdk
     $apiURL: string
+    $socketURL: string
     $bus: Vue
     $snotify: SnotifyService | any
     $await: AwaitController

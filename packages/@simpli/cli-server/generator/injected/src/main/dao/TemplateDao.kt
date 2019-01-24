@@ -40,7 +40,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             """, { rs -> <%-table.modelName%>(rs) }, <%-table.primariesByComma(true)%>)
     }
 
-    fun list(): MutableList<<%-table.modelName%>> {
+    fun list(): List<<%-table.modelName%>> {
         // TODO: review generated method
         return selectList("""
             SELECT *
@@ -56,7 +56,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         page: Int?,
         limit: Int?,
         orderRequest: String?,
-        asc: Boolean?): MutableList<<%-table.modelName%>> {
+        asc: Boolean?): List<<%-table.modelName%>> {
         // TODO: review generated method
         val orderRequestAndColumn = HashMap<String, String>()
 
@@ -218,7 +218,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             <%-columnRef.name%>).affectedRows
     }
 
-    fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): MutableList<<%-columnRef.foreign.referencedTableModelName%>> {
+    fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): List<<%-columnRef.foreign.referencedTableModelName%>> {
         // TODO: review generated method
         return selectList("""
             SELECT *

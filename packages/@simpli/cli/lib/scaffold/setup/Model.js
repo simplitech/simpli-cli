@@ -696,11 +696,11 @@ module.exports = class Model {
     let result = ''
 
     this.objectAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.all${attr.type}.items as ${attr.type}[],\n`
+      result += `        ${attr.name}: this.all${attr.type}.items,\n`
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.all${attr.type}.items as ${attr.type}[],\n`
+      result += `        ${attr.name}: this.all${attr.type}.items,\n`
     })
 
     result = result.slice(0, -1) // remove last line

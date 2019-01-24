@@ -43,7 +43,7 @@ class <%-table.modelName%> : ModelWrapper<<%-table.modelName%>Dao> {
 <%_ if (!relation.isManyToMany) { _%>
     var <%-relation.name%>: <%-relation.referencedTableModelName%>? = null
 <%_ } else { _%>
-    var <%-relation.name%>: MutableList<<%-relation.referencedTableModelName%>>? = null
+    var <%-relation.name%>: List<<%-relation.referencedTableModelName%>>? = null
 <%_ } _%>
 <%_ } _%>
 <%_ if (table.validRelations.length) { _%>

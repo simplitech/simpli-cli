@@ -1,2 +1,4 @@
 <%_ var config = rootOptions.scaffoldSetup _%>
+<%_ var appNameKebabCase = rootOptions.scaffoldSetup.kebabCase(rootOptions.scaffoldSetup.appName) _%>
 VUE_APP_API_URL=<%-config.apiUrlDev%>
+VUE_APP_SOCKET_URL=ws://localhost:8080/<%-appNameKebabCase%>/ws

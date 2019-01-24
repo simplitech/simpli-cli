@@ -72,7 +72,7 @@
   export default class Sidebar extends Vue {
     @Getter('version') version!: string
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    // @Getter('auth/user') user!: User
+    // @Getter('auth/user') user?: User
     @Action('auth/signOut') signOut!: Function
 <%_ } _%>
 

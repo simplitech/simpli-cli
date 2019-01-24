@@ -95,7 +95,7 @@ module.exports = class Auth {
       if (attr.isPrimaryOrigin) {
         result += `  ${attr.name}: null,\n`
       } else if (attr.isObjectOrigin) {
-        result += `  ${attr.name}: new ${attr.type}(),\n`
+        result += `  ${attr.name}: null,\n`
       } else if (attr.isArrayOrigin) {
         result += `  ${attr.name}: [],\n`
       }
@@ -176,6 +176,14 @@ module.exports = class Auth {
     let result = ''
     if (!this.model.loginResp) return result
 
+    const userAttr = this.model.loginResp.objectAtrrs[0]
+
+    if (userAttr) {
+      result += `    const id = response.${userAttr.name} && response.${userAttr.name}.$id || 0\n\n`
+    } else {
+      result += `    const id = 0\n\n`
+    }
+
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.name !== 'token') {
         result += `    state.${attr.name} = response.${attr.name}\n`
@@ -193,7 +201,7 @@ module.exports = class Auth {
       if (attr.isPrimaryOrigin) {
         result += `    state.${attr.name} = null\n`
       } else if (attr.isObjectOrigin) {
-        result += `    state.${attr.name} = new ${attr.type}()\n`
+        result += `    state.${attr.name} = null\n`
       }
     })
 

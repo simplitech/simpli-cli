@@ -16,15 +16,17 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-import {Action} from 'vuex-class'
+import {Getter, Action} from 'vuex-class'
 <%_ } _%>
 import Sidebar from '@/components/Sidebar.vue'
+import {$, SocketConnection} from '@/simpli'
 
 @Component({
   components: { Sidebar },
 })
 export default class DefaultPanelLayout extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
+  @Getter('auth/notification') notification?: SocketConnection<String>
   @Action('auth/auth') auth!: Function
 
   authorized = false
@@ -32,6 +34,10 @@ export default class DefaultPanelLayout extends Vue {
   async mounted() {
     await this.auth()
     this.authorized = true
+
+    if (this.notification) {
+      this.notification.onData((resp) => $.snotify.info(resp))
+    }
   }
 <%_ } _%>
 }

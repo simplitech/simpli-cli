@@ -5,6 +5,7 @@
 package <%-packageAddress%>.<%-moduleName%>.response
 
 import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.<%-moduleName%>.socket.NotificationSocket
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -16,4 +17,9 @@ import io.swagger.annotations.ApiModelProperty
 class AuthResponse(var token: String, var <%-userTable.instanceName%>: <%-userTable.modelName%>) {
     val id @ApiModelProperty(hidden = true) get() = <%-userTable.instanceName%>.id
     val <%-accountColumn.name%> @ApiModelProperty(hidden = true) get() = <%-userTable.instanceName%>.<%-accountColumn.name%>
+
+    @ApiModelProperty(hidden = true)
+    fun sendNotification(content: String) {
+        NotificationSocket.socket.send(content, id)
+    }
 }

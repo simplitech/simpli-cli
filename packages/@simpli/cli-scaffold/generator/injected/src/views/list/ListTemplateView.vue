@@ -82,6 +82,7 @@
   import {Component, Prop, Watch, Mixins, Vue} from 'vue-property-decorator'
   <%-model.injectIntoDependence().build()%>
   import PagedResp from '@/model/collection/PagedResp'
+  import All from '@/model/collection/All'
   import {$, MixinQueryRouter, pushByName} from '@/simpli'
 
   @Component({
@@ -113,7 +114,7 @@
 
 <%_ } _%>
     async downloadCsv() {
-      const csv = new PagedResp(<%-model.name%>, {}, null, null)
+      const csv = new All(<%-model.name%>)
 
       const fetch = async () => await csv.search()
       await $.await.run(fetch, 'downloadCsv')
