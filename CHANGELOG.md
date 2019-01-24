@@ -1,3 +1,13 @@
+<a name="2.0.0-beta.3"></a>
+# [2.0.0-beta.3](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2019-01-24)
+
+
+### Features
+
+* Added Socket Support ([d17d21b](https://github.com/simplitech/simpli-cli/commit/d17d21b))
+
+
+
 <a name="2.0.0-beta.2"></a>
 # [2.0.0-beta.2](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2019-01-22)
 
