@@ -1,3 +1,13 @@
+<a name="2.0.0-beta.4"></a>
+# [2.0.0-beta.4](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2019-01-29)
+
+
+### Features
+
+* assigned into PageCollection and WholeCollection ([a230227](https://github.com/simplitech/simpli-cli/commit/a230227))
+
+
+
 <a name="2.0.0-beta.3"></a>
 # [2.0.0-beta.3](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2019-01-24)
 
