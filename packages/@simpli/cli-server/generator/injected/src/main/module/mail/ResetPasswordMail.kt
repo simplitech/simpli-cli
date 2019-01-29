@@ -5,7 +5,7 @@
 package <%-packageAddress%>.<%-moduleName%>.mail
 
 import <%-packageAddress%>.wrapper.MailWrapper
-import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.model.LanguageHolder
 
 /**

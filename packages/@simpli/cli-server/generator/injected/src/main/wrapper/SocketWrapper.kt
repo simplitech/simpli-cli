@@ -2,13 +2,7 @@
 package <%-packageAddress%>.wrapper
 
 import <%-packageAddress%>.app.Cast.classToJson
-import <%-packageAddress%>.app.Env.DEBUG_MODE
-import <%-packageAddress%>.app.RequestLogger
-import <%-packageAddress%>.exception.response.NotFoundException
-import <%-packageAddress%>.wrapper.RouterWrapper
 import java.nio.ByteBuffer
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.websocket.Session
 
 /**

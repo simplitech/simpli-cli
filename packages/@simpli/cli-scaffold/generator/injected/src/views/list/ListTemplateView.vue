@@ -81,15 +81,13 @@
 <script lang="ts">
   import {Component, Prop, Watch, Mixins, Vue} from 'vue-property-decorator'
   <%-model.injectIntoDependence().build()%>
-  import PagedResp from '@/model/collection/PagedResp'
-  import All from '@/model/collection/All'
-  import {$, MixinQueryRouter, pushByName} from '@/simpli'
+  import {$, PageCollection, WholeCollection, MixinQueryRouter, pushByName} from '@/simpli'
 
   @Component({
     mixins: [MixinQueryRouter],
   })
   export default class List<%-model.name%>View extends Mixins<MixinQueryRouter>() {
-    collection = new PagedResp(<%-model.name%>)
+    collection = new PageCollection(<%-model.name%>)
 <%_ if (model.resource.deletable) { _%>
     toRemove = new <%-model.name%>()
 <%_ } _%>
@@ -114,7 +112,7 @@
 
 <%_ } _%>
     async downloadCsv() {
-      const csv = new All(<%-model.name%>)
+      const csv = new WholeCollection(<%-model.name%>)
 
       const fetch = async () => await csv.search()
       await $.await.run(fetch, 'downloadCsv')

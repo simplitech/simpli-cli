@@ -12,7 +12,7 @@ import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
 import <%-packageAddress%>.app.Env.TESTER_ID
 import <%-packageAddress%>.app.Env.TESTER_LOGIN
 import <%-packageAddress%>.app.Env.TESTER_PASSWORD
-import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.tools.SecurityUtils.sha256
 
 /**

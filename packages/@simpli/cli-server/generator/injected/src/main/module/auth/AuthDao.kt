@@ -5,7 +5,7 @@
 <%_ var passwordColumn = options.serverSetup.passwordColumn _%>
 package <%-packageAddress%>.<%-moduleName%>.auth
 
-import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
 import java.sql.Connection

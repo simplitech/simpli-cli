@@ -6,10 +6,10 @@ package <%-packageAddress%>.<%-moduleName%>.process
 import <%-packageAddress%>.<%-moduleName%>.ProcessTest
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
-import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.model.resource.<%-table.modelName%>
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 <%_ if (m2m.crossRelationModelName !== table.modelName) { _%>
-import <%-packageAddress%>.model.<%-m2m.crossRelationModelName%>
+import <%-packageAddress%>.model.resource.<%-m2m.crossRelationModelName%>
 <%_ } _%>
 <%_ } _%>
 import java.util.Date
@@ -59,8 +59,8 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
     @Test
     fun testList() {
         val result = subject.list(Request.list)
-        assertFalse(result.list.isEmpty())
-        assertNotEquals(0, result.recordsTotal)
+        assertFalse(result.items.isEmpty())
+        assertNotEquals(0, result.total)
     }
 
     @Test
@@ -69,9 +69,9 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
         Request.list.limit = 1
 
         val result = subject.list(Request.list)
-        assertFalse(result.list.isEmpty())
-        assertNotEquals(0, result.recordsTotal)
-        assertTrue(result.list.size <= Request.list.limit ?: 0)
+        assertFalse(result.items.isEmpty())
+        assertNotEquals(0, result.total)
+        assertTrue(result.items.size <= Request.list.limit ?: 0)
     }
 
     @Test

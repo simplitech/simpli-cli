@@ -347,7 +347,7 @@
           "200":{
             "description":"successful operation",
             "schema":{
-              "$ref":"#/definitions/PagedRespUser"
+              "$ref":"#/definitions/PageCollectionUser"
             }
           }
         }
@@ -539,7 +539,7 @@
         }
       }
     },
-    "PagedRespUser":{
+    "PageCollectionUser":{
       "type":"object",
       "properties":{
         "list":{

@@ -1,5 +1,5 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
-package <%-packageAddress%>.model
+package <%-packageAddress%>.model.resource
 
 import <%-packageAddress%>.AppTest
 import <%-packageAddress%>.dao.<%-table.modelName%>Dao

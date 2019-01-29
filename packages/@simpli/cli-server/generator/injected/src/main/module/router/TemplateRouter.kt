@@ -7,8 +7,8 @@ package <%-packageAddress%>.<%-moduleName%>.router
 import <%-packageAddress%>.<%-moduleName%>.gateway.AuthGateway
 import <%-packageAddress%>.<%-moduleName%>.process.<%-table.modelName%>Process
 import <%-packageAddress%>.wrapper.RouterWrapper
-import <%-packageAddress%>.model.<%-table.modelName%>
-import br.com.simpli.model.PagedResp
+import <%-packageAddress%>.model.collection.PageCollection
+import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import javax.ws.rs.BeanParam
@@ -44,7 +44,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
     @GET
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%>")
-    fun list<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.ListParam): PagedResp<<%-table.modelName%>> {
+    fun list<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         return connection(authGateway).handle(process, param) {
 			it.list(param)

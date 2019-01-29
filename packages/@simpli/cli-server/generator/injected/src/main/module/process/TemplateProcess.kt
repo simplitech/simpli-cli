@@ -8,11 +8,11 @@ import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 import <%-packageAddress%>.dao.<%-m2m.pivotModelName%>Dao
 <%_ } _%>
 <%_ } _%>
-import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.model.collection.PageCollection
+import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.wrapper.ProcessWrapper
-import br.com.simpli.model.PagedResp
 
 /**
  * <%-table.modelName%> business logic
@@ -26,12 +26,12 @@ class <%-table.modelName%>Process : ProcessWrapper() {
         dao = <%-table.modelName%>Dao(con, lang)
     }
 
-    fun list(request: <%-table.modelName%>.ListParam): PagedResp<<%-table.modelName%>> {
+    fun list(request: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         val list = dao.list(request.query, request.page, request.limit, request.orderRequest, request.asc)
 
-        val resp = PagedResp(list)
-        resp.recordsTotal = dao.count(request.query)
+        val resp = PageCollection(list)
+        resp.total = dao.count(request.query)
 
         return resp
     }

@@ -2,7 +2,7 @@
 package <%-packageAddress%>.dao
 
 <%_ if (!table.isPivot) { _%>
-import <%-packageAddress%>.model.<%-table.modelName%>
+import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import java.sql.Connection
 import java.util.ArrayList
 import java.util.Date
@@ -13,7 +13,7 @@ import br.com.simpli.sql.Dao
 <%_ var cache = [] _%>
 <%_ for (var i in table.foreignColumns) { var column = table.foreignColumns[i] _%>
 <%_ if (!cache.includes(column.foreign.referencedTableModelName)) { _%>
-import <%-packageAddress%>.model.<%-column.foreign.referencedTableModelName%>
+import <%-packageAddress%>.model.resource.<%-column.foreign.referencedTableModelName%>
 <%_ cache.push(column.foreign.referencedTableModelName) _%>
 <%_ } _%>
 <%_ } _%>
@@ -40,7 +40,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             """, { rs -> <%-table.modelName%>(rs) }, <%-table.primariesByComma(true)%>)
     }
 
-    fun list(): List<<%-table.modelName%>> {
+    fun list(): MutableList<<%-table.modelName%>> {
         // TODO: review generated method
         return selectList("""
             SELECT *
@@ -56,7 +56,8 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         page: Int?,
         limit: Int?,
         orderRequest: String?,
-        asc: Boolean?): List<<%-table.modelName%>> {
+        asc: Boolean?
+    ): MutableList<<%-table.modelName%>> {
         // TODO: review generated method
         val orderRequestAndColumn = HashMap<String, String>()
 
@@ -218,7 +219,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             <%-columnRef.name%>).affectedRows
     }
 
-    fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): List<<%-columnRef.foreign.referencedTableModelName%>> {
+    fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): MutableList<<%-columnRef.foreign.referencedTableModelName%>> {
         // TODO: review generated method
         return selectList("""
             SELECT *

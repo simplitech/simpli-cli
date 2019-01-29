@@ -58,6 +58,9 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/locale/EnUs.kt', `../java/${dir}/locale/EnUs.kt`)
     api.renderFrom('./injected', 'src/main/locale/PtBr.kt', `../java/${dir}/locale/PtBr.kt`)
 
+    // main/model/collection
+    api.renderFrom('./injected', 'src/main/model/collection/PageCollection.kt', `../../java/${dir}/model/collection/PageCollection.kt`)
+
     // main/param
     api.renderFrom('./injected', 'src/main/param/DefaultParam.kt', `../java/${dir}/param/DefaultParam.kt`)
 
@@ -109,8 +112,8 @@ module.exports = (api, options) => {
     // main/dao
     api.renderFrom('./injected', 'src/main/dao/TemplateDao.kt', `../java/${dir}/dao/${table.modelName}Dao.kt`, data)
 
-    // main/model
-    api.renderFrom('./injected', 'src/main/model/Template.kt', `../java/${dir}/model/${table.modelName}.kt`, data)
+    // main/model/resource
+    api.renderFrom('./injected', 'src/main/model/resource/Template.kt', `../../java/${dir}/model/resource/${table.modelName}.kt`, data)
 
     // main/module/process
     api.renderFrom('./injected', 'src/main/module/process/TemplateProcess.kt', `../../java/${dir}/${moduleName}/process/${table.modelName}Process.kt`, data)
@@ -118,8 +121,8 @@ module.exports = (api, options) => {
     // main/module/router
     api.renderFrom('./injected', 'src/main/module/router/TemplateRouter.kt', `../../java/${dir}/${moduleName}/router/${table.modelName}Router.kt`, data)
 
-    // test/model
-    api.renderFrom('./injected', 'src/test/model/TemplateTest.kt', `../java/${dir}/model/${table.modelName}Test.kt`, data)
+    // test/model/resource
+    api.renderFrom('./injected', 'src/test/model/resource/TemplateTest.kt', `../../java/${dir}/model/resource/${table.modelName}Test.kt`, data)
 
     // test/module/process
     api.renderFrom('./injected', 'src/test/module/process/TemplateProcessTest.kt', `../../java/${dir}/${moduleName}/process/${table.modelName}ProcessTest.kt`, data)

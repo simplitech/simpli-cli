@@ -316,7 +316,7 @@ module.exports = class Swagger {
   }
 
   static async requestSync (scaffoldSetup) {
-    const availableModels = scaffoldSetup.exceptPagedRespModels
+    const availableModels = scaffoldSetup.availableModels
 
     const { syncModelNames } = await inquirer.prompt([
       {

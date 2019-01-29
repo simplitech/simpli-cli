@@ -37,10 +37,7 @@
 <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
   <%-dependence.build()%>
 <%_ } _%>
-<%_ if (model.resolvedPersistDependencies.length) { _%>
-  import All from '@/model/collection/All'
-<%_ } _%>
-  import {$, successAndPush} from '@/simpli'
+  import {$, WholeCollection, successAndPush} from '@/simpli'
 
   @Component
   export default class Persist<%-model.name%>View extends Vue {

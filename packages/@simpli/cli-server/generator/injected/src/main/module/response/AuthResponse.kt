@@ -4,7 +4,7 @@
 <%_ var accountColumn = options.serverSetup.accountColumn _%>
 package <%-packageAddress%>.<%-moduleName%>.response
 
-import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.<%-moduleName%>.socket.NotificationSocket
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty

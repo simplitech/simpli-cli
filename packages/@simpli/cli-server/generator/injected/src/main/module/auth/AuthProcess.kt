@@ -11,7 +11,7 @@ import <%-packageAddress%>.wrapper.ProcessWrapper
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.exception.response.UnauthorizedException
-import <%-packageAddress%>.model.<%-userTable.modelName%>
+import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.app.Cast.classToJson
 import <%-packageAddress%>.app.Cast.jsonToClass
 import <%-packageAddress%>.<%-moduleName%>.mail.ResetPasswordMail

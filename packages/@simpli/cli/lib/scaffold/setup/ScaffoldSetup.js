@@ -37,6 +37,16 @@ module.exports = class ScaffoldSetup {
     })
   }
 
+  get socketUrlDev () {
+    const apiUrlDev = this.apiUrlDev || ''
+    return apiUrlDev.replace(/^http[s]?:\/\/(\S+)\/api(\/?)$/g, 'ws:\/\/$1\/ws$2')
+  }
+
+  get socketUrlProd () {
+    const apiUrlProd = this.apiUrlProd || ''
+    return apiUrlProd.replace(/^http[s]?:\/\/(\S+)\/api(\/?)$/g, 'ws:\/\/$1\/ws$2')
+  }
+
   get standardModels () {
     return this.modelsByType(ModelType.STANDARD)
   }

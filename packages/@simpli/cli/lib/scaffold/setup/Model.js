@@ -212,7 +212,7 @@ module.exports = class Model {
   }
 
   definePaginated () {
-    if (this.name.match(/^(PagedResp)\w+$/)) {
+    if (this.name.match(/^(PageCollection)\w+$/)) {
       this.type = ModelType.PAGINATED
     }
   }
@@ -686,7 +686,7 @@ module.exports = class Model {
     let result = ''
 
     this.persistDependencies.forEach((dep) => {
-      result += `    all${dep.children[0]} = new All(${dep.children[0]})\n`
+      result += `    all${dep.children[0]} = new WholeCollection(${dep.children[0]})\n`
     })
 
     return result
