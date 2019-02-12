@@ -253,15 +253,17 @@ input[type=radio], input[type=checkbox] {
   & ~ span {
     position: relative;
     display: flex;
-    margin-left: 20px;
+    margin-left: 30px;
     cursor: pointer;
 
     &:after {
       @extend .transition;
       @extend .pal-black-10.bg;
+      font-family: sans-serif;
       cursor: pointer;
       content: " ";
       left: -20px;
+      top: calc(50% - 7.5px);
       position: absolute;
       width: 14px;
       height: 14px;
@@ -270,6 +272,18 @@ input[type=radio], input[type=checkbox] {
       padding-left: 1px;
       padding-top: 1px;
       font-size: 15px;
+    }
+
+    &.btn {
+      padding: 0 20px 0 30px;
+      text-transform: none;
+      font-size: 12px;
+      margin-left: 0;
+      margin-bottom: -10px;
+
+      &:after {
+        left: 10px;
+      }
     }
   }
 

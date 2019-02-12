@@ -49,7 +49,7 @@ module.exports = class Server {
 
   async databaseSetup () {
     // Get data normalize database
-    const { connection, availableTables } = await Database.requestConnection(this.serverSetup)
+    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup)
 
     // Set the server name
     const { serverName } = await Database.requestServerName(this.name)
@@ -68,7 +68,7 @@ module.exports = class Server {
     } = await Database.requestUserTable(availableTables, filteredTables)
 
     // Add data.sql
-    const { seedSamples } = await Database.requestSeed()
+    const { seedSamples } = await Database.requestSeedSamples()
 
     await Database.confirm()
 
@@ -83,6 +83,7 @@ module.exports = class Server {
     this.serverSetup.passwordColumn = passwordColumn
 
     this.serverSetup.seedSamples = seedSamples
+    this.serverSetup.createSQL = createSQL
   }
 
   async create (options = {}) {
@@ -252,7 +253,7 @@ module.exports = class Server {
     }
 
     // Get data normalize database
-    const { connection, availableTables } = await Database.requestConnection(this.serverSetup, defaultConnection)
+    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup, defaultConnection)
     // Select tables to be added
     const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
 
@@ -270,6 +271,7 @@ module.exports = class Server {
 
     this.serverSetup.connection = connection
     this.serverSetup.seedSamples = seedSamples
+    this.serverSetup.createSQL = createSQL
 
     this.serverSetup.userTable = userTable
     this.serverSetup.accountColumn = accountColumn
@@ -312,7 +314,7 @@ module.exports = class Server {
     await installDeps(context, 'npm')
 
     log()
-    log(`⚙️  Creating data.sql...`)
+    log(`⚙️  Creating create.sql and data.sql...`)
     const plugins = this.resolvePlugins(preset.plugins, options.debug)
     const generator = new Generator(context, {
       pkg: { _ignore: true },

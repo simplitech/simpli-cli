@@ -1,14 +1,15 @@
 /* eslint-disable handle-callback-err */
-const fs = require('fs')
 const inquirer = require('inquirer')
 const chalk = require('chalk')
 const mysql = require('promise-mysql')
 const camelCase = require('lodash.camelcase')
+const mysqldump = require('mysqldump')
+const runSql = require('./util/runSql')
+
 const {
   log,
   error,
-  logWithSpinner,
-  stopSpinner
+  logWithSpinner
 } = require('@vue/cli-shared-utils')
 
 module.exports = class Database {
@@ -135,6 +136,18 @@ module.exports = class Database {
       process.exit(1)
     }
 
+    const createSQL = await mysqldump({
+      connection: {
+        host,
+        user,
+        password,
+        database
+      },
+      dump: {
+        data: false
+      }
+    })
+
     serverSetup.injectDatabase(dataTables)
 
     const availableTables = serverSetup.tables
@@ -147,7 +160,7 @@ module.exports = class Database {
 
     const connection = { host, port, user, password, database }
 
-    return { connection, dataTables, availableTables, allTables }
+    return { connection, dataTables, availableTables, allTables, createSQL }
   }
 
   static async requestServerName (defaultName) {
@@ -270,22 +283,6 @@ module.exports = class Database {
     return { userTable, accountColumn, passwordColumn }
   }
 
-  static async requestSeed () {
-    const { confirm } = await inquirer.prompt([
-      {
-        name: 'confirm',
-        type: 'confirm',
-        message: 'Do you want to create data.sql for seeding?'
-      }
-    ])
-
-    if (confirm) {
-      return await this.requestSeedSamples()
-    }
-
-    return { seedSamples: null }
-  }
-
   static async requestSeedSamples () {
     const { seedSamples } = await inquirer.prompt([
       {
@@ -297,7 +294,7 @@ module.exports = class Database {
           const valid = !isNaN(parseFloat(value))
           if (valid) {
             const val = Number(value)
-            if (val < 1 || val > 1000) return 'Enter a value between 1 and 1000'
+            if (val < 1 || val > 500) return 'Enter a value between 1 and 500'
             return true
           }
           return 'Please enter a number'
@@ -339,14 +336,16 @@ module.exports = class Database {
     }
   }
 
-  static async seedDatabase (dataPath, connection) {
-    if (connection.host !== 'localhost') {
+  static async seedDatabase (createPath, dataPath, connection, localhost = false) {
+    if (connection.host !== 'localhost' && connection.host !== 'db') {
       error('For security reasons, this operation only allows MySQL host from localhost')
       process.exit(1)
     }
 
-    log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)} at ${chalk.yellow(connection.host)}`)
-    try {
+    if (localhost) {
+      connection.host = 'localhost'
+    } else {
+      log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)} at ${chalk.yellow(connection.host)}`)
       const { confirm } = await inquirer.prompt([
         {
           name: 'confirm',
@@ -370,21 +369,16 @@ module.exports = class Database {
         error('Wrong database name')
         process.exit(1)
       }
-
-      await fs.readFile(dataPath, 'utf8', async (err, data) => {
-        logWithSpinner(`✨`, `Seeding ${chalk.yellow(connection.database)}.`)
-
-        connection.multipleStatements = true
-
-        const conn = await mysql.createConnection(connection)
-        conn.query(data)
-        conn.end()
-
-        stopSpinner()
-      })
-    } catch (e) {
-      error(e.sqlMessage || e)
-      process.exit(1)
     }
+
+    const database = `${connection.database}`
+
+    logWithSpinner(`✨`, `Seeding ${chalk.yellow(connection.database)}.`)
+
+    delete connection.database
+    await runSql(createPath, connection)
+
+    connection.database = database
+    await runSql(dataPath, connection)
   }
 }

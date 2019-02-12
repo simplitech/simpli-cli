@@ -69,8 +69,9 @@ program
 program
   .command('server:seed')
   .description('seed the database with test data from the current backend project')
-  .action(() => {
-    require('../lib/cmd/serverSeed')()
+  .option('-L, --localhost', 'force seeding into the localhost')
+  .action((cmd) => {
+    require('../lib/cmd/serverSeed')(cleanArgs(cmd))
   })
 
 // output help information on unknown commands
