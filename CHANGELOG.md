@@ -1,3 +1,14 @@
+<a name="2.0.0-beta.5"></a>
+# [2.0.0-beta.5](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2019-02-12)
+
+
+### Features
+
+* added docker support ([a92ddd1](https://github.com/simplitech/simpli-cli/commit/a92ddd1))
+* server generation now generates create.sql ([b8c79d8](https://github.com/simplitech/simpli-cli/commit/b8c79d8))
+
+
+
 <a name="2.0.0-beta.4"></a>
 # [2.0.0-beta.4](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2019-01-29)
 
