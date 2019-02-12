@@ -83,9 +83,10 @@ module.exports = class Database {
     }
 
     const dataTables = []
+    const connection = { host, port, user, password, database }
 
     try {
-      const pool = mysql.createPool({ host, port, user, password, database })
+      const pool = mysql.createPool(connection)
 
       const getFirstKey = (obj) => Object.keys(obj)[0] || null
 
@@ -158,9 +159,69 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const connection = { host, port, user, password, database }
+    const localhostHost = 'localhost'
+    let localhostPort = port
+    let localhostUser = user
+    let localhostPassword = password
 
-    return { connection, dataTables, availableTables, allTables, createSQL }
+    if (host !== 'localhost' && host !== '127.0.0.1' && host !== '0.0.0.0') {
+      const { port } = defaultConfig.port ? defaultConfig
+        : await inquirer.prompt([
+          {
+            name: 'port',
+            type: 'input',
+            message: 'Enter the MYSQL port of the localhost',
+            default: 3306
+          }
+        ])
+      if (!port) {
+        error('You must define the MYSQL port of the localhost')
+        process.exit(1)
+      }
+
+      const { user } = defaultConfig.user ? defaultConfig
+        : await inquirer.prompt([
+          {
+            name: 'user',
+            type: 'input',
+            message: 'Enter the MYSQL user of the localhost',
+            default: 'root'
+          }
+        ])
+      if (!user) {
+        error('You must define the MYSQL user of the localhost')
+        process.exit(1)
+      }
+
+      const { password } = defaultConfig.password ? defaultConfig
+        : await inquirer.prompt([
+          {
+            name: 'password',
+            type: 'password',
+            message: 'Enter the MYSQL password of the localhost'
+          }
+        ])
+      if (!password) {
+        error('You must define the MYSQL password of the localhost')
+        process.exit(1)
+      }
+
+      localhostPort = port
+      localhostUser = user
+      localhostPassword = password
+    }
+
+    const localhostConnection = { host: localhostHost, port: localhostPort, user: localhostUser, password: localhostPassword }
+    try {
+      const pool = mysql.createPool(localhostConnection)
+      await pool.query(`SHOW DATABASES;`)
+      pool.end()
+    } catch (e) {
+      error(e.sqlMessage || e)
+      process.exit(1)
+    }
+
+    return { connection, localhostConnection, dataTables, availableTables, allTables, createSQL }
   }
 
   static async requestServerName (defaultName) {

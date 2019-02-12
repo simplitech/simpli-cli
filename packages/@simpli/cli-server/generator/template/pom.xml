@@ -11,6 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <kotlin.version>1.2.71</kotlin.version>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -93,6 +94,7 @@
       <version>1.11.302</version>
     </dependency>
   </dependencies>
+
   <build>
     <finalName><%-options.serverSetup.serverName%></finalName>
     <plugins>
@@ -190,7 +192,6 @@
             <configuration>
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                <sourceDir>${project.basedir}/src/main/java</sourceDir>
               </sourceDirs>
             </configuration>
           </execution>
@@ -202,12 +203,13 @@
             <configuration>
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                <sourceDir>${project.basedir}/src/test/java</sourceDir>
               </sourceDirs>
             </configuration>
           </execution>
+
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

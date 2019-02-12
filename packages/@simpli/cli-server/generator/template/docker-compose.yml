@@ -1,0 +1,21 @@
+server:
+  image: ftgibran/simpli-tomcat:latest
+  container_name: tomcat-container-<%-options.serverSetup.connection.database%>
+  ports:
+    - "8080:8080"
+  volumes:
+    - ./target/<%-options.serverSetup.serverName%>.war:/usr/local/tomcat/webapps/ROOT.war
+  links:
+    - db
+db:
+  image: mysql:5.7
+  container_name: mysql-container-<%-options.serverSetup.connection.database%>
+  environment:
+    MYSQL_USER: <%-options.serverSetup.localhostConnection.user%>
+    MYSQL_PASSWORD: <%-options.serverSetup.localhostConnection.password%>
+    MYSQL_DATABASE: <%-options.serverSetup.connection.database%>
+  expose:
+    - "<%-options.serverSetup.localhostConnection.port%>"
+  volumes:
+    - ./src/test/resources/database/create.sql:/docker-entrypoint-initdb.d/create.sql
+    - ./src/test/resources/database/data.sql:/docker-entrypoint-initdb.d/data.sql

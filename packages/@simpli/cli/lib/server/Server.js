@@ -49,7 +49,7 @@ module.exports = class Server {
 
   async databaseSetup () {
     // Get data normalize database
-    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup)
+    const { connection, localhostConnection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup)
 
     // Set the server name
     const { serverName } = await Database.requestServerName(this.name)
@@ -77,6 +77,7 @@ module.exports = class Server {
     this.serverSetup.packageAddress = packageAddress
 
     this.serverSetup.connection = connection
+    this.serverSetup.localhostConnection = localhostConnection
 
     this.serverSetup.userTable = userTable
     this.serverSetup.accountColumn = accountColumn
@@ -166,11 +167,9 @@ module.exports = class Server {
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
     log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
-    log(`👉  Seed your database: ${chalk.cyan(`simpli server:seed`)}`)
-    log(`👉  Generate the WAR file: ${chalk.cyan('mvn package')}`)
-    log(`👉  Initialize Tomcat: ${chalk.cyan('tomcat start')}`)
-    log(`👉  Move the WAR file to tomcat folder to deploy it: ${chalk.cyan('mv <warfile> <tomcat-webapps-location>')}`)
-    log(`👉  Go to ${chalk.cyan('localhost:8080/[WAR-file-name]')}`)
+    log(`👉  Make sure the port ${chalk.cyan(`8080`)} is not in use`)
+    log(`👉  Run ${chalk.yellow(`sh serve.sh`)}`)
+    log(`👉  Go to ${chalk.cyan('http://localhost:8080')}`)
     log()
 
     generator.printExitLogs()
@@ -253,7 +252,7 @@ module.exports = class Server {
     }
 
     // Get data normalize database
-    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup, defaultConnection)
+    const { connection, localhostConnection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup, defaultConnection)
     // Select tables to be added
     const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
 
@@ -270,6 +269,7 @@ module.exports = class Server {
     await Database.confirm()
 
     this.serverSetup.connection = connection
+    this.serverSetup.localhostConnection = localhostConnection
     this.serverSetup.seedSamples = seedSamples
     this.serverSetup.createSQL = createSQL
 
