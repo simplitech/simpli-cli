@@ -1,3 +1,13 @@
+<a name="2.0.0-beta.6"></a>
+# [2.0.0-beta.6](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2019-02-21)
+
+
+### Features
+
+* Added docker support ([1b41cfe](https://github.com/simplitech/simpli-cli/commit/1b41cfe))
+
+
+
 <a name="2.0.0-beta.5"></a>
 # [2.0.0-beta.5](https://github.com/simplitech/simpli-cli/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2019-02-12)
 
