@@ -21,12 +21,6 @@ module.exports = class ServerSetup {
       password: null,
       database: null
     }
-    this.localhostConnection = {
-      host: null,
-      port: null,
-      user: null,
-      password: null
-    }
     this.userTable = new Table() // The user table used for authentication (e.g. user)
     this.accountColumn = new Column() // The account column used for authentication (e.g. email)
     this.passwordColumn = new Column() // The password column used for authentication (e.g. password)

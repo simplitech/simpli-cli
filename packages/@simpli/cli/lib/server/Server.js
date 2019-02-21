@@ -49,7 +49,7 @@ module.exports = class Server {
 
   async databaseSetup () {
     // Get data normalize database
-    const { connection, localhostConnection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup)
+    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup)
 
     // Set the server name
     const { serverName } = await Database.requestServerName(this.name)
@@ -77,7 +77,6 @@ module.exports = class Server {
     this.serverSetup.packageAddress = packageAddress
 
     this.serverSetup.connection = connection
-    this.serverSetup.localhostConnection = localhostConnection
 
     this.serverSetup.userTable = userTable
     this.serverSetup.accountColumn = accountColumn
@@ -167,8 +166,9 @@ module.exports = class Server {
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
     log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
-    log(`👉  Make sure the port ${chalk.cyan(`8080`)} is not in use`)
+    log(`👉  Run ${chalk.yellow(`simpli server:seed`)}`)
     log(`👉  Run ${chalk.yellow(`sh serve.sh`)}`)
+    log(`👉  Make sure the port ${chalk.cyan(`8080`)} is not in use`)
     log(`👉  Go to ${chalk.cyan('http://localhost:8080')}`)
     log()
 
@@ -252,7 +252,7 @@ module.exports = class Server {
     }
 
     // Get data normalize database
-    const { connection, localhostConnection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup, defaultConnection)
+    const { connection, availableTables, createSQL } = await Database.requestConnection(this.serverSetup, defaultConnection)
     // Select tables to be added
     const { filteredTables } = await Database.requestTables(availableTables, this.serverSetup)
 
@@ -269,7 +269,6 @@ module.exports = class Server {
     await Database.confirm()
 
     this.serverSetup.connection = connection
-    this.serverSetup.localhostConnection = localhostConnection
     this.serverSetup.seedSamples = seedSamples
     this.serverSetup.createSQL = createSQL
 

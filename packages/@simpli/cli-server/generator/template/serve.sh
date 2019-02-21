@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-simpli server:seed --localhost
 mvn clean package
 docker-compose stop
 docker-compose up -d
@@ -26,4 +25,3 @@ sleep 5
 open http://localhost:8080/
 
 read -p "Press enter to exit" nothing
-

@@ -2,9 +2,9 @@
 <Context antiJARLocking="true" path="/<%-options.serverSetup.serverName%>">
     <Resource
         name="jdbc/<%-options.serverSetup.connection.database%>DS"
-        url="jdbc:mysql://db:<%-options.serverSetup.localhostConnection.port%>/<%-options.serverSetup.connection.database%>"
-        username="<%-options.serverSetup.localhostConnection.user%>"
-        password="<%-options.serverSetup.localhostConnection.password%>"
+        url="jdbc:mysql://db:3306/<%-options.serverSetup.connection.database%>"
+        username="root"
+        password="root"
         auth="Container" driverClassName="com.mysql.jdbc.Driver"
         factory="org.apache.commons.dbcp.BasicDataSourceFactory"
         initialSize="1" maxActive="3" maxIdle="1"

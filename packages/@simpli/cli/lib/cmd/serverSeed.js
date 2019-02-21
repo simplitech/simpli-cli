@@ -29,7 +29,7 @@ async function serverSeed (options) {
   await clearConsole()
 
   await contextConnection(async (connection) => {
-    await Database.seedDatabase(createPath, dataPath, connection, options.localhost)
+    await Database.seedDatabase(createPath, dataPath, connection, options.force)
   })
 }
 

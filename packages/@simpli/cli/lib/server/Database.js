@@ -159,69 +159,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const localhostHost = 'localhost'
-    let localhostPort = port
-    let localhostUser = user
-    let localhostPassword = password
-
-    if (host !== 'localhost' && host !== '127.0.0.1' && host !== '0.0.0.0') {
-      const { port } = defaultConfig.port ? defaultConfig
-        : await inquirer.prompt([
-          {
-            name: 'port',
-            type: 'input',
-            message: 'Enter the MYSQL port of the localhost',
-            default: 3306
-          }
-        ])
-      if (!port) {
-        error('You must define the MYSQL port of the localhost')
-        process.exit(1)
-      }
-
-      const { user } = defaultConfig.user ? defaultConfig
-        : await inquirer.prompt([
-          {
-            name: 'user',
-            type: 'input',
-            message: 'Enter the MYSQL user of the localhost',
-            default: 'root'
-          }
-        ])
-      if (!user) {
-        error('You must define the MYSQL user of the localhost')
-        process.exit(1)
-      }
-
-      const { password } = defaultConfig.password ? defaultConfig
-        : await inquirer.prompt([
-          {
-            name: 'password',
-            type: 'password',
-            message: 'Enter the MYSQL password of the localhost'
-          }
-        ])
-      if (!password) {
-        error('You must define the MYSQL password of the localhost')
-        process.exit(1)
-      }
-
-      localhostPort = port
-      localhostUser = user
-      localhostPassword = password
-    }
-
-    const localhostConnection = { host: localhostHost, port: localhostPort, user: localhostUser, password: localhostPassword }
-    try {
-      const pool = mysql.createPool(localhostConnection)
-      await pool.query(`SHOW DATABASES;`)
-      pool.end()
-    } catch (e) {
-      error(e.sqlMessage || e)
-      process.exit(1)
-    }
-
-    return { connection, localhostConnection, dataTables, availableTables, allTables, createSQL }
+    return { connection, dataTables, availableTables, allTables, createSQL }
   }
 
   static async requestServerName (defaultName) {
@@ -397,15 +335,84 @@ module.exports = class Database {
     }
   }
 
-  static async seedDatabase (createPath, dataPath, connection, localhost = false) {
-    if (connection.host !== 'localhost' && connection.host !== 'db') {
+  static async seedDatabase (createPath, dataPath, connection, force = false) {
+    if (!force && connection.host !== 'localhost' && connection.host !== 'db') {
       error('For security reasons, this operation only allows MySQL host from localhost')
       process.exit(1)
     }
 
-    if (localhost) {
-      connection.host = 'localhost'
-    } else {
+    if (connection.host === 'db') {
+      const { host } = await inquirer.prompt([
+        {
+          name: 'host',
+          type: 'input',
+          message: 'Enter the MYSQL host',
+          default: 'localhost'
+        }
+      ])
+      if (!host) {
+        error('You must define the MYSQL host')
+        process.exit(1)
+      }
+
+      const { port } = await inquirer.prompt([
+        {
+          name: 'port',
+          type: 'input',
+          message: 'Enter the MYSQL port of the localhost',
+          default: 3306
+        }
+      ])
+      if (!port) {
+        error('You must define the MYSQL port of the localhost')
+        process.exit(1)
+      }
+
+      const { user } = await inquirer.prompt([
+        {
+          name: 'user',
+          type: 'input',
+          message: 'Enter the MYSQL user of the localhost',
+          default: 'root'
+        }
+      ])
+      if (!user) {
+        error('You must define the MYSQL user of the localhost')
+        process.exit(1)
+      }
+
+      const { password } = await inquirer.prompt([
+        {
+          name: 'password',
+          type: 'password',
+          message: 'Enter the MYSQL password of the localhost'
+        }
+      ])
+      if (!password) {
+        error('You must define the MYSQL password of the localhost')
+        process.exit(1)
+      }
+
+      const { database } = await inquirer.prompt([
+        {
+          name: 'database',
+          type: 'input',
+          message: 'Enter the MYSQL database'
+        }
+      ])
+      if (!database) {
+        error('You must define the MYSQL database')
+        process.exit(1)
+      }
+
+      connection.host = host
+      connection.port = port
+      connection.user = user
+      connection.password = password
+      connection.database = database
+    }
+
+    if (!force) {
       log(`${chalk.bgRed(' Danger Zone ')} You are about to truncate tables from database ${chalk.yellow(connection.database)} at ${chalk.yellow(connection.host)}`)
       const { confirm } = await inquirer.prompt([
         {

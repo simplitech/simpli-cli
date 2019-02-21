@@ -11,11 +11,8 @@ db:
   image: mysql:5.7
   container_name: mysql-container-<%-options.serverSetup.connection.database%>
   environment:
-    MYSQL_USER: <%-options.serverSetup.localhostConnection.user%>
-    MYSQL_PASSWORD: <%-options.serverSetup.localhostConnection.password%>
+    MYSQL_ROOT_PASSWORD: root
     MYSQL_DATABASE: <%-options.serverSetup.connection.database%>
-  expose:
-    - "<%-options.serverSetup.localhostConnection.port%>"
   volumes:
     - ./src/test/resources/database/create.sql:/docker-entrypoint-initdb.d/create.sql
     - ./src/test/resources/database/data.sql:/docker-entrypoint-initdb.d/data.sql
