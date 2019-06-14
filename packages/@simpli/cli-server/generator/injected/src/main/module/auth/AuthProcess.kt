@@ -82,9 +82,9 @@ class AuthProcess : ProcessWrapper() {
     fun recoverPasswordByMail(request: RecoverPasswordByMailRequest): Long {
         request.validate(lang)
 
-        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail(request.<%-accountColumn.name%>!!) ?: throw BadRequestException(lang.emailNotFound())
+        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail("${request.<%-accountColumn.name%>}") ?: throw BadRequestException(lang.emailNotFound())
 
-        val json = classToJson(TokenForgottenPassword(<%-userTable.instanceName%>.<%-accountColumn.name%>.toString()))
+        val json = classToJson(TokenForgottenPassword("${<%-userTable.instanceName%>.<%-accountColumn.name%>}"))
         val encrypted = encrypt(json, ENCRYPT_HASH)
         val hash = encrypted?.replace("/", "%2F") ?: "invalid_hash"
 
@@ -100,7 +100,7 @@ class AuthProcess : ProcessWrapper() {
     fun resetPassword(request: ResetPasswordRequest): String {
         request.validate(lang)
 
-        val hashResolved = request.hash!!.replace(" ", "+")
+        val hashResolved = request.hash?.replace(" ", "+") ?: ""
         val token = decrypt(hashResolved, ENCRYPT_HASH) ?: throw BadRequestException(lang.invalidToken())
 
         val tokenForgottenPassword = jsonToClass(token, TokenForgottenPassword::class.java)
@@ -112,7 +112,9 @@ class AuthProcess : ProcessWrapper() {
         // token expires after x days
         if (calendar.time.before(Date())) throw BadRequestException(lang.expiredToken())
 
-        dao.update<%-userTable.modelName%>Password(tokenForgottenPassword.<%-accountColumn.name%>, request.newPassword!!)
+        request.newPassword?.also {
+            dao.update<%-userTable.modelName%>Password(tokenForgottenPassword.<%-accountColumn.name%>, it)
+        }
 
         return requestToToken(AuthRequest(tokenForgottenPassword.<%-accountColumn.name%>, request.newPassword))
     }
@@ -128,13 +130,14 @@ class AuthProcess : ProcessWrapper() {
 
         request.validate(lang)
 
-        val newPassword = request.newPassword!!
-        val currentPassword = request.currentPassword!!
+        request.newPassword?.also { newPassword ->
+            request.currentPassword?.also { currentPassword ->
+                val idVerify = dao.getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>, currentPassword)
+                if (id != idVerify) throw BadRequestException(lang["wrong_password"])
 
-        val idVerify = dao.getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>, currentPassword)
-        if (id != idVerify) throw BadRequestException(lang["wrong_password"])
-
-        dao.update<%-userTable.modelName%>Password(<%-accountColumn.name%>, newPassword)
+                dao.update<%-userTable.modelName%>Password(<%-accountColumn.name%>, newPassword)
+            }
+        }
 
         return 1L
     }
@@ -146,7 +149,7 @@ class AuthProcess : ProcessWrapper() {
     fun getId(request: AuthRequest): Long {
         request.validate(lang)
 
-        return dao.getIdOf<%-userTable.modelName%>(request.<%-accountColumn.name%>!!, request.<%-passwordColumn.name%>!!) ?: throw NotFoundException(lang["user_id_not_found"])
+        return dao.getIdOf<%-userTable.modelName%>("${request.<%-accountColumn.name%>}", "${request.<%-passwordColumn.name%>}") ?: throw NotFoundException(lang["user_id_not_found"])
     }
 
     /**

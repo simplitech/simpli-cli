@@ -14,7 +14,7 @@ import br.com.simpli.model.LanguageHolder
  */
 class RecoverPasswordMail(lang: LanguageHolder, <%-userTable.instanceName%>: <%-userTable.modelName%>, hash: String) : MailWrapper(lang) {
     init {
-        to = <%-userTable.instanceName%>.<%-accountColumn.name%>!!
+        to = "${<%-userTable.instanceName%>.<%-accountColumn.name%>}"
         subject = lang["email_reset_password_subject"]
 
         data["title"] = lang["email_reset_password_title"]
