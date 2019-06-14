@@ -102,7 +102,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         // TODO: review generated method
         val query = Query()
                 .updateTable("<%-table.name%>")
-                .updateSet(*<%-table.instanceName%>.updateSet())
+                .updateSet(<%-table.instanceName%>.updateSet())
                 <%-table.primariesByWhere(false, table.instanceName)%>
 
         return execute(query).affectedRows
@@ -112,7 +112,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
         // TODO: review generated method
         val query = Query()
                 .insertInto("<%-table.name%>")
-                .insertValues(*<%-table.instanceName%>.insertValues())
+                .insertValues(<%-table.instanceName%>.insertValues())
 
         return execute(query).key
     }

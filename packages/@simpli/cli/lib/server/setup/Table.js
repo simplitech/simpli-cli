@@ -336,7 +336,7 @@ module.exports = class Table {
   buildUpdateSet () {
     let result = ''
 
-    result += `    fun updateSet() = arrayOf(\n`
+    result += `    fun updateSet() = mapOf(\n`
     this.exceptIDColumns.forEach((column) => {
       if (column.isPassword) {
         result += `            "${column.field}" to Query("IF(? IS NOT NULL, SHA2(?, 256), ${column.field})", ${column.name}, ${column.name}),\n`
@@ -357,7 +357,7 @@ module.exports = class Table {
   buildInsertValues () {
     let result = ''
 
-    result += `    fun insertValues() = arrayOf(\n`
+    result += `    fun insertValues() = mapOf(\n`
     this.exceptAutoIncrementColumns.forEach((column) => {
       if (column.isPassword) {
         result += `            "${column.field}" to Query("SHA2(?, 256)", ${column.name}),\n`
