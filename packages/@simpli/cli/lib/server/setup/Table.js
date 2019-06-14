@@ -51,6 +51,10 @@ module.exports = class Table {
     return this.columns.filter((column) => !column.isPrimary)
   }
 
+  get exceptPasswordColumns () {
+    return this.columns.filter((column) => !column.isPassword)
+  }
+
   get exceptIDColumns () {
     return this.columns.filter((column) => !column.isID)
   }
@@ -195,10 +199,17 @@ module.exports = class Table {
     }).join(' && ')
   }
 
-  primariesByWhere (different = false) {
+  primariesByWhere (different = false, instanceName = '') {
     const columns = this.idsColumn
     if (columns.length === 0) columns.push(new Column())
-    return columns.map((column) => `AND ${column.field} ${different ? '<>' : '='} ?`).join(' ')
+    if (instanceName) {
+      const printId = (name, index) => `${instanceName}.id${(Number(index) + 1) || ''}`
+      return columns.map((column, index) => {
+        const attr = columns.length <= 1 ? printId(column.name) : printId(column.name, index)
+        return `.where${different ? 'Not' : ''}Eq("${column.field}", ${attr})`
+      }).join('\n                ')
+    }
+    return columns.map((column) => `.where${different ? 'Not' : ''}Eq("${column.field}", ${column.name})`).join('\n                ')
   }
 
   primariesTestValuesByParam () {
@@ -240,139 +251,55 @@ module.exports = class Table {
     return uniqBy(instances, 'modelName')
   }
 
-  buildDaoUpdateQuery () {
-    let result = ''
-
-    this.exceptIDColumns.forEach((column) => {
-      if (column.isPassword) {
-        result += `\t\t\t${column.field} = IF(? IS NOT NULL, SHA2(?, 256), ${column.field}),\n`
-      } else if (column.isUpdatedAt) {
-        result += `\t\t\t${column.field} = NOW(),\n`
-      } else if (!column.isCreatedAt) {
-        result += `\t\t\t${column.field} = ?,\n`
-      }
-    })
-
-    result = result.slice(0, -2) // remove last line
-    result += `\n`
-
-    return result
-  }
-
-  buildDaoUpdateParams () {
-    let result = ''
-
-    this.exceptIDColumns.forEach((column) => {
-      if (column.isPassword) {
-        result += `\t\t\t${this.instanceName}.${column.name}, ${this.instanceName}.${column.name},\n`
-      } else if (column.isUpdatedAt) {
-      } else if (!column.isCreatedAt) {
-        result += `\t\t\t${this.instanceName}.${column.name},\n`
-      }
-    })
-
-    this.idsColumn.forEach((column) => {
-      result += `\t\t\t${this.instanceName}.${column.name},\n`
-    })
-
-    result = result.slice(0, -2) // remove last line and comma
-    result += `\n`
-
-    return result
-  }
-
-  buildDaoInsertQuery () {
-    let result = ''
-
-    this.exceptAutoIncrementColumns.forEach((column) => {
-      if (!column.isUpdatedAt) {
-        result += `\t\t\t${column.field},\n`
-      }
-    })
-
-    result = result.slice(0, -2) // remove last line and comma
-    result += `\n`
-
-    return result
-  }
-
-  buildDaoInsertValues () {
-    let result = ''
-
-    this.exceptAutoIncrementColumns.forEach((column) => {
-      if (column.isPassword) {
-        result += `SHA2(?, 256),`
-      } else if (column.isCreatedAt) {
-        result += `NOW(),`
-      } else if (!column.isUpdatedAt) {
-        result += `?,`
-      }
-    })
-
-    result = result.slice(0, -1) // remove last comma
-
-    return result
-  }
-
-  buildDaoInsertParams () {
-    let result = ''
-
-    this.exceptAutoIncrementColumns.forEach((column) => {
-      if (column.isCreatedAt) {
-      } else if (!column.isUpdatedAt) {
-        result += `\t\t\t${this.instanceName}.${column.name},\n`
-      }
-    })
-
-    result = result.slice(0, -2) // remove last line and comma
-    result += `\n`
-
-    return result
-  }
-
   buildValidate () {
     let result = ''
 
     if (!this.hasID) {
       this.foreignColumns.forEach((column) => {
-        result += `\t\tif (${column.name} == 0L) {\n`
-        result += `\t\t\tthrow BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
-        result += `\t\t}\n`
+        result += `        if (${column.name} == 0L) {\n`
+        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `        }\n`
       })
     }
     this.exceptPrimaryColumns.forEach((column) => {
       if (column.isLong && column.isRequired) {
-        result += `\t\tif (${column.name} == 0L) {\n`
-        result += `\t\t\tthrow BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
-        result += `\t\t}\n`
+        result += `        if (${column.name} == 0L) {\n`
+        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `        }\n`
       } else if (column.isString) {
         if (column.isRequired) {
-          result += `\t\tif (${column.name}.isNullOrEmpty()) {\n`
-          result += `\t\t\tthrow BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
-          result += `\t\t}\n`
+          result += `        if (${column.name}.isEmpty()) {\n`
+          result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+          result += `        }\n`
         }
         if (column.size) {
-          result += `\t\tif (${column.name}?.length ?: 0 > ${column.size}) {\n`
-          result += `\t\t\tthrow BadRequestException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}))\n`
-          result += `\t\t}\n`
+          if (column.isRequired) {
+            result += `        if (${column.name}.length > ${column.size}) {\n`
+            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}))\n`
+            result += `        }\n`
+          } else {
+            result += `        if (${column.name}?.length ?: 0 > ${column.size}) {\n`
+            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}))\n`
+            result += `        }\n`
+          }
         }
         if (column.isEmail) {
-          result += `\t\tif (${column.name} != null && !Validator.isEmail(${column.name})) {\n`
-          result += `\t\t\tthrow BadRequestException(lang.isNotAValidEmail("${startCase(column.name)}"))\n`
-          result += `\t\t}\n`
+          result += `        if (${column.name} != null && !Validator.isEmail(${column.name})) {\n`
+          result += `            throw BadRequestException(lang.isNotAValidEmail("${startCase(column.name)}"))\n`
+          result += `        }\n`
         } else if (column.isCpf) {
-          result += `\t\tif (${column.name} != null && !Validator.isCPF(${column.name})) {\n`
-          result += `\t\t\tthrow BadRequestException(lang.isNotAValidCPF("${startCase(column.name)}"))\n`
-          result += `\t\t}\n`
+          result += `        if (${column.name} != null && !Validator.isCPF(${column.name})) {\n`
+          result += `            throw BadRequestException(lang.isNotAValidCPF("${startCase(column.name)}"))\n`
+          result += `        }\n`
         } else if (column.isCnpj) {
-          result += `\t\tif (${column.name} != null && !Validator.isCNPJ(${column.name} ?: "")) {\n`
-          result += `\t\t\tthrow BadRequestException(lang.isNotAValidCNPJ("${startCase(column.name)}"))\n`
-          result += `\t\t}\n`
+          result += `        if (${column.name} != null && !Validator.isCNPJ(${column.name} ?: "")) {\n`
+          result += `            throw BadRequestException(lang.isNotAValidCNPJ("${startCase(column.name)}"))\n`
+          result += `        }\n`
         }
       } else if (column.isRequired && !column.isBoolean && !column.isDouble) {
-        result += `\t\tif (${column.name} == null) {\n`
-        result += `\t\t\tthrow BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
-        result += `\t\t}\n`
+        result += `        if (${column.name} == null) {\n`
+        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `        }\n`
       }
     })
 
@@ -382,26 +309,68 @@ module.exports = class Table {
   buildConstructor () {
     let result = ''
 
-    result += `\t@Throws(SQLException::class)\n`
-    result += `\tconstructor(rs: ResultSet, alias: String = "${this.name}") {\n`
+    result += `    @Throws(SQLException::class)\n`
+    result += `    constructor(rs: ResultSet, alias: String = "${this.name}") {\n`
     this.columns.forEach((column) => {
       if (column.isLong) {
-        result += `\t\t${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `        ${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDouble) {
-        result += `\t\t${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `        ${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isString) {
         if (column.isRequired) {
-          result += `\t\t${column.name} = rs.getString(alias, "${column.field}").toString()\n`
+          result += `        ${column.name} = rs.getString(alias, "${column.field}").toString()\n`
         } else {
-          result += `\t\t${column.name} = rs.getString(alias, "${column.field}")\n`
+          result += `        ${column.name} = rs.getString(alias, "${column.field}")\n`
         }
       } else if (column.isBoolean) {
-        result += `\t\t${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `        ${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDate) {
-        result += `\t\t${column.name} = rs.getTimestamp(alias, "${column.field}")\n`
+        result += `        ${column.name} = rs.getTimestamp(alias, "${column.field}")\n`
       }
     })
-    result += `\t}\n`
+    result += `    }\n`
+
+    return result
+  }
+
+  buildUpdateSet () {
+    let result = ''
+
+    result += `    fun updateSet() = arrayOf(\n`
+    this.exceptIDColumns.forEach((column) => {
+      if (column.isPassword) {
+        result += `            "${column.field}" to Query("IF(? IS NOT NULL, SHA2(?, 256), ${column.field})", ${column.name}, ${column.name}),\n`
+      } else if (column.isSoftDelete) {
+        result += `            "${column.field}" to true,\n`
+      } else if (column.isUpdatedAt) {
+        result += `            "${column.field}" to Date(),\n`
+      } else if (!column.isCreatedAt) {
+        result += `            "${column.field}" to ${column.name},\n`
+      }
+    })
+    result = result.slice(0, -2) // remove last line
+    result += `\n    )\n`
+
+    return result
+  }
+
+  buildInsertValues () {
+    let result = ''
+
+    result += `    fun insertValues() = arrayOf(\n`
+    this.exceptAutoIncrementColumns.forEach((column) => {
+      if (column.isPassword) {
+        result += `            "${column.field}" to Query("SHA2(?, 256)", ${column.name}),\n`
+      } else if (column.isSoftDelete) {
+        result += `            "${column.field}" to true,\n`
+      } else if (column.isCreatedAt) {
+        result += `            "${column.field}" to Date(),\n`
+      } else if (!column.isUpdatedAt) {
+        result += `            "${column.field}" to ${column.name},\n`
+      }
+    })
+    result = result.slice(0, -2) // remove last line
+    result += `\n    )\n`
 
     return result
   }

@@ -14,11 +14,11 @@ import <%-packageAddress%>.exception.response.UnauthorizedException
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.app.Cast.classToJson
 import <%-packageAddress%>.app.Cast.jsonToClass
-import <%-packageAddress%>.<%-moduleName%>.mail.ResetPasswordMail
+import <%-packageAddress%>.<%-moduleName%>.mail.RecoverPasswordMail
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
-import <%-packageAddress%>.<%-moduleName%>.request.RecoverPasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ResetPasswordRequest
+import <%-packageAddress%>.<%-moduleName%>.request.RecoverPasswordByMailRequest
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
 import br.com.simpli.tools.SecurityUtils.decode
 import br.com.simpli.tools.SecurityUtils.decrypt
@@ -50,6 +50,8 @@ class AuthProcess : ProcessWrapper() {
             val <%-userTable.instanceName%> = get<%-userTable.modelName%>(id)
 
             return AuthResponse(token, <%-userTable.instanceName%>)
+        } catch (e: BadRequestException) {
+            throw UnauthorizedException(lang.pleaseLogin())
         } catch (e: NotFoundException) {
             throw UnauthorizedException(lang.pleaseLogin())
         }
@@ -77,23 +79,25 @@ class AuthProcess : ProcessWrapper() {
      * Send an e-mail in order to reset the password
      */
     @Throws(BadRequestException::class)
-    fun resetPassword(request: ResetPasswordRequest): Long {
-        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail(request.<%-accountColumn.name%>) ?: throw BadRequestException(lang.emailNotFound())
+    fun recoverPasswordByMail(request: RecoverPasswordByMailRequest): Long {
+        request.validate(lang)
+
+        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail(request.<%-accountColumn.name%>!!) ?: throw BadRequestException(lang.emailNotFound())
 
         val json = classToJson(TokenForgottenPassword(<%-userTable.instanceName%>.<%-accountColumn.name%>.toString()))
         val encrypted = encrypt(json, ENCRYPT_HASH)
         val hash = encrypted?.replace("/", "%2F") ?: "invalid_hash"
 
-        ResetPasswordMail(lang, <%-userTable.instanceName%>, hash).send()
+        RecoverPasswordMail(lang, <%-userTable.instanceName%>, hash).send()
 
         return 1L
     }
 
     /**
-     * Recover the password
+     * Reset the password
      */
     @Throws(BadRequestException::class)
-    fun recoverPassword(request: RecoverPasswordRequest): String {
+    fun resetPassword(request: ResetPasswordRequest): String {
         request.validate(lang)
 
         val hashResolved = request.hash!!.replace(" ", "+")
@@ -138,9 +142,11 @@ class AuthProcess : ProcessWrapper() {
     /**
      * Get the ID by auth request
      */
-    @Throws(NotFoundException::class)
+    @Throws(BadRequestException::class, NotFoundException::class)
     fun getId(request: AuthRequest): Long {
-        return dao.getIdOf<%-userTable.modelName%>(request.<%-accountColumn.name%>, request.<%-passwordColumn.name%>) ?: throw NotFoundException(lang["user_id_not_found"])
+        request.validate(lang)
+
+        return dao.getIdOf<%-userTable.modelName%>(request.<%-accountColumn.name%>!!, request.<%-passwordColumn.name%>!!) ?: throw NotFoundException(lang["user_id_not_found"])
     }
 
     /**

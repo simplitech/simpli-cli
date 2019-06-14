@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256" height="256">
+  <img alt="Simpli Logo" src="../logo.png" width="256" height="256">
   <br>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/v/@simpli/cli.svg"></a>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/dt/@simpli/cli.svg"></a>
@@ -19,10 +19,17 @@ Simpli CLI provides tools to generate either web-server or web-client projects b
 
 ### Server Project
 
-> Client projects are generated based on your `MySQL database`, and it provides `Restful APIs`, including `Login API`. Once you have built your server, you may use the `IntelliJ` or `NetBeans` in order to run your server. I will assume you know how to use Tomcat Server and Maven.
+> Client projects are generated based on your `MySQL database`, and it provides `Restful APIs`, including `Login API`.
+Once you have built your server, you may use the `Docker`, `IntelliJ` or `NetBeans` in order to run your server.
+I will assume you know how to use Tomcat Server and Maven.
 
 #### Requirements
-	- Maven
+	- MVN CLI (Maven)
+	- Docker CLI
+
+or
+
+	- MVN CLI (Maven)
 	- Tomcat Server with Catalina
 	- MySQL Server
 
@@ -44,27 +51,37 @@ project-root/
     src/
         resource/
         main/
-            java/
-                crud/
+            kotlin/
+                [module_name]/
                     process/
                     response/
+                app/
                 dao/
+                enums/
+                exception/
+                locale/
                 model/
+                param/
+                wrapper/
             webapp/
                 META-INF/
                 WEB-INF/
         test/
-            java/
-                crud/
+            kotlin/
+                [module_name]/
                     process/
                 model/
+            resource/
+                database/
+                    create.sql
+                    data.sql
 ```
 
 ---
 
 ### Client Project
 
-> Client projects are generated based on `swagger.json` which can be found in server projects. It provides an interface with `CRUDs`, including `Login System`. Also, `SimpliPack` classes support you to easily develop your platform system. Access the [simpli-ts-vue documentation](https://github.com/simplitech/simpli-ts-vue) to further information.
+> Client projects are generated based on `swagger.json` which can be found in server projects. It provides an interface with `CRUDs`, including `Login System`. Also, `Simpli Web SDK` supports you to easily develop your platform system. Access the [simpli-web-sdk documentation](https://github.com/simplitech/simpli-web-sdk) to further information.
 
 #### Requirements
 ```
@@ -137,11 +154,11 @@ You may now choose between `Server Project` and `Client Project`.
 
 When you choose the `Server Project`, you have to provide your MySQL access with the chosen database:
 
-![Server Prompt MySQL Access](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img1.png)
+![Server Prompt MySQL Access](./img/server-img1.png)
 
 Then, fill the rest of the prompt and confirm. Follow this example:
 
-![Server Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img2.png)
+![Server Prompt Example](./img/server-img2.png)
 
 ### Generating Fake Data
 
@@ -156,28 +173,26 @@ Make sure your database is used for testing because the command `simpli server:s
 
 #### Running the Server
 
+Make sure the port 8080 is not in use.
+
 Go to your project directory root and seed your database:
 
 ```sh
 $ simpli server:seed
 ```
 
-Then, generate the War file:
+Then, run this shell:
 
 ```sh
-$ mvn package
+$ sh build.sh
 ```
 
-Then, initialize the Tomcat and move the WAR file to tomcat folder to deploy it:
+This command will use the `mvn` CLI and the `docker` CLI.
+Therefore, it should have those installed.
 
-```sh
-$ tomcat start
-$ mv <warfile> <tomcat-webapps-location>
-```
+Go to `localhost:8080`
 
-Once you have run your generated server, you may access `localhost:8080/[WAR-file-name]` (it can vary depending on your Tomcat configuration):
-
-![Server Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img3.png)
+![Server Running](./img/server-img3.png)
 
 Copy the swagger URL in order to generate the `Client Project`.
 
@@ -187,11 +202,11 @@ Copy the swagger URL in order to generate the `Client Project`.
 
 When you choose the `Client Project`, you have to provide the swagger URL found in your `Server Project`:
 
-![Client Prompt Swagger Request](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img1.png)
+![Client Prompt Swagger Request](./img/client-img1.png)
 
 Then, fill the rest of the prompt and confirm. Follow this example:
 
-![Client Prompt Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img2.png)
+![Client Prompt Example](./img/client-img2.png)
 
 Once you have generated the client, go to your project directory root and run:
 
@@ -206,7 +221,7 @@ to build for `production mode`.
 
 When you enter on `dev`, you may see this screen at `localhost:8181`:
 
-![Client Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-img3.png)
+![Client Running](./img/client-img3.png)
 
 #### _Important_
 > The password column of your login table must be encrypted by `double SHA-256`. E.g.: The password `123456` should be `49dc52e6bf2abe5ef6e2bb5b0f1ee2d765b922ae6cc8b95d39dc06c21c848f8c` in the password column.
@@ -294,7 +309,7 @@ $ simpli scaffold:inspect [options] [paths...]
 $ simpli scaffold:inspect api.signIn
 ```
 
-![Scaffold Inspect Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/client-inspect-example.png)
+![Scaffold Inspect Example](./img/client-inspect-example.png)
 
 ---
 
@@ -338,10 +353,10 @@ $ simpli server:inspect [options] [paths...]
 #### Example
 
 ```sh
-$ simpli server:inspect table.user.columns
+$ simpli server:inspect table.user
 ```
 
-![Server Inspect Example](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-inspect-example.png)
+![Server Inspect Example](./img/server-inspect-example.png)
 
 ---
 

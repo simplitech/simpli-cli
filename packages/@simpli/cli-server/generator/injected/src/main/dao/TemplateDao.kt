@@ -5,10 +5,9 @@ package <%-packageAddress%>.dao
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import java.sql.Connection
 import java.util.ArrayList
-import java.util.Date
-import java.util.HashMap
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
+import br.com.simpli.sql.Query
 <%_ } else { _%>
 <%_ var cache = [] _%>
 <%_ for (var i in table.foreignColumns) { var column = table.foreignColumns[i] _%>
@@ -17,14 +16,14 @@ import <%-packageAddress%>.model.resource.<%-column.foreign.referencedTableModel
 <%_ cache.push(column.foreign.referencedTableModelName) _%>
 <%_ } _%>
 <%_ } _%>
+import java.sql.Connection
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
-import java.sql.Connection
-import java.util.Date
+import br.com.simpli.sql.Query
 <%_ } _%>
 
 /**
- * Responsible for <%-table.modelName%> database operations
+ * Data Access Object of <%-table.modelName%> from table <%-table.name%>
  * @author Simpli CLI generator
  */
 class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
@@ -32,180 +31,141 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ if (!table.isPivot) { _%>
     fun getOne(<%-table.primariesByParam()%>): <%-table.modelName%>? {
         // TODO: review generated method
-        return selectOne("""
-            SELECT *
-            FROM <%-table.name%>
-            WHERE 1 = 1
-            <%-table.primariesByWhere()%>
-            """, { rs -> <%-table.modelName%>(rs) }, <%-table.primariesByComma(true)%>)
+        val query = Query()
+                .selectAll()
+                .from("<%-table.name%>")
+                <%-table.primariesByWhere()%>
+
+        return getOne(query) { <%-table.modelName%>(it) }
     }
 
-    fun list(): MutableList<<%-table.modelName%>> {
+    fun getList(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): MutableList<<%-table.modelName%>> {
         // TODO: review generated method
-        return selectList("""
-            SELECT *
-            FROM <%-table.name%>
+        val query = Query()
+                .selectAll()
+                .from("<%-table.name%>")
 <%_ if (table.isRemovable) { _%>
-            WHERE <%-table.removableColumn.field%> = 1
-<%_ } _%>
-            """, { rs -> <%-table.modelName%>(rs) })
-    }
-
-    fun list(
-        query: String?,
-        page: Int?,
-        limit: Int?,
-        orderRequest: String?,
-        asc: Boolean?
-    ): MutableList<<%-table.modelName%>> {
-        // TODO: review generated method
-        val orderRequestAndColumn = HashMap<String, String>()
-
-<%_ for (var i in table.columns) { var column = table.columns[i] _%>
-<%_ if (!column.isPassword) { _%>
-        orderRequestAndColumn["<%-column.name%>"] = "<%-table.name%>.<%-column.field%>"
-<%_ } _%>
+                .whereEq("<%-table.removableColumn.field%>", true)
 <%_ } _%>
 
-        val orderColumn = orderRequestAndColumn[orderRequest]
-
-        val params = ArrayList<Any>()
-<%_ if (table.isRemovable) { _%>
-        var where = "WHERE <%-table.removableColumn.field%> = 1 "
-<%_ } else { _%>
-        var where = "WHERE 1 = 1 "
-<%_ } _%>
-
-        if (!query.isNullOrEmpty()) {
-            where += ("""
-                AND LOWER(CONCAT(
+        param.query?.also {
+            if (it.isNotEmpty()) {
+                query.where(Query()
 <%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
-                IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.queryColumns.length - 1 ? ',' : ''%>
+                        .orLike("<%-table.name%>.<%-column.field%>", "%$it%")
 <%_ } _%>
-                )) LIKE LOWER(?)
-                """)
-            params.add("%$query%")
+                )
+            }
         }
 
-        var limitQuery = ""
-        if (page != null && limit != null) {
-            limitQuery = "LIMIT ?, ? "
-            params.add(page * limit)
-            params.add(limit)
+        val orderMap = mapOf(
+<%_ for (var i in table.exceptPasswordColumns) { var column = table.exceptPasswordColumns[i] _%>
+                "<%-column.name%>" to "<%-table.name%>.<%-column.field%>"<%-i < table.exceptPasswordColumns.length - 1 ? ',' : ''%>
+<%_ } _%>
+        )
+
+        orderMap[param.orderBy]?.also {
+            query.orderByAsc(it, param.ascending)
         }
 
-        return selectList("""
-            SELECT *
-            FROM <%-table.name%>
-            $where
-            ${(if (orderColumn != null && asc != null) "ORDER BY " + orderColumn + " " + (if (asc) "ASC " else "DESC ") else "")}
-            $limitQuery
-            """, { rs -> <%-table.modelName%>(rs) }, *params.toTypedArray())
+        param.limit?.also {
+            val index = (param.page ?: 0) * it
+            query.limit(index, it)
+        }
+
+        return getList(query) { <%-table.modelName%>(it) }
     }
     
-    fun count(query: String?): Int {
+    fun count(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): Int {
         // TODO: review generated method
-        val params = ArrayList<Any>()
+        val query = Query()
+                .countRaw("DISTINCT <%-table.idColumn.field%>")
+                .from("<%-table.name%>")
 <%_ if (table.isRemovable) { _%>
-        var where = "WHERE <%-table.removableColumn.field%> = 1 "
-<%_ } else { _%>
-        var where = "WHERE 1 = 1 "
+                .whereEq("<%-table.removableColumn.field%>", true)
 <%_ } _%>
 
-        if (!query.isNullOrEmpty()) {
-            where += ("""
-                AND LOWER(CONCAT(
+        param.query?.also {
+            if (it.isNotEmpty()) {
+                query.where(Query()
 <%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
-                IFNULL(<%-table.name%>.<%-column.field%>, '')<%-i < table.queryColumns.length - 1 ? ',' : ''%>
+                        .orLike("<%-table.name%>.<%-column.field%>", "%$it%")
 <%_ } _%>
-                )) LIKE LOWER(?)
-                """)
-            params.add("%$query%")
+                )
+            }
         }
 
-        return selectFirstInt("""
-            SELECT COUNT(<%-table.idColumn.field%>)
-            FROM <%-table.name%>
-            $where
-            """, *params.toTypedArray()) ?: 0
+        return getFirstInt(query) ?: 0
     }
 
     fun update(<%-table.instanceName%>: <%-table.modelName%>): Int {
         // TODO: review generated method
-        return update("""
-            UPDATE <%-table.name%>
-            SET
-<%-table.buildDaoUpdateQuery()-%>
-            WHERE 1 = 1
-            <%-table.primariesByWhere()%>
-            """,
-<%-table.buildDaoUpdateParams()-%>
-        ).affectedRows
+        val query = Query()
+                .updateTable("<%-table.name%>")
+                .updateSet(*<%-table.instanceName%>.updateSet())
+                <%-table.primariesByWhere(false, table.instanceName)%>
+
+        return execute(query).affectedRows
     }
 
     fun insert(<%-table.instanceName%>: <%-table.modelName%>): Long {
         // TODO: review generated method
-        return update("""
-            INSERT INTO <%-table.name%> (
-<%-table.buildDaoInsertQuery()-%>
-            ) VALUES (<%-table.buildDaoInsertValues()-%>)
-            """,
-<%-table.buildDaoInsertParams()-%>
-        ).key
+        val query = Query()
+                .insertInto("<%-table.name%>")
+                .insertValues(*<%-table.instanceName%>.insertValues())
+
+        return execute(query).key
     }
 
     fun exist(<%-table.primariesByParam()%>): Boolean {
         // TODO: review generated method
-        return exist("""
-            SELECT <%-table.idColumn.field%>
-            FROM <%-table.name%>
-            WHERE 1 = 1
-            <%-table.primariesByWhere()%>
-            """, <%-table.primariesByComma(true)%>)
+        val query = Query()
+                .select("<%-table.idColumn.field%>")
+                .from("<%-table.name%>")
+                <%-table.primariesByWhere()%>
+
+        return exist(query)
     }
 
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-    fun exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-column.name%>: <%-column.kotlinType%>?, <%-table.primariesByParam()%>): Boolean {
+    fun exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-column.name%>: <%-column.kotlinType%>, <%-table.primariesByParam()%>): Boolean {
         // TODO: review generated method
-        return exist("""
-            SELECT <%-column.field%>
-            FROM <%-table.name%>
-            WHERE <%-column.field%> = ?
-            <%-table.primariesByWhere(true)%>
-            """, <%-column.name%>, <%-table.primariesByComma(true)%>)
+        val query = Query()
+                .select("<%-column.field%>")
+                .from("<%-table.name%>")
+                .whereEq("<%-column.field%>", <%-column.name%>)
+                <%-table.primariesByWhere(true)%>
+
+        return exist(query)
     }
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
 
     fun softDelete(<%-table.primariesByParam()%>): Int {
         // TODO: review generated method
-        return update("""
-            UPDATE <%-table.name%>
-            SET <%-table.removableColumn.field%> = 0
-            WHERE 1 = 1
-            <%-table.primariesByWhere()%>
-            """, <%-table.primariesByComma(true)%>).affectedRows
+        val query = Query()
+                .updateTable("<%-table.name%>")
+                .updateSet("<%-table.removableColumn.field%>" to false)
+                <%-table.primariesByWhere()%>
+
+        return execute(query).affectedRows
     }
 <%_ } _%>
 <%_ } else if (table.isPivot) { _%>
 <%_ var foreignColumns = table.foreignColumns _%>
 <%_ var columnRef1 = foreignColumns[0] _%>
 <%_ var columnRef2 = foreignColumns[1] _%>
-    fun insert(<%-table.primariesByParam()%>): Int {
+    fun insert(<%-table.primariesByParam()%>): Long {
         // TODO: review generated method
-        return update("""
-            INSERT INTO <%-table.name%> (
+        val query = Query()
+                .insertInto("<%-table.name%>")
+                .insertValues(
 <%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
-            <%-column.field%><%-i < foreignColumns.length - 1 ? ',' : ''%>
+                        "<%-column.field%>" to <%-column.name%><%-i < foreignColumns.length - 1 ? ',' : ''%>
 <%_ } _%>
-            ) VALUES (<%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
-<%- '?' + (i < foreignColumns.length - 1 ? ',' : '') -%>
-<%_ } _%>)
-            """,
-<%_ for (var i in foreignColumns) { var column = foreignColumns[i] _%>
-            <%-column.name%><%-i < foreignColumns.length - 1 ? ',' : ''%>
-<%_ } _%>
-        ).affectedRows
+                )
+
+        return execute(query).key
     }
 
 <%_ var cache = [] _%>
@@ -215,18 +175,22 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ if (!cache.includes(columnRef.foreign.referencedTableModelName)) { _%>
     fun removeAllFrom<%-columnRef.foreign.referencedTableModelName%>(<%-columnRef.name%>: <%-columnRef.kotlinType%>): Int {
         // TODO: review generated method
-        return update("DELETE FROM <%-table.name%> WHERE <%-columnRef.field%> = ? ",
-            <%-columnRef.name%>).affectedRows
+        val query = Query()
+                .deleteFrom("<%-table.name%>")
+                .whereEq("<%-columnRef.field%>", <%-columnRef.name%>)
+
+        return execute(query).affectedRows
     }
 
     fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): MutableList<<%-columnRef.foreign.referencedTableModelName%>> {
         // TODO: review generated method
-        return selectList("""
-            SELECT *
-            FROM <%-columnRef.foreign.referencedTableName%>
-            INNER JOIN <%-table.name%> ON <%-columnRef.foreign.referencedTableName%>.<%-columnRef.foreign.referencedColumnName%> = <%-table.name%>.<%-columnRef.field%>
-            WHERE <%-table.name%>.<%-columnCross.field%> = ?
-            """, { rs -> <%-columnRef.foreign.referencedTableModelName%>(rs) }, <%-columnCross.name%>)
+        val query = Query()
+                .selectAll()
+                .from("<%-columnRef.foreign.referencedTableName%>")
+                .innerJoin("<%-table.name%>", "<%-columnRef.foreign.referencedTableName%>.<%-columnRef.foreign.referencedColumnName%>", "<%-table.name%>.<%-columnRef.field%>")
+                .whereEq("<%-table.name%>.<%-columnCross.field%>", <%-columnCross.name%>)
+
+        return getList(query) { <%-columnRef.foreign.referencedTableModelName%>(it) }
     }
 
 <%_ cache.push(columnRef.foreign.referencedTableModelName) _%>

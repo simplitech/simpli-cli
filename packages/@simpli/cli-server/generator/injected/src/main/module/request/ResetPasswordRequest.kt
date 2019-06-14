@@ -3,7 +3,6 @@
 package <%-packageAddress%>.<%-moduleName%>.request
 
 import br.com.simpli.model.LanguageHolder
-import br.com.simpli.tools.Validator
 import io.swagger.annotations.ApiModel
 import javax.ws.rs.BadRequestException
 
@@ -12,14 +11,22 @@ import javax.ws.rs.BadRequestException
  * @author Simpli CLI generator
  */
 @ApiModel(value = "ResetPasswordRequest")
-class ResetPasswordRequest(val email: String?) {
+class ResetPasswordRequest(var newPassword: String?, var confirmPassword: String?, var hash: String?) {
     fun validate(lang: LanguageHolder) {
-        if (email.isNullOrEmpty()) {
-            throw BadRequestException(lang.cannotBeNull("E-Mail"))
+        if (newPassword.isNullOrEmpty()) {
+            throw BadRequestException(lang.cannotBeNull("New Password"))
         }
 
-        if (!Validator.isEmail(email)) {
-            throw BadRequestException(lang.isNotAValidEmail("E-Mail"))
+        if (confirmPassword.isNullOrEmpty()) {
+            throw BadRequestException(lang.cannotBeNull("Confirm Password"))
+        }
+
+        if (newPassword != confirmPassword) {
+            throw BadRequestException(lang["password_no_match"])
+        }
+
+        if (hash.isNullOrEmpty()) {
+            throw BadRequestException(lang.cannotBeNull("Hash"))
         }
     }
 }

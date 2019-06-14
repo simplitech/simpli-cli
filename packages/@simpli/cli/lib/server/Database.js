@@ -14,7 +14,7 @@ const {
 
 module.exports = class Database {
   static async requestConnection (serverSetup, defaultConfig = {}) {
-    const { host } = defaultConfig.host ? defaultConfig
+    const { host } = defaultConfig.host && defaultConfig.host !== 'db' ? defaultConfig
       : await inquirer.prompt([
         {
           name: 'host',
@@ -28,7 +28,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const { port } = defaultConfig.port ? defaultConfig
+    const { port } = defaultConfig.port && defaultConfig.host !== 'db' ? defaultConfig
       : await inquirer.prompt([
         {
           name: 'port',
@@ -42,7 +42,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const { user } = defaultConfig.user ? defaultConfig
+    const { user } = defaultConfig.user && defaultConfig.host !== 'db' ? defaultConfig
       : await inquirer.prompt([
         {
           name: 'user',
@@ -56,7 +56,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const { password } = defaultConfig.password ? defaultConfig
+    const { password } = defaultConfig.password && defaultConfig.host !== 'db' ? defaultConfig
       : await inquirer.prompt([
         {
           name: 'password',
@@ -69,7 +69,7 @@ module.exports = class Database {
       process.exit(1)
     }
 
-    const { database } = defaultConfig.database ? defaultConfig
+    const { database } = defaultConfig.database && defaultConfig.host !== 'db' ? defaultConfig
       : await inquirer.prompt([
         {
           name: 'database',

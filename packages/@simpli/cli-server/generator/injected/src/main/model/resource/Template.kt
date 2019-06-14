@@ -1,4 +1,5 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
+<%_ var startCase = options.serverSetup.startCase _%>
 package <%-packageAddress%>.model.resource
 
 import <%-packageAddress%>.dao.<%-table.modelName%>Dao
@@ -14,6 +15,7 @@ import br.com.simpli.sql.getLongOrNull
 import br.com.simpli.sql.getBoolean
 import br.com.simpli.sql.getBooleanOrNull
 import br.com.simpli.sql.getTimestamp
+import br.com.simpli.sql.Query
 import br.com.simpli.tools.Validator
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -132,17 +134,22 @@ class <%-table.modelName%> : ModelWrapper<<%-table.modelName%>Dao> {
             }
         }
 
-<%_ for (var i in table.softDeleteColumns) { var column = table.softDeleteColumns[i] _%>
-        <%-column.name%> = true
-
-<%_ } _%>
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-        if (dao.exist<%-column.capitalizedName%>(<%-column.name%>, <%-table.primariesByParamCall()%>)) {
-            throw BadRequestException(lang.alreadyExist("<%-column.name%>"))
+        <%-column.name%>?.also {
+            if (dao.exist<%-column.capitalizedName%>(it, <%-table.primariesByParamCall()%>)) {
+                throw BadRequestException(lang.alreadyExist("<%-startCase(column.name)%>"))
+            }
         }
+
 <%_ } _%>
 <%-table.buildValidate()-%>
     }
+
+<%-table.buildConstructor()-%>
+
+<%-table.buildUpdateSet()-%>
+
+<%-table.buildInsertValues()-%>
 
     open class ListParam : DefaultParam.AuthPaged()
 
@@ -168,6 +175,4 @@ class <%-table.modelName%> : ModelWrapper<<%-table.modelName%>Dao> {
     }
 
     open class PersistParam : DefaultParam.Auth()
-
-<%-table.buildConstructor()-%>
 }

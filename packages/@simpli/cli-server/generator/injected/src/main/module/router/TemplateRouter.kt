@@ -24,8 +24,8 @@ import javax.ws.rs.core.MediaType
  * Routing the API address into <%-table.modelName%> Process
  * @author Simpli CLI generator
  */
+@Api
 @Path("/<%-moduleNameKebabCase%>/<%-table.apiName%>")
-@Api()
 @Produces(MediaType.APPLICATION_JSON)
 class <%-table.modelName%>Router : RouterWrapper() {
 
@@ -38,7 +38,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     fun get<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.GetParam): <%-table.modelName%> {
         // TODO: review generated method
         return connection(authGateway).handle(process, param) {
-			it.getOne(param)
+			it.get(param)
 		}
     }
 

@@ -9,10 +9,10 @@ import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.model.LanguageHolder
 
 /**
- * Reset Password E-Mail handle
+ * Recover Password E-Mail handler
  * @author Simpli CLI generator
  */
-class ResetPasswordMail(lang: LanguageHolder, <%-userTable.instanceName%>: <%-userTable.modelName%>, hash: String) : MailWrapper(lang) {
+class RecoverPasswordMail(lang: LanguageHolder, <%-userTable.instanceName%>: <%-userTable.modelName%>, hash: String) : MailWrapper(lang) {
     init {
         to = <%-userTable.instanceName%>.<%-accountColumn.name%>!!
         subject = lang["email_reset_password_subject"]

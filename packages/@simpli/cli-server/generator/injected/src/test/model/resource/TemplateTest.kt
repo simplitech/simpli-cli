@@ -30,6 +30,8 @@ class <%-table.modelName%>Test: AppTest() {
     fun testValidate<%-column.capitalizedName%>NullFail() {
 <%_ if (!column.isRequired) { _%>
         model.<%-column.name%> = null
+<%_ } else if (column.isString) { _%>
+        model.<%-column.name%> = ""
 <%_ } else if (column.isLong) { _%>
         model.<%-column.name%> = 0L
 <%_ } else if (column.isDouble) { _%>

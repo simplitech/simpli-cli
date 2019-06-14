@@ -26,18 +26,8 @@ class <%-table.modelName%>Process : ProcessWrapper() {
         dao = <%-table.modelName%>Dao(con, lang)
     }
 
-    fun list(request: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
-        // TODO: review generated method
-        val list = dao.list(request.query, request.page, request.limit, request.orderRequest, request.asc)
-
-        val resp = PageCollection(list)
-        resp.total = dao.count(request.query)
-
-        return resp
-    }
-
     @Throws(BadRequestException::class, NotFoundException::class)
-    fun getOne(request: <%-table.modelName%>.GetParam): <%-table.modelName%> {
+    fun get(request: <%-table.modelName%>.GetParam): <%-table.modelName%> {
         // TODO: review generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
         val id = request.id ?: throw BadRequestException()
@@ -63,37 +53,15 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 <%_ } _%>
     }
 
+    fun list(request: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
+        // TODO: review generated method
+        val items = dao.getList(request)
+        val total = dao.count(request)
+
+        return PageCollection(items, total)
+    }
+
 <%_ if (table.hasPersist) { _%>
-    @Throws(BadRequestException::class)
-    fun create(model: <%-table.modelName%>): Long {
-        // TODO: review generated method
-        model.validate(false, dao, lang)
-
-<%_ if (table.idsColumn.length <= 1) { _%>
-        model.id = dao.insert(model)
-
-        return model.id
-<%_ } else { _%>
-        dao.insert(model)
-
-        return model.id1
-<%_ } _%>
-    }
-
-    @Throws(BadRequestException::class)
-    fun update(model: <%-table.modelName%>): Long {
-        // TODO: review generated method
-        model.validate(true, dao, lang)
-
-        dao.update(model)
-
-<%_ if (table.idsColumn.length <= 1) { _%>
-        return model.id
-<%_ } else { _%>
-        return model.id1
-<%_ } _%>
-    }
-
     /**
      * Use this to handle similarities between create and persist
      */
@@ -129,6 +97,36 @@ class <%-table.modelName%>Process : ProcessWrapper() {
         }
 
 <%_ } _%>
+<%_ if (table.idsColumn.length <= 1) { _%>
+        return model.id
+<%_ } else { _%>
+        return model.id1
+<%_ } _%>
+    }
+
+    @Throws(BadRequestException::class)
+    fun create(model: <%-table.modelName%>): Long {
+        // TODO: review generated method
+        model.validate(false, dao, lang)
+
+<%_ if (table.idsColumn.length <= 1) { _%>
+        model.id = dao.insert(model)
+
+        return model.id
+<%_ } else { _%>
+        dao.insert(model)
+
+        return model.id1
+<%_ } _%>
+    }
+
+    @Throws(BadRequestException::class)
+    fun update(model: <%-table.modelName%>): Long {
+        // TODO: review generated method
+        model.validate(true, dao, lang)
+
+        dao.update(model)
+
 <%_ if (table.idsColumn.length <= 1) { _%>
         return model.id
 <%_ } else { _%>

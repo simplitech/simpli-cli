@@ -75,7 +75,7 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
     }
 
     @Test
-    fun testGetOneSuccess() {
+    fun testGetSuccess() {
 <%_ if (table.idsColumn.length <= 1) { _%>
         Request.get.id = id
 <%_ } else { _%>
@@ -84,7 +84,7 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 <%_ } _%>
 <%_ } _%>
 
-        val result = subject.getOne(Request.get)
+        val result = subject.get(Request.get)
 <%_ if (table.idsColumn.length <= 1) { _%>
         assertNotSame(<%-table.idColumn.isString ? '\"0\"' : '0'%>, result.id)
 <%_ } else { _%>
@@ -98,7 +98,7 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
     }
 
     @Test(expected = NotFoundException::class)
-    fun testGetOneFail() {
+    fun testGetFail() {
 <%_ if (table.idsColumn.length <= 1) { _%>
         Request.get.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
 <%_ } else { _%>
@@ -107,7 +107,7 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 <%_ } _%>
 <%_ } _%>
 
-        subject.getOne(Request.get)
+        subject.get(Request.get)
     }
 <%_ if (table.hasPersist) { _%>
 

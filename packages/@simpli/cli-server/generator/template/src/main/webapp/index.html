@@ -24,6 +24,16 @@
       margin: 0;
       background: rgba(255, 255, 255, 0.6);
     }
+
+    .spin-gear {
+      animation: spin 3s infinite linear;
+      height: 50px;
+    }
+
+    @keyframes spin {
+      from {transform:rotate(0deg);}
+      to {transform:rotate(360deg);}
+    }
   </style>
 </head>
 <body>
@@ -33,6 +43,7 @@
       <h1 class="display-4 float-left">
         <img src="./simpli.png" alt="simpli" height="80">
         The server is running!
+        <img src="./gear.svg" class="spin-gear" alt="gear">
       </h1>
       <div class="float-right">
         <a href="./docs">Swagger Docs</a>

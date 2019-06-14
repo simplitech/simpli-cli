@@ -35,11 +35,11 @@ open class DefaultParam {
 
         @QueryParam("orderBy")
         @ApiParam(value = "Identifier for sorting, usually a property name", example = "id")
-        var orderRequest: String? = null
+        var orderBy: String? = null
 
         @QueryParam("ascending")
         @ApiParam(value = "True for ascending order", defaultValue = "false")
-        var asc: Boolean = false
+        var ascending: Boolean? = null
     }
 
     open class Auth : DefaultParam() {
@@ -63,10 +63,10 @@ open class DefaultParam {
 
         @QueryParam("orderBy")
         @ApiParam(value = "Identifier for sorting, usually a property name", example = "id")
-        var orderRequest: String? = null
+        var orderBy: String? = null
 
         @QueryParam("ascending")
         @ApiParam(value = "True for ascending order", defaultValue = "false")
-        var asc: Boolean = false
+        var ascending: Boolean? = null
     }
 }

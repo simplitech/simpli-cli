@@ -41,7 +41,7 @@ class AppProvider : ParamConverterProvider, ContextResolver<Gson>, ContainerResp
     override fun filter(request: ContainerRequestContext, response: ContainerResponseContext) {
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-        response.headers.add("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin, Accept, X-Client-Version, Authorization, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
+        response.headers.add("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin, Accept, X-Client-Version, X-Ignore-Errors, Authorization, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
     }
 
     internal class DateParameterConverter : ParamConverter<Date> {

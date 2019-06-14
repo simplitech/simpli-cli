@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mvn clean package
+mvn clean package -DskipTests
 docker-compose stop
 docker-compose up -d
 

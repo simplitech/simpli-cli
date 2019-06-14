@@ -2,18 +2,36 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 <%_ var accountColumn = options.serverSetup.accountColumn _%>
 <%_ var passwordColumn = options.serverSetup.passwordColumn _%>
+<%_ var startCase = options.serverSetup.startCase _%>
 package <%-packageAddress%>.<%-moduleName%>.request
 
-import <%-packageAddress%>.<%-moduleName%>.auth.AuthProcess
+import br.com.simpli.model.LanguageHolder
+import br.com.simpli.tools.Validator
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import <%-packageAddress%>.<%-moduleName%>.auth.AuthProcess
+import <%-packageAddress%>.exception.response.BadRequestException
 
 /**
  * Authentication Request Model
  * @author Simpli CLI generator
  */
 @ApiModel(value = "AuthRequest")
-class AuthRequest(val <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, val <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?) {
+class AuthRequest(var <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, var <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?) {
+    fun validate(lang: LanguageHolder) {
+        if (<%-accountColumn.name%>.isNullOrEmpty()) {
+            throw BadRequestException(lang.cannotBeNull("<%-startCase(accountColumn.name)%>"))
+        }
+
+        if (!Validator.isEmail(<%-accountColumn.name%>)) {
+            throw BadRequestException(lang.isNotAValidEmail("<%-startCase(accountColumn.name)%>"))
+        }
+
+        if (<%-passwordColumn.name%>.isNullOrEmpty()) {
+            throw BadRequestException(lang.cannotBeNull("<%-startCase(passwordColumn.name)%>"))
+        }
+    }
+
     @ApiModelProperty(hidden = true)
     fun toToken() = AuthProcess.requestToToken(this)
 }

@@ -3,6 +3,7 @@ const Column = require('./Column')
 const Relation = require('./Relation')
 const ManyToMany = require('./ManyToMany')
 const lorem = require('../util/lorem')
+const startCase = require('lodash.startcase')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const uniqBy = require('lodash.uniqby')
@@ -183,6 +184,10 @@ module.exports = class ServerSetup {
 
   capitalizeFirstLetter (str = '') {
     return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
+  startCase (str = '') {
+    return startCase(str)
   }
 
   kebabCase (str = '') {

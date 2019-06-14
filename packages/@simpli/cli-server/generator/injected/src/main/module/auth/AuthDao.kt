@@ -8,6 +8,7 @@ package <%-packageAddress%>.<%-moduleName%>.auth
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.Dao
+import br.com.simpli.sql.Query
 import java.sql.Connection
 
 /**
@@ -16,38 +17,43 @@ import java.sql.Connection
  */
 class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
 
-    fun getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?): Long? {
-        return selectFirstLong("""
-                SELECT <%-userTable.idColumn.name%>
-                FROM <%-userTable.name%>
-                WHERE <%-accountColumn.field%> = ?
-                AND <%-passwordColumn.field%> = sha2(?, 256)
-                """,
-                <%-accountColumn.name%>, <%-passwordColumn.name%>)
+    fun getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>): Long? {
+        val query = Query()
+                .select("<%-userTable.idColumn.name%>")
+                .from("<%-userTable.name%>")
+                .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
+                .where("<%-passwordColumn.field%> = SHA2(?, 256)", <%-passwordColumn.name%>)
+
+        return getFirstLong(query)
     }
 
     fun get<%-userTable.modelName%>(<%-userTable.idColumn.name%>: <%-userTable.idColumn.kotlinType%>): <%-userTable.modelName%>? {
-        return selectOne("""
-            SELECT *
-            FROM <%-userTable.name%>
-            WHERE <%-userTable.idColumn.field%> = ?
-            """, { rs -> <%-userTable.modelName%>(rs) }, <%-userTable.idColumn.name%>)
+        val query = Query()
+                .selectAll()
+                .from("<%-userTable.name%>")
+                .whereEq("<%-userTable.idColumn.field%>", <%-userTable.idColumn.name%>)
+
+        return getOne(query) { <%-userTable.modelName%>(it) }
     }
 
-    fun get<%-userTable.modelName%>ByEmail(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>?): <%-userTable.modelName%>? {
-        return selectOne("""
-            SELECT *
-            FROM <%-userTable.name%>
-            WHERE <%-accountColumn.field%> = ?
-            """, { rs -> <%-userTable.modelName%>(rs)}, <%-accountColumn.name%>)
+    fun get<%-userTable.modelName%>ByEmail(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>): <%-userTable.modelName%>? {
+        val query = Query()
+                .selectAll()
+                .from("<%-userTable.name%>")
+                .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
+
+        return getOne(query) { <%-userTable.modelName%>(it) }
     }
 
     fun update<%-userTable.modelName%>Password(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>): Int {
-        return update("""
-            UPDATE <%-userTable.name%>
-            SET <%-passwordColumn.field%> = IF(? IS NOT NULL, SHA2(?, 256), <%-passwordColumn.field%>)
-            WHERE <%-accountColumn.field%> = ?
-            """, <%-passwordColumn.name%>, <%-passwordColumn.name%>, <%-accountColumn.name%>).affectedRows
+        val query = Query()
+                .updateTable("<%-userTable.name%>")
+                .updateSet(
+                        "<%-passwordColumn.field%>" to Query("SHA2(?, 256)", <%-passwordColumn.name%>)
+                )
+                .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
+
+        return execute(query).affectedRows
     }
 
 }

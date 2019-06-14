@@ -165,10 +165,10 @@ module.exports = class Server {
     stopSpinner()
     log()
     log(`🎉  Successfully created server project ${chalk.yellow(name)}.`)
+    log(`👉  Make sure the port ${chalk.cyan(`8080`)} is not in use`)
     log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
     log(`👉  Run ${chalk.yellow(`simpli server:seed`)}`)
-    log(`👉  Run ${chalk.yellow(`sh serve.sh`)}`)
-    log(`👉  Make sure the port ${chalk.cyan(`8080`)} is not in use`)
+    log(`👉  Run ${chalk.yellow(`sh build.sh`)}`)
     log(`👉  Go to ${chalk.cyan('http://localhost:8080')}`)
     log()
 

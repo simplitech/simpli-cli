@@ -6,7 +6,6 @@ import <%-packageAddress%>.enums.Lang
 import <%-packageAddress%>.param.DefaultParam
 import <%-packageAddress%>.wrapper.GatewayWrapper
 import <%-packageAddress%>.wrapper.ProcessWrapper
-import <%-packageAddress%>.wrapper.RouterWrapper
 import br.com.simpli.model.LanguageHolder
 import java.sql.Connection
 
@@ -27,15 +26,11 @@ open class GuestGateway : GatewayWrapper() {
         val lang = getLang(param.lang)
         val clientVersion = param.clientVersion
 
-        if (lang !== Lang.EN_US) {
+        if (clientVersion != "w1.0.0") {
             //
         }
 
-        if (clientVersion !== "w1.0.0") {
-            //
-        }
-
-        when(param) {
+        when (param) {
             is DefaultParam.Paged -> {
                 param.query = param.query?.replace("[.,:\\-/]".toRegex(), "")
             }
