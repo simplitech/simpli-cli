@@ -15,6 +15,27 @@ module.exports = class Resource {
     return str
   }
 
+  get endpointParamsMethodImploded () {
+    let str = ''
+    this.endpointParams.forEach((param) => {
+      str += `${param}, `
+    })
+    str = str.slice(0, -2)
+    return str
+  }
+
+  get endpointParamsIfImploded () {
+    let str = 'true'
+    if (this.endpointParams.length) {
+      str = ''
+    }
+    this.endpointParams.forEach((param) => {
+      str += `${param} && `
+    })
+    str = str.slice(0, -4)
+    return str
+  }
+
   /**
    * Set endpoint and endpointParams values
    * @param wsEndpoint WebSever Endpoint

@@ -35,6 +35,7 @@
   "dependencies": {
     "@vue/cli-shared-utils": "^3.0.0-beta.6",
     "chalk": "^2.3.0",
+    "class-transformer": "^0.2.3",
     "commander": "^2.12.2",
     "conventional-changelog": "^1.1.22",
     "debug": "^3.1.0",

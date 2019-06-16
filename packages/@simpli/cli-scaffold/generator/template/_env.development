@@ -1,3 +1,5 @@
 <%_ var config = rootOptions.scaffoldSetup _%>
 VUE_APP_API_URL=<%-config.apiUrlDev%>
 VUE_APP_SOCKET_URL=<%-config.socketUrlDev%>
+
+BASE_URL=/

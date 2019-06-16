@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModel
  * @author Simpli CLI generator
  */
 @ApiModel(value = "ChangePasswordRequest")
-class ChangePasswordRequest(var currentPassword: String?, var newPassword: String?, private val confirmPassword: String?) {
+class ChangePasswordRequest(var currentPassword: String?, var newPassword: String?, var confirmPassword: String?) {
     fun validate(lang: LanguageHolder) {
         if (currentPassword.isNullOrEmpty()) {
             throw BadRequestException(lang.cannotBeNull("Current Password"))

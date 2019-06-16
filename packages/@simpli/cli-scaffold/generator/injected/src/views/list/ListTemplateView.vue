@@ -4,20 +4,20 @@
     <section class="header">
       <div class="horiz items-center gutter-10">
         <h1 class="m-0">
-          {{$t('classes.<%-model.name%>.title')}}
+          {{$t('resource.<%-model.name%>')}}
         </h1>
 
         <adap-searchfield :collection="collection" :placeholder="$t('app.search')"/>
 
-        <await name="query<%-model.name%>"></await>
+        <await name="list"></await>
 
         <div class="weight-1"></div>
 
-        <span v-if="collection.items.length">
+        <span v-if="collection.size()">
           {{ $t('app.totalLines', {total: collection.total}) }}
         </span>
 
-        <await name="downloadCsv">
+        <await name="listCsv">
           <button @click="downloadCsv">
             {{ $t('app.downloadCsv') }}
           </button>
@@ -30,8 +30,8 @@
     </section>
 
     <section>
-      <await init name="query" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
-        <template v-if="!collection.items.length">
+      <await init name="query" class="rel h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+        <template v-if="!collection.size()">
           <h3 class="p-20 text-center">
             {{ $t('app.noDataToShow') }}
           </h3>
@@ -44,23 +44,23 @@
               <tr>
                 <th></th>
 
-                <th v-for="(value, key) in collection.header" :key="key">
+                <th v-for="(value, key) in schema.header" :key="key">
                   <adap-orderby :collection="collection" :name="key" :label="value"/>
                 </th>
               </tr>
               </thead>
 
               <tbody>
-              <tr v-for="(item, i) in collection.items" :key="i">
+              <tr v-for="(item, i) in collection.all()" :key="i">
                 <td class="horiz nowrap">
-                  <a @click="pushByName('edit<%-model.name%>', item.$id)" class="icon icon-pencil"></a>
+                  <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="icon icon-pencil"></a>
 <%_ if (model.resource.deletable) { _%>
                   <a @click="openRemoveModal(item)" class="icon icon-trash"></a>
 <%_ } _%>
                 </td>
 
-                <td v-for="(field, j) in item.fieldsToRender" :key="j">
-                  <resource-render v-model="collection.items[i]" :field="field"/>
+                <td v-for="(field, j) in schema.allFields" :key="j">
+                  <render-schema v-model="collection.get(i)" :schema="schema" :field="field"/>
                 </td>
               </tr>
               </tbody>
@@ -69,59 +69,58 @@
 
           <adap-pagination :collection="collection"/>
         </template>
+
+        <await name="adapQuery" class="await-screen"/>
       </await>
     </section>
 <%_ if (model.resource.deletable) { _%>
 
-    <modal-remove name="modalRemove" :text="toRemove.$tag" @cancel="closeRemoveModal" @confirm="removeItem"/>
+    <modal-remove v-model="toRemove" @confirm="removeItem"/>
 <%_ } _%>
   </div>
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Watch, Mixins, Vue} from 'vue-property-decorator'
+  import {Component, Prop, Watch, Mixins} from 'vue-property-decorator'
+  import {$, Helper, MixinQueryRouter} from '@/simpli'
   <%-model.injectIntoDependence().build()%>
-  import {$, PageCollection, WholeCollection, MixinQueryRouter, pushByName} from '@/simpli'
+  <%-model.injectCollectionIntoDependence().build()%>
+  <%-model.injectSchemaIntoDependence('List').build()%>
+  <%-model.injectSchemaIntoDependence('Csv').build()%>
 
-  @Component({
-    mixins: [MixinQueryRouter],
-  })
-  export default class List<%-model.name%>View extends Mixins<MixinQueryRouter>() {
-    collection = new PageCollection(<%-model.name%>)
+  @Component
+  export default class List<%-model.name%>View extends Mixins(MixinQueryRouter) {
+    Helper = Helper
+
+    schema = new List<%-model.name%>Schema()
+    collection = new <%-model.name%>Collection()
+
 <%_ if (model.resource.deletable) { _%>
-    toRemove = new <%-model.name%>()
+    toRemove: <%-model.name%> | null = null
+
 <%_ } _%>
-    pushByName = pushByName
-
-<%_ if (model.resource.deletable) { _%>
-    async removeItem() {
-      await this.toRemove.remove()
-      this.closeRemoveModal()
-      await this.collection.search()
+    async mounted() {
+      await this.query()
     }
 
+<%_ if (model.resource.deletable) { _%>
     openRemoveModal(item: <%-model.name%>) {
       this.toRemove = item
-      $.modal.open('modalRemove')
     }
 
-    closeRemoveModal() {
-      this.toRemove = new <%-model.name%>()
-      $.modal.close('modalRemove')
+    async removeItem() {
+      if (this.toRemove) {
+        await this.toRemove.remove()
+        this.toRemove = null
+        await this.collection.list()
+      }
     }
 
 <%_ } _%>
     async downloadCsv() {
-      const csv = new WholeCollection(<%-model.name%>)
-
-      const fetch = async () => await csv.search()
-      await $.await.run(fetch, 'downloadCsv')
-
-      csv.downloadCsv()
-    }
-
-    async mounted() {
-      await this.query()
+      const csv = new <%-model.name%>Collection().whole()
+      await csv.listCsv()
+      new Csv<%-model.name%>Schema().downloadCsv(csv.all())
     }
   }
 </script>

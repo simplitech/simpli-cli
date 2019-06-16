@@ -1,5 +1,5 @@
 import {ActionTree, GetterTree, MutationTree} from 'vuex'
-import {$, Lang, Currency} from '@/simpli'
+import {Simpli, Enum} from '@/simpli'
 import {RootState} from '@/types/store'
 import {defaultCurrency, defaultLang} from '@/config/locale.config'
 const app = require('../../package.json')
@@ -25,8 +25,8 @@ export const actions: ActionTree<RootState, RootState> = {
    * @param commit
    * @param val
    */
-  setLang: ({commit}, val: Lang) => {
-    $.i18n.locale = val
+  setLang: ({commit}, val: Enum.Lang) => {
+    Simpli.changeLocale(val)
     commit('SET_LANG', val)
   },
 
@@ -35,7 +35,8 @@ export const actions: ActionTree<RootState, RootState> = {
    * @param commit
    * @param val
    */
-  setCurrency: ({commit}, val: Currency) => {
+  setCurrency: ({commit}, val: Enum.Currency) => {
+    Simpli.changeCurrency(val)
     commit('SET_CURRENCY', val)
   },
 }

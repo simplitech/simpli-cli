@@ -34,7 +34,7 @@
 <%_ for (var i in resources) { var resource = resources[i] _%>
           <li>
             <router-link to="/<%-kebabCase(resource.name)%>/list" @click.native="menuOff" class="btn fluid flat contrast">
-              {{ $t('classes.<%-resource.name%>.title') }}
+              {{ $t('resource.<%-resource.name%>') }}
             </router-link>
           </li>
 <%_ } _%>

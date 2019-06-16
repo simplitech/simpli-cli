@@ -6,7 +6,7 @@
  */
 
 import Vue from 'vue'
-import {$} from '@/simpli'
+import {$, Schema, PageCollection, ToastConfig, InputText} from '@/simpli'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import GridLoader from 'vue-spinner/src/GridLoader.vue'
@@ -55,3 +55,23 @@ $.modal.defaultTransition = 'blur'
 $.modal.defaultBackgroundTransition = 'fade'
 $.modal.defaultClosable = true
 $.modal.defaultCloseOutside = true
+
+$.tip.defaultMessage = ''
+$.tip.defaultTransition = 'fade'
+$.tip.defaultWidth = 'auto'
+$.tip.defaultOffset = 0
+
+$.snotify.setDefaults({
+  global: ToastConfig.ToastGlobalConfig,
+  toast: ToastConfig.ToastDefaultConfig,
+})
+
+Schema.defaultI18nPath = 'schema.{schemaName}.{fieldName}'
+
+PageCollection.defaultMinCharToSearch = 3
+PageCollection.defaultCurrentPage = 0
+PageCollection.defaultPerPage = 10
+
+// $.ajv.instance.addFormat('customValidationFormat', new RegExp(/.+/))
+
+// InputText.addPreset('customMaskPreset', CustomMaskPreset)

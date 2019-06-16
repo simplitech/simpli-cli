@@ -1,58 +1,82 @@
 /**
  * @file
  * Http Request Configuration
- * Used in library: vue-resource
+ * Used in library: axios
  *
  * This file provides the standard configuration to communicate with the server
- * See https://github.com/pagekit/vue-resource/blob/develop/docs/http.md#interceptors
+ * See https://github.com/axios/axios
  * This configuration will be set in @/bootstrap/app.ts
  */
 
-import VueResource from 'vue-resource'
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-import {$, getToken, getVersion, getLanguage, isLogged, signOut, HttpStatus, error} from '@/simpli'
-<%_ } else { _%>
-import {$, getVersion, getLanguage, HttpStatus, error} from '@/simpli'
-<%_ } _%>
+import axios, {AxiosError} from 'axios'
+import {$, Helper, Enum, socket} from '@/simpli'
+import {AppHelper} from '@/helpers'
 
 /**
- * Base URL of the server API
- * @type {string}
+ * Web Server request & response config
  */
-export const apiURL = process.env.VUE_APP_API_URL || 'http://localhost/api'
+const axiosInstance = axios.create({
+  baseURL: process.env.VUE_APP_API_URL,
+})
 
 /**
- * Base URL of the Socket server
- * @type {string}
+ * Socket Server config
  */
-export const socketURL = process.env.VUE_APP_SOCKET_URL || 'ws://localhost/ws'
+const socketInstance = socket.create({
+  baseURL: process.env.VUE_APP_SOCKET_URL,
+})
 
 /**
- * Standard behavior during a request
- * @param {VueResource.HttpOptions} request
- * @param {Function} next
+ * Interceptor for every HTTP request of this app
  */
-export const httpInterceptor = (request: VueResource.HttpOptions, next: any) => {
-  const regex = new RegExp(`^${apiURL}\\S*$`, 'g')
-  const match = regex.exec(request.url || '')
+axiosInstance.interceptors.request.use((config) => {
+  const pattern = /^(?:https?:)?\/\/[\w.]+[\w-/]+[\w?&=%]*$/g
+  const isRelativeUrl = !pattern.exec(config.url || '')
 
-  if (match) {
-    request.headers.set('Accept-Language', getLanguage())
-    request.headers.set('X-Client-Version', `w${getVersion()}`) // w = web
+  if (isRelativeUrl) {
+    config.headers['Accept-Language'] = AppHelper.getLanguage()
+    config.headers['X-Client-Version'] = `w${AppHelper.getVersion()}` // w = web
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
-    if (isLogged()) request.headers.set('Authorization', `Bearer ${getToken()}`)
+    if (AppHelper.isLogged()) {
+      config.headers.Authorization = `Bearer ${AppHelper.getToken()}`
+    }
 <%_ } _%>
   }
 
-  next((resp: VueResource.HttpResponse) => {
-    if (!resp.status) error('system.error.noServer')
-    else if (resp.status >= 400) {
+  return config
+})
+
+/**
+ * Interceptor for every HTTP response of this app
+ */
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    const response = error.response
+
+    if (error.config.headers['X-Ignore-Errors']) {
+      return Promise.reject('')
+    }
+
+    if (!response) {
+      Helper.error('system.error.noServer')
+      return Promise.reject($.t('system.error.noServer'))
+    }
+
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-      if (resp.status === HttpStatus.UNAUTHORIZED) signOut()
+    if (response.status === Enum.HttpStatus.UNAUTHORIZED) {
+      AppHelper.signOut()
+    }
 
 <%_ } _%>
-      $.snotify.error(resp.data.message || resp.statusText, resp.status.toString())
+    if (response.status && response.status >= 400) {
+      $.snotify.error(response.data.message || response.statusText, response.status.toString())
+      return Promise.reject(response.data.message || response.statusText)
     }
-  })
-}
+
+    return Promise.reject(error)
+  },
+)
+
+export {axiosInstance, socketInstance}

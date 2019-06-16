@@ -7,9 +7,16 @@ const startCase = require('lodash.startcase')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const uniqBy = require('lodash.uniqby')
+const Class = require('class-transformer')
 
 module.exports = class Model {
   constructor (name, definition, path, apis) {
+    // Model name //e.g User
+    this.originalName = `${name || ''}`
+
+    if (name.match(/^(PageCollection)\w+$/)) {
+      name = `${name.replace(/^PageCollection/, '')}Collection`
+    }
     // Model name //e.g User
     this.name = name || ''
 
@@ -19,7 +26,7 @@ module.exports = class Model {
     // Model description (not mandatory)
     this.description = definition.description || null
 
-    // Model module //e.g @/model/User
+    // Model module //e.g @/model/resource/User
     this.module = null
 
     // Attributes
@@ -36,7 +43,6 @@ module.exports = class Model {
 
     // Dependencies to import
     this.dependencies = []
-    this.schemaDependencies = []
     this.persistDependencies = []
 
     this.setAttr(name, definition.properties, definition.required)
@@ -44,7 +50,6 @@ module.exports = class Model {
     this.setAPIs(apis)
     this.resolveModule()
     this.setDependencies()
-    this.setSchemaDependencies()
     this.setPersistDependencies()
   }
 
@@ -63,6 +68,13 @@ module.exports = class Model {
   }
 
   /**
+   * Filter attrs by foreign
+   */
+  get foreignAtrrs () {
+    return this.attrs.filter((attr) => attr.isForeign)
+  }
+
+  /**
    * Filter attrs by non-foreign
    */
   get nonForeignAtrrs () {
@@ -70,17 +82,24 @@ module.exports = class Model {
   }
 
   /**
+   * Filter apis by resp type
+   */
+  get respObjectApis () {
+    return this.apis.filter((api) => api.respModelType === 'object')
+  }
+
+  /**
+   * Filter apis by body model
+   */
+  get bodyApis () {
+    return this.apis.filter((attr) => attr.body.model)
+  }
+
+  /**
    * Only resolved dependencies
    */
   get resolvedDependencies () {
     return this.dependencies.filter((dep) => dep.resolved)
-  }
-
-  /**
-   * Only resolved schema dependencies
-   */
-  get resolvedSchemaDependencies () {
-    return this.schemaDependencies.filter((dep) => dep.resolved)
   }
 
   /**
@@ -95,9 +114,33 @@ module.exports = class Model {
    */
   get notResolvedDependencies () {
     const notResolvedDependencies = this.dependencies.filter((dep) => !dep.resolved)
-    const notResolvedSchemaDependencies = this.schemaDependencies.filter((dep) => !dep.resolved)
     const notResolvedPersistDependencies = this.persistDependencies.filter((dep) => !dep.resolved)
-    return [...notResolvedDependencies, ...notResolvedSchemaDependencies, ...notResolvedPersistDependencies]
+    return [...notResolvedDependencies, ...notResolvedPersistDependencies]
+  }
+
+  /**
+   * Get the schema module of this model
+   */
+  getSchemaModule (schemaRef = '') {
+    switch (this.type) {
+    case ModelType.RESOURCE:
+      return `@/schema/resource/${this.name}/${schemaRef}${this.name}Schema`
+    case ModelType.REQUEST:
+      return `@/schema/request/${this.name}/${schemaRef}${this.name}Schema`
+    case ModelType.RESPONSE:
+      return `@/schema/response/${this.name}/${schemaRef}${this.name}Schema`
+    case ModelType.PAGINATED:
+      return `@/schema/collection/${this.name}/${schemaRef}${this.name}Schema`
+    default:
+      return `@/schema/model/${this.name}/${schemaRef}${this.name}Schema`
+    }
+  }
+
+  /**
+   * Get the collection module of this model
+   */
+  getCollectionModule () {
+    return `@/model/collection/${this.name}Collection`
   }
 
   /**
@@ -115,7 +158,7 @@ module.exports = class Model {
       this.module = `@/model/response/${this.name}`
       break
     case ModelType.PAGINATED:
-      this.module = `@/model/paginated/${this.name}`
+      this.module = `@/model/collection/${this.name}`
       break
     default:
       this.module = `@/model/${this.name}`
@@ -212,7 +255,7 @@ module.exports = class Model {
   }
 
   definePaginated () {
-    if (this.name.match(/^(PageCollection)\w+$/)) {
+    if (this.originalName.match(/^(PageCollection)\w+$/)) {
       this.type = ModelType.PAGINATED
     }
   }
@@ -241,17 +284,27 @@ module.exports = class Model {
     return this.is(ModelType.PAGINATED)
   }
 
+  get itemModelName () {
+    if (this.isPaginated) {
+      return this.originalName.replace(/^PageCollection/, '')
+    }
+    return null
+  }
+
   /**
    * Populates all APIs (not included CRUD APIs)
    */
   setAPIs (apis = []) {
-    const conditionsOr = (api) => [
-      api.respModel === this.name, // or
-      !api.respModel && api.hasTag(this.name), // or
-      !api.respModel && !api.hasTag(this.name) && !api.tags.length && api.body.model === this.name
-    ]
-    // Get APIs which have the same response model, body model or tag of this model
-    this.apis = apis.filter((api) => !!conditionsOr(api).find((item) => item))
+    if (this.isPaginated) {
+      this.apis = Class.classToClass(apis.filter((api) => api.respModel === this.name)) // clone
+    } else {
+      // Get APIs which belongs the same tag of this model name
+      this.apis = Class.classToClass(apis.filter((api) => api.hasTag(this.name))) // clone
+    }
+
+    this.apis.forEach((api) => {
+      api.belongsToModel = this.name
+    })
   }
 
   /**
@@ -261,8 +314,15 @@ module.exports = class Model {
     const dependencies = []
     const simpliModule = '@/simpli'
 
+    // Add moment
+    if (this.attrs.find((attr) => attr.isDate || attr.isDatetime)) {
+      const momentDep = new Dependence(`moment`, true, false)
+      momentDep.addChild('moment')
+      dependencies.push(momentDep)
+    }
+
     const simpliCommons = new Dependence(simpliModule)
-    const simpliDecorator = new Dependence(simpliModule, false)
+    const simpliDecorator = new Dependence(simpliModule)
 
     this.populateSimpliCommons(simpliCommons)
     this.populateSimpliDecorator(simpliDecorator)
@@ -271,40 +331,7 @@ module.exports = class Model {
     if (simpliDecorator.hasChildren) dependencies.push(simpliDecorator)
     dependencies.push(...this.generateModelResources())
 
-    // Add Schema
-    if (this.isResource) {
-      const modelResource = new Dependence(`@/schema/${this.name}.schema`, true, false)
-      modelResource.addChild(`${this.name}Schema`)
-      dependencies.push(modelResource)
-    }
-
     this.dependencies = dependencies
-  }
-
-  /**
-   * Populates all dependencies of Schema
-   */
-  setSchemaDependencies () {
-    const dependencies = []
-    const simpliModule = '@/simpli'
-
-    const simpliSchemaCommons = new Dependence(simpliModule)
-    const simpliMisc = new Dependence(simpliModule)
-
-    this.populateSimpliSchemaCommons(simpliSchemaCommons)
-    this.populateSimpliMisc(simpliMisc)
-
-    if (simpliSchemaCommons.hasChildren) dependencies.push(simpliSchemaCommons)
-    if (simpliMisc.hasChildren) dependencies.push(simpliMisc)
-
-    // Add this model
-    if (this.isResource) {
-      const modelResource = new Dependence(`@/model/resource/${this.name}`, true, false)
-      modelResource.addChild(this.name)
-      dependencies.push(modelResource)
-    }
-
-    this.schemaDependencies = dependencies
   }
 
   /**
@@ -314,14 +341,14 @@ module.exports = class Model {
     const dependencies = []
 
     this.objectAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.name) dependencies.push(modelResource)
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.name) dependencies.push(modelResource)
@@ -332,6 +359,8 @@ module.exports = class Model {
 
   populateSimpliCommons (dep = new Dependence()) {
     dep.addChild('$')
+    dep.addChild('Helper')
+    dep.addChild('Request')
     if (this.isResource) {
       dep.addChild('Resource')
       dep.addChild('ID')
@@ -340,14 +369,7 @@ module.exports = class Model {
       const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
       if (hasID) dep.addChild('ID')
       dep.addChild('Model')
-      dep.addChild('sleep')
-      dep.addChild('encrypt')
     }
-  }
-
-  populateSimpliSchemaCommons (dep = new Dependence()) {
-    dep.addChild('Schema')
-    dep.addChild('InputType')
   }
 
   populateSimpliDecorator (dep = new Dependence()) {
@@ -355,55 +377,37 @@ module.exports = class Model {
       attr.responses.forEach((response) => {
         dep.addChild(response.title)
       })
-
-      attr.validations.forEach((validation) => {
-        dep.addChild(validation.title)
-      })
     })
-  }
-
-  populateSimpliMisc (dep = new Dependence()) {
-    const hasBoolean = !!this.attrs.find((attr) => attr.isBoolean)
-    const hasDate = !!this.attrs.find((attr) => attr.isDate)
-    const hasDatetime = !!this.attrs.find((attr) => attr.isDatetime)
-    const hasUrl = !!this.attrs.find((attr) => attr.isUrl)
-    const hasImageUrl = !!this.attrs.find((attr) => attr.isImageUrl)
-    const hasPhone = !!this.attrs.find((attr) => attr.isPhone)
-    const hasZipcode = !!this.attrs.find((attr) => attr.isZipcode)
-    const hasCpf = !!this.attrs.find((attr) => attr.isCpf)
-    const hasCnpj = !!this.attrs.find((attr) => attr.isCnpj)
-
-    if (hasBoolean) dep.addChild('bool')
-    if (hasDate) dep.addChild('date')
-    if (hasDatetime) dep.addChild('datetime')
-    if (hasUrl) dep.addChild('RenderAnchor')
-    if (hasImageUrl) dep.addChild('RenderImage')
-    if (hasPhone) dep.addChild('phone')
-    if (hasZipcode) dep.addChild('cep')
-    if (hasCpf) dep.addChild('cpf')
-    if (hasCnpj) dep.addChild('cnpj')
   }
 
   generateModelResources () {
     const list = []
 
     this.objectAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.name) list.push(modelResource)
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.name) list.push(modelResource)
     })
 
-    const apisWithModel = this.apis.filter((attr) => attr.body.model)
-    apisWithModel.forEach((api) => {
-      const modelResource = new Dependence(api.body.model, true, false)
+    // Add from APIs
+    this.respObjectApis.forEach((api) => {
+      const modelResource = new Dependence(api.respModel)
+      modelResource.resolved = false
+      modelResource.addChild(api.respModel)
+      if (api.respModel !== this.name) list.push(modelResource)
+    })
+
+    // Add from APIs
+    this.bodyApis.forEach((api) => {
+      const modelResource = new Dependence(api.body.modele)
       modelResource.resolved = false
       modelResource.addChild(api.body.model)
       if (api.body.model !== this.name) list.push(modelResource)
@@ -416,11 +420,50 @@ module.exports = class Model {
    * Inject this model into a dependence
    */
   injectIntoDependence () {
-    const dependence = new Dependence(this.module || this.name, true, false)
+    const dependence = new Dependence(this.module || this.name)
     if (!this.module) dependence.resolved = false
     dependence.addChild(this.name)
 
     return dependence
+  }
+
+  /**
+   * Inject the schema of this model into a dependence
+   */
+  injectSchemaIntoDependence (schemaRef = '', singleLine = true) {
+    const dependence = new Dependence(this.getSchemaModule(schemaRef), singleLine)
+    dependence.addChild(`${schemaRef}${this.name}Schema`)
+
+    return dependence
+  }
+
+  /**
+   * Inject the collection of this model into a dependence
+   */
+  injectCollectionIntoDependence () {
+    const dependence = new Dependence(this.getCollectionModule())
+    dependence.addChild(`${this.name}Collection`)
+
+    return dependence
+  }
+
+  /**
+   * Implode Resource IDs
+   */
+  implodeResourceIds (prefix) {
+    let result = ''
+
+    const attrFromID = this.attrs.find((attr) => attr.name === this.resource.keyID)
+    if (attrFromID && !attrFromID.isArrayOrigin) {
+      result += prefix ? `${prefix}.$id` : '$id'
+    } else {
+      this.foreignAtrrs.forEach((attr) => {
+        result += prefix ? `${prefix}.${attr.name}, ` : `${attr.name}, `
+      })
+      result = result.slice(0, -2)
+    }
+
+    return result
   }
 
   /**
@@ -431,12 +474,6 @@ module.exports = class Model {
     if (!this.isResource) return result
     const attrFromID = this.attrs.find((attr) => attr.name === this.resource.keyID)
     const attrFromTAG = this.attrs.find((attr) => attr.name === this.resource.keyTAG)
-
-    result += `  readonly $endpoint: string = '${this.resource.endpoint}'\n\n`
-
-    result += `  get $schema() {\n`
-    result += `    return ${this.name}Schema(this)\n`
-    result += `  }\n\n`
 
     result += `  get $id() {\n`
     if (attrFromID && !attrFromID.isArrayOrigin) {
@@ -499,184 +536,411 @@ module.exports = class Model {
   /**
    * Print the schema into the template generator
    */
-  buildSchema () {
+  buildInputSchema () {
     let result = ''
-    if (!this.isResource) return result
 
     this.nonForeignAtrrs.forEach((attr) => {
-      result += `  ${attr.name}: {\n`
-      if (attr.isObjectOrigin && attr.isObjectResource) {
-        if (attr.isRequired) {
-          result += `    content: model.${attr.name}.$id,\n`
+      if (!attr.isID) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        if (attr.isObjectOrigin && attr.isObjectResource) {
+          result += `      is: Component.InputSelect,\n`
+          result += `      bind: {\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isArrayOrigin) {
+          result += `      is: Component.InputSelect,\n`
+          result += `      bind: {\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isSoftDelete) {
+          result += `      is: Component.InputCheckbox,\n`
+          result += `      bind: {\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isUrl) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'text',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        maxlength: 255,\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isImageUrl) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'text',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        maxlength: 255,\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isBoolean) {
+          result += `      is: Component.InputCheckbox,\n`
+          result += `      bind: {\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isDate) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'date',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isDatetime) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'datetime',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isMoney) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'currency',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isInteger || attr.isDouble) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'number',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        maxlength: 255,\n`
+          if (attr.isInteger) {
+            result += `        step: 1,\n`
+          } else if (attr.isDouble) {
+            result += `        step: 'any',\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isEmail) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'email',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          if (this.isRequest) {
+            result += `        class: 'contrast',\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isPassword) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'password',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          if (this.isRequest) {
+            result += `        class: 'contrast',\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isPhone) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'phone',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isZipcode) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'zipcode',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isCpf) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'cpf',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isCnpj) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'cnpj',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
+        } else if (attr.isRg) {
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'mask',\n`
+          result += `        maskPreset: 'rg',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
         } else {
-          result += `    content: model.${attr.name} && model.${attr.name}.$id,\n`
+          result += `      is: Component.InputText,\n`
+          result += `      bind: {\n`
+          result += `        type: 'text',\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+          }
+          if (this.isRequest) {
+            result += `        class: 'contrast',\n`
+          }
+          result += `        maxlength: 255,\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `      },\n`
         }
-        result += `    input: InputType.SELECT,\n`
-      } else if (attr.isArrayOrigin) {
-        result += `    hidden: true,\n`
-        result += `    input: InputType.SELECT,\n`
-      } else if (attr.isID) {
-        result += `    content: model.${attr.name},\n`
-        result += `    editable: false,\n`
-      } else if (attr.isSoftDelete) {
-        result += `    content: bool(model.${attr.name}),\n`
-        result += `    hidden: true,\n`
-        result += `    editable: false,\n`
-      } else if (attr.isUrl) {
-        result += `    content: {\n`
-        result += `      component: RenderAnchor,\n`
-        result += `      props: {\n`
-        result += `        href: model.${attr.name},\n`
-        result += `        label: model.${attr.name},\n`
-        result += `        target: '_black',\n`
-        result += `      },\n`
-        result += `    },\n`
-        result += `    textContent: model.${attr.name},\n`
-        result += `    input: InputType.TEXT,\n`
-        result += `    meta: {\n`
-        if (attr.isRequired) {
-          result += `      required: true,\n`
-        }
-        result += `      maxlength: '255',\n`
-        result += `    },\n`
-      } else if (attr.isImageUrl) {
-        result += `    content: {\n`
-        result += `      component: RenderImage,\n`
-        result += `      props: {\n`
-        result += `        src: model.${attr.name},\n`
-        result += `        alt: model.$tag,\n`
-        result += `      },\n`
-        result += `    },\n`
-        result += `    textContent: model.${attr.name},\n`
-        result += `    input: InputType.TEXT,\n`
-        result += `    meta: {\n`
-        if (attr.isRequired) {
-          result += `      required: true,\n`
-        }
-        result += `      maxlength: '255',\n`
-        result += `    },\n`
-      } else if (attr.isBoolean) {
-        result += `    content: bool(model.${attr.name}),\n`
-        result += `    input: InputType.CHECKBOX,\n`
-      } else if (attr.isDate) {
-        result += `    content: date(model.${attr.name}),\n`
-        result += `    input: InputType.DATETIME,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isDatetime) {
-        result += `    content: datetime(model.${attr.name}),\n`
-        result += `    input: InputType.DATETIME,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isMoney) {
-        result += `    content: model.${attr.name},\n`
-        result += `    input: InputType.CURRENCY,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isInteger || attr.isDouble) {
-        result += `    content: model.${attr.name},\n`
-        result += `    input: InputType.NUMBER,\n`
-        result += `    meta: {\n`
-        if (attr.isRequired) {
-          result += `      required: true,\n`
-        }
-        if (attr.isInteger) {
-          result += `      step: '1',\n`
-        } else if (attr.isDouble) {
-          result += `      step: 'any',\n`
-        }
-        result += `    },\n`
-      } else if (attr.isEmail) {
-        result += `    content: model.${attr.name},\n`
-        result += `    input: InputType.EMAIL,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isPassword) {
-        result += `    content: model.${attr.name},\n`
-        result += `    hidden: true,\n`
-        result += `    input: InputType.PASSWORD,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isPhone) {
-        result += `    content: phone(model.${attr.name}),\n`
-        result += `    input: InputType.PHONE,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isZipcode) {
-        result += `    content: cep(model.${attr.name}),\n`
-        result += `    input: InputType.CEP,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isCpf) {
-        result += `    content: cpf(model.${attr.name}),\n`
-        result += `    input: InputType.CPF,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else if (attr.isCnpj) {
-        result += `    content: cnpj(model.${attr.name}),\n`
-        result += `    input: InputType.CNPJ,\n`
-        if (attr.isRequired) {
-          result += `    meta: {\n`
-          result += `      required: true,\n`
-          result += `    },\n`
-        }
-      } else {
-        result += `    content: model.${attr.name},\n`
-        result += `    input: InputType.TEXT,\n`
-        result += `    meta: {\n`
-        if (attr.isRequired) {
-          result += `      required: true,\n`
-        }
-        result += `      maxlength: '255',\n`
-        result += `    },\n`
-      }
 
-      result += `  },\n\n`
+        result += this.buildAjv(attr)
+
+        result += `    }),\n`
+      }
     })
 
-    result = result.slice(0, -2) // remove last line
+    result = result.slice(0, -1) // remove last line
+    return result
+  }
+
+  /**
+   * Print the schema into the template generator
+   */
+  buildListSchema () {
+    let result = ''
+
+    this.nonForeignAtrrs.forEach((attr) => {
+      if (attr.isObjectOrigin && attr.isObjectResource) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        if (attr.isRequired) {
+          result += `        content: schema.model.${attr.name}.$id,\n`
+        } else {
+          result += `        content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+        }
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isArrayOrigin) {
+      } else if (attr.isSoftDelete) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.bool(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isUrl) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.RenderAnchor,\n`
+        result += `      bind: {\n`
+        result += `        href: schema.model.${attr.name},\n`
+        result += `        label: schema.model.${attr.name},\n`
+        result += `        target: '_blank',\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isImageUrl) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.RenderImage,\n`
+        result += `      bind: {\n`
+        result += `        src: schema.model.${attr.name},\n`
+        result += `        alt: this.translateFrom(schema.fieldName),\n`
+        result += `        innerClass: 'w-50 h-50',\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isBoolean) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.bool(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isDate) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.date(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isDatetime) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.datetime(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isPassword) {
+      } else if (attr.isPhone) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.phone(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isCpf) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.cpf(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isCnpj) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.cnpj(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else if (attr.isRg) {
+        result += `    ${attr.name}: (schema): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `      bind: {\n`
+        result += `        content: Helper.rg(schema.model.${attr.name}),\n`
+        result += `      },\n`
+        result += `    }),\n`
+      } else {
+        result += `    ${attr.name}: (): FieldComponent => ({\n`
+        result += `      is: Component.Render,\n`
+        result += `    }),\n`
+      }
+    })
+
+    result = result.slice(0, -1) // remove last line
+    return result
+  }
+
+  /**
+   * Print the schema into the template generator
+   */
+  buildCsvSchema () {
+    let result = ''
+
+    this.nonForeignAtrrs.forEach((attr) => {
+      if (attr.isObjectOrigin && attr.isObjectResource) {
+        result += `    ${attr.name}: (schema) => `
+        if (attr.isRequired) {
+          result += `schema.model.${attr.name}.$id,\n`
+        } else {
+          result += `schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+        }
+      } else if (attr.isArrayOrigin) {
+      } else if (attr.isSoftDelete) {
+        result += `    ${attr.name}: (schema) => Helper.bool(schema.model.${attr.name}),\n`
+      } else if (attr.isUrl) {
+        result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
+      } else if (attr.isImageUrl) {
+        result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
+      } else if (attr.isBoolean) {
+        result += `    ${attr.name}: (schema) => Helper.bool(schema.model.${attr.name}),\n`
+      } else if (attr.isDate) {
+        result += `    ${attr.name}: (schema) => Helper.date(schema.model.${attr.name}),\n`
+      } else if (attr.isDatetime) {
+        result += `    ${attr.name}: (schema) => Helper.datetime(schema.model.${attr.name}),\n`
+      } else if (attr.isPassword) {
+      } else if (attr.isPhone) {
+        result += `    ${attr.name}: (schema) => Helper.phone(schema.model.${attr.name}),\n`
+      } else if (attr.isCpf) {
+        result += `    ${attr.name}: (schema) => Helper.cpf(schema.model.${attr.name}),\n`
+      } else if (attr.isCnpj) {
+        result += `    ${attr.name}: (schema) => Helper.cnpj(schema.model.${attr.name}),\n`
+      } else if (attr.isRg) {
+        result += `    ${attr.name}: (schema) => Helper.rg(schema.model.${attr.name}),\n`
+      } else {
+        result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
+      }
+    })
+
+    result = result.slice(0, -1) // remove last line
+    return result
+  }
+
+  /**
+   * Print the AJV
+   */
+  buildAjv (attr = new Attr()) {
+    let result = ''
+
+    if (attr.isString || attr.isTAG || attr.isEmail || attr.isPassword || attr.isDate || attr.isDatetime || attr.isInteger || attr.isDouble) {
+      result += `      ajv: {\n`
+      if (attr.isInteger) {
+        if (attr.isRequired) {
+          result += `        type: AjvType.requiredInteger,\n`
+        } else {
+          result += `        type: AjvType.integerOrNull,\n`
+        }
+      } else if (attr.isDouble) {
+        if (attr.isRequired) {
+          result += `        type: AjvType.requiredNumber,\n`
+        } else {
+          result += `        type: AjvType.numberOrNull,\n`
+        }
+      } else {
+        if (attr.isRequired) {
+          result += `        type: AjvType.requiredString,\n`
+        } else {
+          result += `        type: AjvType.stringOrNull,\n`
+        }
+        if (attr.isEmail) {
+          result += `        format: 'email',\n`
+        } else if (attr.isPhone) {
+          result += `        format: 'phone',\n`
+        } else if (attr.isDate) {
+          result += `        format: 'date',\n`
+        } else if (attr.isCpf) {
+          result += `        format: 'cpf',\n`
+        } else if (attr.isCnpj) {
+          result += `        format: 'cnpj',\n`
+        } else if (attr.isRg) {
+          result += `        format: 'rg',\n`
+        } else if (attr.isDatetime) {
+          result += `        format: 'datetime',\n`
+        } else {
+          result += `        maxLength: 255,\n`
+        }
+      }
+      result += `      },\n`
+    }
+
     return result
   }
 
   /**
    * Print the locale classes into the template generator
    */
-  buildLocale () {
+  buildLocale (prefix = '') {
     let result = ''
 
-    result += `    ${this.name}: {\n`
-    result += `      title: '${startCase(this.name)}',\n`
-    if (this.attrs.length > 0) {
-      result += `      columns: {\n`
-      this.attrs.forEach((attr) => {
-        result += `        ${attr.name}: '${startCase(attr.name)}',\n`
-      })
-      result += `      },\n`
-    }
+    result += `    ${prefix}${this.name}: {\n`
+    this.attrs.forEach((attr) => {
+      result += `      ${attr.name}: '${startCase(attr.name)}',\n`
+    })
     result += `    },\n`
 
     return result
@@ -686,7 +950,7 @@ module.exports = class Model {
     let result = ''
 
     this.persistDependencies.forEach((dep) => {
-      result += `    all${dep.children[0]} = new WholeCollection(${dep.children[0]})\n`
+      result += `    collection${dep.children[0]} = new ${dep.children[0]}Collection().whole()\n`
     })
 
     return result
@@ -696,11 +960,11 @@ module.exports = class Model {
     let result = ''
 
     this.objectAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.all${attr.type}.items,\n`
+      result += `        ${attr.name}: this.collection${attr.type}.all(),\n`
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.all${attr.type}.items,\n`
+      result += `        ${attr.name}: this.collection${attr.type}.all(),\n`
     })
 
     result = result.slice(0, -1) // remove last line

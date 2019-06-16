@@ -3,26 +3,26 @@
   <div class="verti">
     <section class="header">
       <h1 class="m-0">
-        {{ $t('classes.<%-model.name%>.title') }}
+        {{ $t('resource.<%-model.name%>') }}
       </h1>
     </section>
 
-    <section class="container small">
-      <await init name="find<%-model.name%>" class="my-20">
-        <form class="elevated padded" @submit.prevent="$await.run(persist, 'persist')">
+    <section class="self-center max-w-600 w-full">
+      <await init name="populate" class="m-20">
+        <form class="elevated padded" @submit.prevent="persist">
 
-          <div v-for="(field, i) in <%-model.attrName%>.fieldsToInput" :key="i">
-<%_ if (model.arrayAtrrs.length) { _%>
-            <resource-input v-model="<%-model.attrName%>" :field="field" :selectItems="resource[field]"/>
+          <div v-for="(field, i) in schema.allFields" :key="i">
+<%_ if (model.objectAtrrs.length || model.arrayAtrrs.length) { _%>
+            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" :items="resource[field]"/>
 <%_ } else { _%>
-            <resource-input v-model="<%-model.attrName%>" :field="field"/>
+            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field"/>
 <%_ } _%>
           </div>
 
           <hr>
 
           <await name="persist" class="items-center">
-            <button type="submit" class="primary">{{ $t('persist.submit') }}</button>
+            <button type="submit" class="primary">{{ $t('app.submit') }}</button>
           </await>
 
         </form>
@@ -33,15 +33,20 @@
 
 <script lang="ts">
   import {Component, Prop, Watch, Vue} from 'vue-property-decorator'
+  import {$, Helper} from '@/simpli'
   <%-model.injectIntoDependence().build()%>
 <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-  <%-dependence.build()%>
+  <%-dependence.buildAsCollection()%>
 <%_ } _%>
-  import {$, WholeCollection, successAndPush} from '@/simpli'
+  <%-model.injectSchemaIntoDependence('Input').build()%>
 
   @Component
   export default class Persist<%-model.name%>View extends Vue {
-    @Prop({type: [String, Number]}) id?: string
+<%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>
+    @Prop() <%-param%>?: string
+<%_ } _%>
+
+    schema = new Input<%-model.name%>Schema()
     <%-model.attrName%> = new <%-model.name%>()
 
 <%_ if (model.resolvedPersistDependencies.length) { _%>
@@ -55,19 +60,25 @@
 <%_ } _%>
     async mounted() {
 <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-      await this.all<%-dependence.children[0]%>.query()
+      await this.collection<%-dependence.children[0]%>.list()
 <%_ } _%>
 <%_ if (model.resolvedPersistDependencies.length) { _%>
 
 <%_ } _%>
-      if (this.id) await this.<%-model.attrName%>.find(this.id)
-      $.await.done('find<%-model.name%>')
+<%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>
+      const <%-param%> = Number(this.<%-param%>) || null
+<%_ } _%>
+      if (<%-model.resource.endpointParamsIfImploded%>) {
+        await this.<%-model.attrName%>.populate(<%-model.resource.endpointParamsMethodImploded%>)
+      }
+
+      $.await.done('populate')
     }
 
     async persist() {
-      await this.<%-model.attrName%>.validate()
-      await this.<%-model.attrName%>.save()
-      successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
+      this.schema.validate(this.<%-model.attrName%>)
+      await this.<%-model.attrName%>.persist()
+      Helper.successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
     }
   }
 </script>

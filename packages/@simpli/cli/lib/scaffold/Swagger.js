@@ -209,8 +209,8 @@ module.exports = class Swagger {
 
     const loginHolderModel = availableModels.find((model) => model.name === signInApi.body.model)
     const loginRespModel = availableModels.find((model) => model.name === signInApi.respModel)
+    const recoverPasswordByMailRequestModel = availableModels.find((model) => model.name === 'RecoverPasswordByMailRequest')
     const resetPasswordRequestModel = availableModels.find((model) => model.name === 'ResetPasswordRequest')
-    const recoverPasswordRequestModel = availableModels.find((model) => model.name === 'RecoverPasswordRequest')
     const changePasswordRequestModel = availableModels.find((model) => model.name === 'ChangePasswordRequest')
 
     // Validation
@@ -248,8 +248,8 @@ module.exports = class Swagger {
     auth.api.auth = authApi
     auth.model.loginHolder = loginHolderModel
     auth.model.loginResp = loginRespModel
+    auth.model.recoverPasswordByMailRequest = recoverPasswordByMailRequestModel
     auth.model.resetPasswordRequest = resetPasswordRequestModel
-    auth.model.recoverPasswordRequest = recoverPasswordRequestModel
     auth.model.changePasswordRequest = changePasswordRequestModel
     auth.setDependencies()
 

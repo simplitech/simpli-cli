@@ -91,7 +91,7 @@ project-root/
 #### Features included
 	- Typescript Language
 	- Login System
-	- SimpliPack Classes
+	- Simpli Web Sdk
 	- Serialized API responses into Models
 	- Locale support (en-US and pt-BR included)
 	- Persist Validation

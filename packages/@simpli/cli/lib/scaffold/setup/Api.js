@@ -5,6 +5,7 @@ module.exports = class Api {
     this.name = null
     this.method = null
     this.endpoint = null
+    this.belongsToModel = null
     this.tags = []
     this.paths = []
     this.queries = []
@@ -14,6 +15,7 @@ module.exports = class Api {
       required: null,
       model: null
     }
+    this.respModelType = null
     this.respModel = null
 
     const config = apiConfig || {
@@ -33,6 +35,7 @@ module.exports = class Api {
     this.setPaths(config)
     this.setQueries(config)
     this.setBody(config)
+    this.setRespModelType(config)
     this.setRespModel(config)
   }
 
@@ -81,17 +84,61 @@ module.exports = class Api {
     }
   }
 
+  setRespModelType (config) {
+    const schema = config.responses && config.responses['200'] && config.responses['200'].schema
+    if (schema && schema.$ref) {
+      this.respModelType = schema && schema.type || 'object'
+    } else {
+      this.respModelType = schema && schema.type || null
+    }
+  }
+
   setRespModel (config) {
     const schema = config.responses && config.responses['200'] && config.responses['200'].schema
-    this.respModel = (schema && schema.$ref && schema.$ref.match(/[^\/]+(?=\/$|$)/)[0]) || null
+    if (this.respModelType === 'array') {
+      this.respModel = (
+        schema &&
+        schema.items &&
+        schema.items.$ref &&
+        schema.items.$ref.match(/[^\/]+(?=\/$|$)/)[0]
+      ) || null
+    } else {
+      this.respModel = (schema && schema.$ref && schema.$ref.match(/[^\/]+(?=\/$|$)/)[0]) || null
+    }
+    if ((this.respModel || '').match(/^(PageCollection)\w+$/)) {
+      this.respModel = `${this.respModel.replace(/^PageCollection/, '')}Collection`
+    }
   }
 
   hasTag (name = '') {
     return !!this.tags.find((tag) => (tag || '').toLowerCase() === name.toLowerCase())
   }
 
+  get isBodyThis () {
+    if (this.body.model && this.belongsToModel) {
+      return this.body.model === this.belongsToModel
+    }
+    return false
+  }
+
+  get isRespThis () {
+    if (this.respModelType === 'object' && this.belongsToModel) {
+      return this.respModel === this.belongsToModel
+    }
+    return false
+  }
+
   get methodUppercase () {
     return (this.method || '').toUpperCase()
+  }
+
+  get methodLowercase () {
+    return (this.method || '').toLowerCase()
+  }
+
+  get moduleName () {
+    const match = this.endpoint.match(/^\/([A-Za-z0-9_-]+)\/\S*$/)
+    return match ? match[1] : ''
   }
 
   isSignIn (auth = new Auth()) {
@@ -101,18 +148,18 @@ module.exports = class Api {
     return this.body.model === auth.model.loginHolder.name
   }
 
+  isRecoverPasswordByMail (auth = new Auth()) {
+    if (auth.model.recoverPasswordByMailRequest === null) {
+      return false
+    }
+    return this.body.model === auth.model.recoverPasswordByMailRequest.name
+  }
+
   isResetPassword (auth = new Auth()) {
     if (auth.model.resetPasswordRequest === null) {
       return false
     }
     return this.body.model === auth.model.resetPasswordRequest.name
-  }
-
-  isRecoverPassword (auth = new Auth()) {
-    if (auth.model.recoverPasswordRequest === null) {
-      return false
-    }
-    return this.body.model === auth.model.recoverPasswordRequest.name
   }
 
   isChangePassword (auth = new Auth()) {
@@ -129,18 +176,31 @@ module.exports = class Api {
   }
 
   get stringfyAttrs () {
-    const method = (this.method || '').toUpperCase()
-    let list = []
+    const list = []
 
-    if (method === 'GET' || method === 'DELETE') {
-      list = [...this.paths, ...this.queries]
-    } else if (method === 'POST' || method === 'PUT') {
-      list = [...this.paths]
+    this.paths.forEach((path) => {
+      if (path && path.name === 'id' && (this.methodUppercase === 'PUT' || this.methodUppercase === 'DELETE')) {
+      } else {
+        list.push(path)
+      }
+    })
+
+    if (this.body.model && !this.isBodyThis) {
+      list.push({
+        name: 'body',
+        required: true,
+        type: this.body.model
+      })
     }
 
-    const result = list.map((item) => `${item.name + (item.required ? '' : '?')}: ${item.type}`)
-    result.push(`spinner = '${this.name}'`)
+    list.push(...this.queries)
 
+    const result = list.map((item) => `${item.name + (item.required ? '' : '?')}: ${item.type}`)
+    return result.join(', ')
+  }
+
+  get stringfyCollectionAttrs () {
+    const result = [...this.paths].map((item) => `${item.name + (item.required ? '' : '?')}: ${item.type}`)
     return result.join(', ')
   }
 
@@ -167,7 +227,11 @@ module.exports = class Api {
     const match = endpoint.match(pattern)
     if (match) {
       match.forEach((path) => {
-        endpoint = endpoint.replace(path, `\$${path}`)
+        if (path === '{id}' && (this.methodUppercase === 'PUT' || this.methodUppercase === 'DELETE')) {
+          endpoint = endpoint.replace(path, `\${this.$id}`)
+        } else {
+          endpoint = endpoint.replace(path, `\$${path}`)
+        }
       })
     }
     return endpoint
@@ -179,26 +243,24 @@ module.exports = class Api {
   build (auth = new Auth()) {
     // Find the reserved APIs...
     if (this.isSignIn(auth)) return this.buildSignIn(auth)
+    if (this.isRecoverPasswordByMail(auth)) return this.buildRecoverPasswordByMail()
     if (this.isResetPassword(auth)) return this.buildResetPassword()
-    if (this.isRecoverPassword(auth)) return this.buildRecoverPassword()
     if (this.isChangePassword(auth)) return this.buildChangePassword()
-    // ...Or use the standard methods
-    if (this.methodUppercase === 'GET') return this.buildGetOrDeleteMethod()
-    if (this.methodUppercase === 'POST') return this.buildPostOrPutMethod()
-    if (this.methodUppercase === 'PUT') return this.buildPostOrPutMethod()
-    if (this.methodUppercase === 'DELETE') return this.buildGetOrDeleteMethod()
+    // ...Or use the standard method
+    else return this.buildMethod()
   }
 
   /**
-   * Reserved API print
+   * Print this api into the template generator
    */
-  buildGetOrDeleteMethod () {
+  buildInCollection () {
     let result = ''
 
-    result += `  async ${this.name}(${this.stringfyAttrs}) {\n`
-    if (this.queries.length) result += `    const params = {${this.stringfyParams}}\n`
-    result += `    const fetch = async () => await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`${this.queries.length ? ', {params}' : ''})\n`
-    result += `    return await $.await.run(fetch, spinner)\n`
+    result += `  async ${this.name}(${this.stringfyCollectionAttrs}) {\n`
+    result += `    return await Request.${this.methodLowercase}(\`${this.stringfyEndpoint}\`, {params: this.params})\n`
+    result += `      .name('${this.name}')\n`
+    result += `      .as(this)\n`
+    result += `      .getResponse()\n`
     result += `  }\n`
 
     return result
@@ -207,21 +269,47 @@ module.exports = class Api {
   /**
    * Reserved API print
    */
-  buildPostOrPutMethod () {
+  buildMethod (before, bodyRequest, delay = 0) {
     let result = ''
 
-    result += `  async ${this.name}(${this.stringfyAttrsWithModel}) {\n`
-    result += `    const fetch = async () => {\n`
-    if (this.body.model && this.body.type !== 'array') {
-      if (this.body.required) {
-        result += `      await model.validate()\n`
-      } else {
-        result += `      if (model) await model.validate()\n`
-      }
+    let staticKey = ''
+    if (!bodyRequest && !this.isRespThis && !this.isBodyThis && this.respModelType === 'object') {
+      staticKey = 'static '
     }
-    result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`${this.body.model ? ', model' : ''})\n`
-    result += `    }\n\n`
-    result += `    return await $.await.run(fetch, spinner)\n`
+
+    result += `  ${staticKey}async ${this.name}(${this.stringfyAttrs}) {\n`
+    if (this.queries.length) result += `    const params = {${this.stringfyParams}}\n`
+    const params = this.queries.length ? ', {params}' : ''
+    let body = bodyRequest ? `, ${bodyRequest}` : null
+    if (!body) {
+      body = this.body.model ? (this.isBodyThis ? ', this' : `, ${this.body.model}`) : ''
+    }
+
+    result += before || ''
+
+    result += `    return await Request.${this.methodLowercase}(\`${this.stringfyEndpoint}\`${body}${params})\n`
+    result += `      .name('${this.name}')\n`
+
+    if (delay) {
+      result += `      .delay(${delay})\n`
+    }
+
+    if (this.respModelType === 'object') {
+      if (this.isRespThis) {
+        result += `      .as(this)\n`
+      } else {
+        result += `      .as(${this.respModel})\n`
+      }
+    } else if (this.respModelType === 'array') {
+      result += `      .asArrayOf(${this.respModel})\n`
+    } else if (this.respModelType === 'integer') {
+      result += `      .asNumber()\n`
+    } else if (this.respModelType === 'string') {
+      result += `      .asString()\n`
+    } else {
+      result += `      .asAny()\n`
+    }
+    result += `      .getData()\n`
     result += `  }\n`
 
     return result
@@ -233,21 +321,23 @@ module.exports = class Api {
   buildSignIn (auth = new Auth()) {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
-    result += `    const model = new ${this.body.model}()\n\n`
+    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
 
-    result += `    model.${auth.accountAttrName} = request.${auth.accountAttrName}\n`
-    result += `    model.${auth.passwordAttrName} = encrypt(request.${auth.passwordAttrName} || '')\n\n`
+    result += `    const request = this.$clone()\n`
+    result += `    request.${auth.passwordAttrName} = Helper.encrypt(this.${auth.passwordAttrName} || '')\n\n`
 
-    result += `    const fetch = async () => {\n`
-    result += `      await model.validate()\n`
-    result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, model)\n`
-    result += `    }\n\n`
+    return this.buildMethod(result, 'request', 1000)
+  }
 
-    result += `    return await $.await.run(fetch, spinner, delay)\n`
-    result += `  }\n`
+  /**
+   * Reserved API print
+   */
+  buildRecoverPasswordByMail () {
+    let result = ''
 
-    return result
+    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
+
+    return this.buildMethod(result)
   }
 
   /**
@@ -256,39 +346,13 @@ module.exports = class Api {
   buildResetPassword () {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
-    result += `    const fetch = async () => {\n`
-    result += `      await request.validate()\n`
-    result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
-    result += `    }\n\n`
+    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
 
-    result += `    return await $.await.run(fetch, spinner, delay)\n`
-    result += `  }\n`
+    result += `    const request = this.$clone()\n`
+    result += `    request.newPassword = Helper.encrypt(this.newPassword || '')\n`
+    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword || '')\n\n`
 
-    return result
-  }
-
-  /**
-   * Reserved API print
-   */
-  buildRecoverPassword () {
-    let result = ''
-
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
-    result += `    const model = new ${this.body.model}()\n\n`
-
-    result += `    model.newPassword = encrypt(request.newPassword || '')\n`
-    result += `    model.confirmPassword = encrypt(request.confirmPassword || '')\n\n`
-
-    result += `    const fetch = async () => {\n`
-    result += `      await request.validate()\n`
-    result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
-    result += `    }\n\n`
-
-    result += `    return await $.await.run(fetch, spinner, delay)\n`
-    result += `  }\n`
-
-    return result
+    return this.buildMethod(result, 'request')
   }
 
   /**
@@ -297,20 +361,13 @@ module.exports = class Api {
   buildChangePassword () {
     let result = ''
 
-    result += `  async ${this.name}(request: ${this.body.model}, spinner = '${this.name}', delay = 1000) {\n`
-    result += `    const model = new ${this.body.model}()\n\n`
+    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
 
-    result += `    model.currentPassword = encrypt(request.currentPassword || '')\n`
-    result += `    model.newPassword = encrypt(request.newPassword || '')\n\n`
+    result += `    const request = this.$clone()\n`
+    result += `    request.currentPassword = Helper.encrypt(this.currentPassword || '')\n`
+    result += `    request.newPassword = Helper.encrypt(this.newPassword || '')\n`
+    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword || '')\n\n`
 
-    result += `    const fetch = async () => {\n`
-    result += `      await request.validate()\n`
-    result += `      return await this.${this.methodUppercase}(\`${this.stringfyEndpoint}\`, request)\n`
-    result += `    }\n\n`
-
-    result += `    return await $.await.run(fetch, spinner, delay)\n`
-    result += `  }\n`
-
-    return result
+    return this.buildMethod(result, 'request')
   }
 }

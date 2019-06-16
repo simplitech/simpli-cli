@@ -153,7 +153,7 @@
             "name":"body",
             "required":false,
             "schema":{
-              "$ref":"#/definitions/RecoverPasswordRequest"
+              "$ref":"#/definitions/ResetPasswordRequest"
             }
           }
         ],
@@ -202,7 +202,7 @@
             "name":"body",
             "required":false,
             "schema":{
-              "$ref":"#/definitions/ResetPasswordRequest"
+              "$ref":"#/definitions/RecoverPasswordByMailRequest"
             }
           }
         ],
@@ -503,7 +503,7 @@
         }
       }
     },
-    "RecoverPasswordRequest":{
+    "ResetPasswordRequest":{
       "type":"object",
       "properties":{
         "newPassword":{
@@ -554,7 +554,7 @@
         }
       }
     },
-    "ResetPasswordRequest":{
+    "RecoverPasswordByMailRequest":{
       "type":"object",
       "properties":{
         "email":{

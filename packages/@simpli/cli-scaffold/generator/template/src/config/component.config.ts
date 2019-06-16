@@ -9,13 +9,11 @@
 
 import {ComponentOptions} from '@/simpli'
 
-import Multiselect from 'vue-multiselect/src/Multiselect.vue'
 import ModalRemove from '@/components/modals/ModalRemove.vue'
 
 /**
  * Global VUE Components
  */
 export const components: ComponentOptions = {
-  Multiselect,
   ModalRemove,
 }

@@ -1,5 +1,5 @@
 <template>
-  <modal :name="name">
+  <modal name="modalRemove" v-model="value">
     <div class="verti text-center">
       <div class="horiz">
         <h4 class="weight-1 mt-0 mr-10">
@@ -7,10 +7,10 @@
         </h4>
       </div>
 
-      <p>{{ text }}</p>
+      <p>{{ value && value.$tag }}</p>
 
       <div class="horiz items-center">
-        <button type="button" class="mr-10" @click="cancelEvent">{{ $t("app.cancel") }}</button>
+        <button type="button" class="mr-10" @click="close">{{ $t("app.cancel") }}</button>
         <button type="button" class="danger" @click="confirmEvent">{{ $t("app.remove") }}</button>
       </div>
     </div>
@@ -19,14 +19,14 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
+  import {Resource} from '@/simpli'
 
   @Component
   export default class ModalRemove extends Vue {
-    @Prop({type: String}) name?: string
-    @Prop({default: ''}) text?: string
+    @Prop({required: true}) value!: Resource | null
 
-    cancelEvent() {
-      this.$emit('cancel')
+    close() {
+      this.$emit('input', null)
     }
 
     confirmEvent() {

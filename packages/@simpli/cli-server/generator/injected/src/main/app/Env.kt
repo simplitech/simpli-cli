@@ -61,9 +61,9 @@ object Env {
 
     /**
      * Set the DATE_FORMAT if you know what you are doing
-     * @default yyyy-MM-dd'T'HH:mm:ssX
+     * @default yyyy-MM-dd'T'HH:mm:ssXXX
      */
-    const val DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX"
+    const val DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX"
 
     /**
      * Hash to transform data into token

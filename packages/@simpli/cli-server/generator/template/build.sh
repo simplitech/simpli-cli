@@ -17,7 +17,10 @@ tput setaf 3; echo "=> Run 'docker-compose down' to close the server and destroy
 echo ""
 tput setaf 3; echo "Whenever you make changes, run 'mvn clean package' and then 'docker-compose restart'"
 echo ""
-tput setaf 5; echo "Check the swagger info in http://localhost:8080/"
+tput setaf 5; echo "Check your server status in http://localhost:8080"
+tput setaf 5; echo "The APIs endpoint base is http://localhost:8080/api"
+tput setaf 5; echo "The swagger docs is located in http://localhost:8080/docs"
+tput setaf 5; echo "The swagger JSON is located in http://localhost:8080/api/swagger.json"
 tput sgr0; echo ""
 
 sleep 5

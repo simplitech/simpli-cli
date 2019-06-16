@@ -169,7 +169,11 @@ module.exports = class Server {
     log(`👉  Go to ${chalk.cyan(`cd ${name}`)}`)
     log(`👉  Run ${chalk.yellow(`simpli server:seed`)}`)
     log(`👉  Run ${chalk.yellow(`sh build.sh`)}`)
-    log(`👉  Go to ${chalk.cyan('http://localhost:8080')}`)
+    log()
+    log(`👉  Check your server status in ${chalk.cyan('http://localhost:8080')}`)
+    log(`👉  The APIs endpoint base is ${chalk.cyan('http://localhost:8080/api')}`)
+    log(`👉  The swagger docs is located in ${chalk.cyan('http://localhost:8080/docs')}`)
+    log(`👉  The swagger JSON is located in ${chalk.cyan('http://localhost:8080/api/swagger.json')}`)
     log()
 
     generator.printExitLogs()

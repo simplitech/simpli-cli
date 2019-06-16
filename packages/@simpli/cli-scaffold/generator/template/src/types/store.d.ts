@@ -1,4 +1,4 @@
-import {SocketConnection, Currency, Lang} from '@/simpli'
+import {Currency, Lang} from '@/simpli'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>
@@ -21,7 +21,6 @@ export interface RootState {
  */
 export interface AuthState {
 <%-rootOptions.scaffoldSetup.auth.buildType()-%>
-  notification: SocketConnection<String> | null,
   cachePath: string | null,
   eventListener: AuthEventListener,
 }

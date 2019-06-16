@@ -89,8 +89,8 @@ module.exports = (api, options) => {
     // main/module/request
     api.renderFrom('./injected', 'src/main/module/request/AuthRequest.kt', `../../kotlin/${dir}/${moduleName}/request/AuthRequest.kt`)
     api.renderFrom('./injected', 'src/main/module/request/ChangePasswordRequest.kt', `../../kotlin/${dir}/${moduleName}/request/ChangePasswordRequest.kt`)
-    api.renderFrom('./injected', 'src/main/module/request/ResetPasswordRequest.kt', `../../kotlin/${dir}/${moduleName}/request/ResetPasswordRequest.kt`)
     api.renderFrom('./injected', 'src/main/module/request/RecoverPasswordByMailRequest.kt', `../../kotlin/${dir}/${moduleName}/request/RecoverPasswordByMailRequest.kt`)
+    api.renderFrom('./injected', 'src/main/module/request/ResetPasswordRequest.kt', `../../kotlin/${dir}/${moduleName}/request/ResetPasswordRequest.kt`)
 
     // main/module/response
     api.renderFrom('./injected', 'src/main/module/response/AuthResponse.kt', `../../kotlin/${dir}/${moduleName}/response/AuthResponse.kt`)

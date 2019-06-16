@@ -22,7 +22,7 @@ class RecoverPasswordMail(lang: LanguageHolder, <%-userTable.instanceName%>: <%-
         data["body"] = lang["email_reset_password_body"]
         data["textButton"] = lang["email_reset_password_text_button"]
         data["labelButton"] = lang["email_reset_password_label_button"]
-        data["linkButton"] = """$appUrl/#/password/recover/$hash"""
+        data["linkButton"] = """$appUrl/#/password/reset/$hash"""
 
         setBodyFromTemplate(this::class.java, data, "template.html")
     }

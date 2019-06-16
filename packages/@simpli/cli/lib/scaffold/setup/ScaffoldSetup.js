@@ -3,6 +3,7 @@ const Model = require('./Model')
 const ModelType = require('./ModelType')
 const Api = require('./Api')
 const Auth = require('./Auth')
+const startCase = require('lodash.startCase')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
 const snakeCase = require('lodash.snakecase')
@@ -64,13 +65,16 @@ module.exports = class ScaffoldSetup {
   }
 
   get availableModels () {
-    return [...this.standardModels, ...this.resourceModels, ...this.requestModels, ...this.responseModels]
+    return [...this.standardModels, ...this.resourceModels, ...this.requestModels, ...this.responseModels, ...this.paginatedModels]
   }
 
   modelsByType (type) {
     return this.models.filter((model) => model.type === type)
   }
 
+  startCase (prop) {
+    return startCase(prop)
+  }
   camelCase (prop) {
     return camelCase(prop)
   }

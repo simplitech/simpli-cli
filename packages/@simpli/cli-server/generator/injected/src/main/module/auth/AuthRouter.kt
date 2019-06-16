@@ -36,13 +36,13 @@ class AuthRouter : RouterWrapper() {
     val authGateway = AuthGateway()
 
     @GET
-    @ApiOperation(tags = ["Auth"], value = "Gets the user authentication")
+    @ApiOperation(tags = ["AuthRequest"], value = "Gets the user authentication")
     fun authenticate(@BeanParam param: DefaultParam.Auth): AuthResponse {
         return connection(authGateway).route(param) { auth, _, _, _ -> auth }
     }
 
     @POST
-    @ApiOperation(tags = ["Auth"], value = "Submits the user authentication")
+    @ApiOperation(tags = ["AuthRequest"], value = "Submits the user authentication")
     fun signIn(@BeanParam param: DefaultParam, request: AuthRequest): AuthResponse {
         return connection(guestGateway).handle(process, param) {
             it.signIn(request)
@@ -51,7 +51,7 @@ class AuthRouter : RouterWrapper() {
 
     @PUT
     @Path("/password")
-    @ApiOperation(tags = ["Auth"], value = "Sends an email requesting to change the password")
+    @ApiOperation(tags = ["RecoverPasswordByMailRequest"], value = "Sends an email requesting to change the password")
     fun recoverPasswordByMail(@BeanParam param: DefaultParam, request: RecoverPasswordByMailRequest): Long {
         return connection(guestGateway).handle(process, param) {
             it.recoverPasswordByMail(request)
@@ -60,7 +60,7 @@ class AuthRouter : RouterWrapper() {
 
     @POST
     @Path("/password")
-    @ApiOperation(tags = ["Auth"], value = "Recovers the password with a given hash")
+    @ApiOperation(tags = ["ResetPasswordRequest"], value = "Recovers the password with a given hash")
     fun resetPassword(@BeanParam param: DefaultParam, request: ResetPasswordRequest): String {
         return transaction(guestGateway).handle(process, param) {
             it.resetPassword(request)
@@ -69,7 +69,7 @@ class AuthRouter : RouterWrapper() {
 
     @POST
     @Path("/me/password")
-    @ApiOperation(tags = ["Auth"], value = "Changes the password with a given new password")
+    @ApiOperation(tags = ["ChangePasswordRequest"], value = "Changes the password with a given new password")
     fun changePassword(@BeanParam param: DefaultParam.Auth, request: ChangePasswordRequest): Long {
         return transaction(authGateway).handleWithAuth(process, param) { it, auth ->
             it.changePassword(request, auth)

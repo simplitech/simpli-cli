@@ -155,13 +155,16 @@ module.exports = class Attr {
     }
     if (this.isPassword) {
       result.push({
-        title: 'ResponseHidden',
+        title: 'ResponseExclude',
         attr: ``
       })
     }
     return result
   }
 
+  /**
+   * @deprecated
+   */
   get validations () {
     const result = []
 
@@ -263,6 +266,7 @@ module.exports = class Attr {
     if (this.isID || this.isForeign) return '0'
     if (this.isInteger || this.isDouble) return '0'
     if (this.isBoolean) return 'false'
+    if (this.isDate || this.isDatetime) return 'moment().format()'
     if (this.isObjectOrigin) return `new ${this.type}()`
     if (this.isArrayOrigin) return `[]`
 
@@ -283,9 +287,6 @@ module.exports = class Attr {
 
     this.responses.forEach((resp) => {
       result += `  @${resp.title}(${resp.attr})\n`
-    })
-    this.validations.forEach((valid) => {
-      result += `  @${valid.title}(${valid.attr})\n`
     })
 
     if (!this.foreign || !this.foreignType) {

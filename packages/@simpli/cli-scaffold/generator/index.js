@@ -7,28 +7,50 @@ module.exports = (api, options) => {
   const requestModels = options.scaffoldSetup.requestModels
   const responseModels = options.scaffoldSetup.responseModels
   const resourceModels = options.scaffoldSetup.resourceModels
+  const paginatedModels = options.scaffoldSetup.paginatedModels
 
   standardModels.forEach((resource) => {
     const data = { model: resource }
+
+    api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./model/${resource.name}/Input${resource.name}Schema.ts`, data)
+    api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./model/${resource.name}/List${resource.name}Schema.ts`, data)
+    api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./model/${resource.name}/Csv${resource.name}Schema.ts`, data)
+
     api.renderFrom('./injected', 'src/model/Template.ts', `./${resource.name}.ts`, data)
   })
 
   requestModels.forEach((resource) => {
     const data = { model: resource }
+
+    api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./request/${resource.name}/Input${resource.name}Schema.ts`, data)
+
     api.renderFrom('./injected', 'src/model/Template.ts', `./request/${resource.name}.ts`, data)
   })
 
   responseModels.forEach((resource) => {
     const data = { model: resource }
+
+    api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./response/${resource.name}/List${resource.name}Schema.ts`, data)
+    api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./response/${resource.name}/Csv${resource.name}Schema.ts`, data)
+
     api.renderFrom('./injected', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
   })
 
   resourceModels.forEach((resource) => {
     const data = { model: resource }
     api.renderFrom('./injected', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
-    api.renderFrom('./injected', 'src/schema/Template.schema.ts', `./${resource.name}.schema.ts`, data)
+
+    api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./resource/${resource.name}/Input${resource.name}Schema.ts`, data)
+    api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./resource/${resource.name}/List${resource.name}Schema.ts`, data)
+    api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./resource/${resource.name}/Csv${resource.name}Schema.ts`, data)
+
     api.renderFrom('./injected', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
     api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+  })
+
+  paginatedModels.forEach((resource) => {
+    const data = { model: resource }
+    api.renderFrom('./injected', 'src/model/TemplateCollection.ts', `./collection/${resource.name}.ts`, data)
   })
 
   if (options.sync) return
@@ -37,54 +59,50 @@ module.exports = (api, options) => {
     scripts: {
       'serve': 'vue-cli-service serve' + (
         // only auto open browser on MacOS where applescript
-        // can avoid dupilcate window opens
+        // can avoid duplicate window opens
         process.platform === 'darwin'
           ? ' --open'
           : ''
       ),
+      'beta': 'vue-cli-service build --mode beta',
+      'staging': 'vue-cli-service build --mode staging',
       'build': 'vue-cli-service build',
       'lint': 'vue-cli-service lint',
       'test': 'vue-cli-service test:unit'
     },
     dependencies: {
-      'chart.js': '^2.7.3',
-      'chartkick': '^3.0.2',
       'font-awesome': '^4.7.0',
-      'linelay': '^1.6.1',
-      'moment': '^2.23.0',
+      'linelay': '^2.1.3',
       'normalize-scss': '^7.0.1',
       'register-service-worker': '^1.5.2',
       'simple-line-icons': '^2.4.1',
-      'simpli-web-sdk': '^1.7.0',
-      'vue': '^2.5.21',
-      'vue-router': '^3.0.1',
-      'vue-chartjs': '^3.4.0',
-      'vue-chartkick': '^0.5.0',
-      'vue-meta': '^1.5.8',
+      'simpli-web-sdk': '^2.1.0-0',
+      'vue': '^2.6.10',
+      'vue-class-component': '^7.1.0',
+      'vue-meta': '^1.6.0',
       'vue-moment': '^4.0.0',
-      'vue-multiselect': '^2.1.3',
-      'vue-class-component': '^6.0.0',
-      'vue-property-decorator': '^7.3.0',
+      'vue-property-decorator': '^8.1.0',
       'vue-spinner': '^1.0.3',
       'vuex': '^3.0.1',
       'vuex-class': '^0.3.1'
     },
     devDependencies: {
-      '@types/jest': '^23.1.4',
+      '@types/jest': '^24.0.11',
       '@vue/cli-plugin-babel': '^3.3.0',
       '@vue/cli-plugin-e2e-cypress': '^3.3.0',
       '@vue/cli-plugin-pwa': '^3.3.0',
-      '@vue/cli-plugin-typescript': '^3.3.0',
-      '@vue/cli-plugin-unit-jest': '^3.3.0',
-      '@vue/cli-service': '^3.3.0',
+      '@vue/cli-plugin-typescript': '^3.6.0',
+      '@vue/cli-plugin-unit-jest': '^3.8.0',
+      '@vue/cli-service': '^3.6.0',
       '@vue/test-utils': '^1.0.0-beta.20',
       'babel-core': '7.0.0-bridge.0',
+      'jest': '^24.7.1',
       'lint-staged': '^8.1.0',
       'node-sass': '^4.11.0',
       'sass-loader': '^7.1.0',
-      'ts-jest': '^23.0.0',
-      'typescript': '^3.0.0',
-      'vue-template-compiler': '^2.5.21'
+      'ts-jest': '^24.0.2',
+      'typescript': '^3.4.4',
+      'vue-template-compiler': '^2.6.10'
     },
     'gitHooks': {
       'pre-commit': 'lint-staged'

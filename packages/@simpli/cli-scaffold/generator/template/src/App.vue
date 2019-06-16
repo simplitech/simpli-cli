@@ -3,7 +3,7 @@
     <transition name="blur" mode="out-in">
       <router-view/>
     </transition>
-    <vue-snotify :class="toastStyle"/>
+    <vue-snotify :class="ToastConfig.ToastDefaultStyle"/>
   </div>
 </template>
 
@@ -12,54 +12,28 @@
 </style>
 
 <script lang="ts">
+import {MetaInfo} from 'vue-meta'
 import {Component, Vue} from 'vue-property-decorator'
-import {Action, Getter} from 'vuex-class'
-import {$, ToastDefaultConfig, ToastDefaultStyle, ToastGlobalConfig, ToastStyle} from '@/simpli'
+import {Mutation} from 'vuex-class'
+import {$, ToastConfig} from '@/simpli'
 
-const metaInfo = () => ({
-  title: $.t('app.subtitle'),
+const metaInfo = (): MetaInfo => ({
+  title: $.t('app.subtitle') as string,
   titleTemplate: `%s | ${$.t('app.title')}`,
 })
 
 @Component({metaInfo})
 export default class App extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-  @Action('auth/onSignIn') onSignIn!: Function
-  @Action('auth/onAuth') onAuth!: Function
-  @Action('auth/onSignOut') onSignOut!: Function
+  @Mutation('auth/POPULATE_TOKEN') populateToken!: Function
 
 <%_ } _%>
-  toastStyle: ToastStyle = ToastDefaultStyle
-
+  ToastConfig = ToastConfig
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-  // When the user or system signs in
-  signInEvent() {
-    //
-  }
 
-  // When an auth view is accessed successfully
-  authEvent() {
-    //
-  }
-
-  // When the user or system signs out
-  signOutEvent() {
-    //
-  }
-
-<%_ } _%>
-  // Standard Behaviours
   created() {
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    this.onSignIn(this.signInEvent)
-    this.onAuth(this.authEvent)
-    this.onSignOut(this.signOutEvent)
-
-<%_ } _%>
-    this.$snotify.setDefaults({
-      global: ToastGlobalConfig,
-      toast: ToastDefaultConfig,
-    })
+    this.populateToken()
   }
+<%_ } _%>
 }
 </script>

@@ -35,7 +35,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @GET
     @Path("<%-table.primariesBySlash()%>")
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Gets a instance of a given ID from <%-table.modelName%>")
-    fun get<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.GetParam): <%-table.modelName%> {
+    fun populate(@BeanParam param: <%-table.modelName%>.GetParam): <%-table.modelName%> {
         // TODO: review generated method
         return connection(authGateway).handle(process, param) {
 			it.get(param)
@@ -44,7 +44,17 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
     @GET
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%>")
-    fun list<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
+    fun list(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
+        // TODO: review generated method
+        return connection(authGateway).handle(process, param) {
+			it.list(param)
+		}
+    }
+
+    @GET
+    @Path("/csv")
+    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%> to use it in a CSV file")
+    fun listCsv(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         return connection(authGateway).handle(process, param) {
 			it.list(param)
@@ -54,7 +64,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 <%_ if (table.hasPersist) { _%>
     @POST
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Persists a new instance from <%-table.modelName%>", notes = "Use ID = 0 to create a new one, or ID > 0 to update a current one")
-    fun persist<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.PersistParam, model: <%-table.modelName%>): Long {
+    fun persist(@BeanParam param: <%-table.modelName%>.PersistParam, model: <%-table.modelName%>): Long {
         // TODO: review generated method
         return transaction(authGateway).handle(process, param) {
 			it.persist(model)
@@ -66,7 +76,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @DELETE
     @Path("<%-table.primariesBySlash()%>")
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Deletes a instance of a given ID from <%-table.modelName%>")
-    fun remove<%-table.modelName%>(@BeanParam param: <%-table.modelName%>.GetParam): Long {
+    fun remove(@BeanParam param: <%-table.modelName%>.GetParam): Long {
         // TODO: review generated method
         return transaction(authGateway).handle(process, param) {
 			it.remove(param)

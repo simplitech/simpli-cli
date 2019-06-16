@@ -10,12 +10,12 @@
 
 import {RouterOptions} from 'vue-router'
 
-import DefaultPanelLayout from '@/views/layouts/DefaultPanelLayout.vue'
+import AuthLayout from '@/views/layouts/AuthLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import SignInView from '@/views/SignInView.vue'
+import RecoverPasswordByMailView from '@/views/RecoverPasswordByMailView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
-import RecoverPasswordView from '@/views/RecoverPasswordView.vue'
 
 <%_ } _%>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
@@ -42,20 +42,20 @@ export const router: RouterOptions = {
       component: SignInView,
     },
     {
-      path: '/password/reset',
-      name: 'resetPassword',
-      component: ResetPasswordView,
+      path: '/password/recover',
+      name: 'recoverPasswordByMail',
+      component: RecoverPasswordByMailView,
     },
     {
       path: '/password/recover/:hash',
-      name: 'recoverPassword',
-      component: RecoverPasswordView,
+      name: 'resetPassword',
+      component: ResetPasswordView,
       props: true,
     },
 <%_ } _%>
     {
       path: '/dashboard',
-      component: DefaultPanelLayout,
+      component: AuthLayout,
       children: [
         {
           path: '/dashboard',

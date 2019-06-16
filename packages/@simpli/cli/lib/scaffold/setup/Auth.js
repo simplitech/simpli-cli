@@ -12,8 +12,8 @@ module.exports = class Auth {
     this.model = {
       loginHolder: null,
       loginResp: null,
+      recoverPasswordByMailRequest: null,
       resetPasswordRequest: null,
-      recoverPasswordRequest: null,
       changePasswordRequest: null
     }
     this.dependencies = []
@@ -38,14 +38,14 @@ module.exports = class Auth {
     const dependencies = []
 
     this.model.loginResp.objectAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.model.loginResp.name) dependencies.push(modelResource)
     })
 
     this.model.loginResp.arrayAtrrs.forEach((attr) => {
-      const modelResource = new Dependence(attr.type, true, false)
+      const modelResource = new Dependence(attr.type)
       modelResource.resolved = false
       modelResource.addChild(attr.type)
       if (attr.type !== this.model.loginResp.name) dependencies.push(modelResource)
@@ -172,17 +172,30 @@ module.exports = class Auth {
     return result
   }
 
-  buildPopulate () {
+  buildPopulateIdAndToken () {
     let result = ''
     if (!this.model.loginResp) return result
 
     const userAttr = this.model.loginResp.objectAtrrs[0]
-
     if (userAttr) {
-      result += `    const id = response.${userAttr.name} && response.${userAttr.name}.$id || 0\n\n`
+      result += `    const id = authResponse.${userAttr.name} && authResponse.${userAttr.name}.$id || 0\n`
     } else {
-      result += `    const id = 0\n\n`
+      result += `    const id = 0\n`
     }
+
+    if (this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
+      result += `    const token = authResponse.token || ''\n`
+    } else {
+      result += `    // TODO: define the token attribute\n`
+      result += `    const token = ''\n`
+    }
+
+    return result
+  }
+
+  buildPopulate () {
+    let result = ''
+    if (!this.model.loginResp) return result
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.name !== 'token') {

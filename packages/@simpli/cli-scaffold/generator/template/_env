@@ -5,6 +5,5 @@ VUE_APP_CURRENCY=<%-config.defaultCurrency%>
 
 SWAGGER_URL=<%-config.swaggerUrl%>
 
-BASE_URL=/
 OUTPUT_DIR=dist
 DEV_PORT=8181

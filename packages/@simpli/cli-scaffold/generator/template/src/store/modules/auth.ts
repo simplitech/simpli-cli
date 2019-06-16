@@ -1,22 +1,22 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import {AuthState, RootState} from '@/types/store'
-import {$, SocketConnection, push, success, error, successAndPush, infoAndPush} from '@/simpli'
+import {$, Helper} from '@/simpli'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
 <%_ var loginHolderModel = auth.model.loginHolder _%>
 <%_ var loginRespModel = auth.model.loginResp _%>
+<%_ var recoverPasswordByMailRequestModel = auth.model.recoverPasswordByMailRequest _%>
 <%_ var resetPasswordRequestModel = auth.model.resetPasswordRequest _%>
-<%_ var recoverPasswordRequestModel = auth.model.recoverPasswordRequest _%>
 <%_ var changePasswordRequestModel = auth.model.changePasswordRequest _%>
 <%-loginHolderModel.injectIntoDependence().build()%>
 <%-loginRespModel.injectIntoDependence().build()%>
+<%_ if (recoverPasswordByMailRequestModel) { _%>
+<%-recoverPasswordByMailRequestModel.injectIntoDependence().build()%>
+<%_ } _%>
 <%_ if (resetPasswordRequestModel) { _%>
 <%-resetPasswordRequestModel.injectIntoDependence().build()%>
-<%_ } _%>
-<%_ if (recoverPasswordRequestModel) { _%>
-<%-recoverPasswordRequestModel.injectIntoDependence().build()%>
 <%_ } _%>
 <%_ if (changePasswordRequestModel) { _%>
 <%-changePasswordRequestModel.injectIntoDependence().build()%>
@@ -25,7 +25,6 @@ import {$, SocketConnection, push, success, error, successAndPush, infoAndPush} 
 // initial state
 const state: AuthState = {
 <%-rootOptions.scaffoldSetup.auth.buildState()-%>
-  notification: null,
   cachePath: null,
   eventListener: {
     signIn: [],
@@ -38,7 +37,6 @@ const state: AuthState = {
 const getters: GetterTree<AuthState, RootState> = {
   isLogged: ({token}) => !!token,
 <%-rootOptions.scaffoldSetup.auth.buildGetter()-%>
-  notification: ({notification}) => notification,
   cachePath: ({cachePath}) => cachePath,
 }
 
@@ -53,15 +51,14 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param welcome
    */
   signIn: async ({state, commit, getters}, request: <%-loginHolderModel.name%>) => {
-    const authResponse = new <%-loginRespModel.name%>()
+    const authResponse = await request.<%-signInApi.name%>()
 
-    await authResponse.<%-signInApi.name%>(request)
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
     commit('POPULATE_TOKEN')
 
     const uri = getters.cachePath && $.route.name !== 'signIn' ? getters.cachePath : '/dashboard'
-    infoAndPush('system.info.welcome', uri)
+    Helper.infoAndPush('system.info.welcome', uri)
 
     commit('SET_CACHE_PATH', null)
 
@@ -81,14 +78,22 @@ const actions: ActionTree<AuthState, RootState> = {
     if (!getters.isLogged) {
       commit('SET_CACHE_PATH', $.route.path)
 
-      error('system.error.unauthorized')
+      Helper.error('system.error.unauthorized')
       dispatch('signOut')
       return
     }
 
-    const authResponse = new <%-loginRespModel.name%>()
+    const authResponse = await <%-loginHolderModel.name%>.<%-authApi.name%>()
 
-    await authResponse.<%-authApi.name%>()
+<%-rootOptions.scaffoldSetup.auth.buildPopulateIdAndToken()-%>
+
+    // TODO: verify the need of a socket connection
+    const connection = $.socket.connect<string>('notification', `/<%-signInApi.moduleName%>/notification/${token}`)
+
+    connection.onOpen(() => console.info(`Socket connection with client id=${id} established`))
+    connection.onClose(() => console.info(`Socket connection with client id=${id} lost`))
+    connection.onError(() => console.error(`Error with socket connection(client id=${id})`))
+    connection.onData((resp) => $.snotify.info(resp as string))
 
     commit('POPULATE', authResponse)
     state.eventListener.auth.forEach((item) => item(authResponse))
@@ -101,33 +106,36 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param showError
    */
   signOut: ({state, commit}) => {
-    push('/sign-in')
+    Helper.push('/sign-in')
+
+    // TODO: verify the need of a socket connection
+    $.socket.disconnect('notification')
 
     commit('FORGET')
     state.eventListener.signOut.forEach((item) => item())
   },
 
-<%_ if (resetPasswordRequestModel) { _%>
+<%_ if (recoverPasswordByMailRequestModel) { _%>
   /**
    * Reset password
    * @param context
    * @param request
    */
-  resetPassword: async (context, request: <%-resetPasswordRequestModel.name%>) => {
-    await new <%-loginRespModel.name%>().resetPassword(request)
-    successAndPush('system.success.resetPassword', '/sign-in')
+  resetPassword: async (context, request: <%-recoverPasswordByMailRequestModel.name%>) => {
+    await request.recoverPasswordByMail()
+    Helper.successAndPush('system.success.recoverPasswordByMail', '/sign-in')
   },
 
 <%_ } _%>
-<%_ if (recoverPasswordRequestModel) { _%>
+<%_ if (resetPasswordRequestModel) { _%>
   /**
    * Recover password
    * @param context
    * @param request
    */
-  recoverPassword: async (context, request: <%-recoverPasswordRequestModel.name%>) => {
-    await new <%-loginRespModel.name%>().recoverPassword(request)
-    successAndPush('system.success.recoverPassword', '/sign-in')
+  recoverPassword: async (context, request: <%-resetPasswordRequestModel.name%>) => {
+    await request.resetPassword()
+    Helper.successAndPush('system.success.resetPassword', '/sign-in')
   },
 
 <%_ } _%>
@@ -138,9 +146,9 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param request
    */
   changePassword: async ({dispatch, getters}, request: <%-changePasswordRequestModel.name%>) => {
-    await new <%-loginRespModel.name%>().changePassword(request)
+    await request.changePassword()
 
-    success('system.success.recoverPassword')
+    Helper.success('system.success.changePassword')
 
 <%_ var userAttr = loginRespModel.objectAtrrs[0] _%>
     const authRequest = new <%-loginHolderModel.name%>()
@@ -158,21 +166,30 @@ const actions: ActionTree<AuthState, RootState> = {
    * @param dispatch
    * @param callback
    */
-  onSignIn: ({dispatch}, callback) => dispatch('addEventListener', {name: 'signIn', callback}),
+  onSignIn: ({dispatch}, callback) => {
+    dispatch('removeEventListener', {name: 'signIn'})
+    dispatch('addEventListener', {name: 'signIn', callback})
+  },
 
   /**
    * On Auth Event
    * @param dispatch
    * @param callback
    */
-  onAuth: ({dispatch}, callback) => dispatch('addEventListener', {name: 'auth', callback}),
+  onAuth: ({dispatch}, callback) => {
+    dispatch('removeEventListener', {name: 'auth'})
+    dispatch('addEventListener', {name: 'auth', callback})
+  },
 
   /**
    * On SignOut Event
    * @param dispatch
    * @param callback
    */
-  onSignOut: ({dispatch}, callback) => dispatch('addEventListener', {name: 'signOut', callback}),
+  onSignOut: ({dispatch}, callback) => {
+    dispatch('removeEventListener', {name: 'signOut'})
+    dispatch('addEventListener', {name: 'signOut', callback})
+  },
 
   /**
    * Add event listener
@@ -196,32 +213,14 @@ const mutations: MutationTree<AuthState> = {
     state.token = localStorage.getItem('token') || null
   },
 
-  // Populate user and plan mutation
+  // Populate user mutation
   POPULATE(state, response: <%-loginRespModel.name%>) {
 <%-rootOptions.scaffoldSetup.auth.buildPopulate()-%>
-    state.notification = new SocketConnection(String, `/admin/notification/${response.token}`)
-
-    state.notification.onOpen(() => {
-      console.info(`Socket connection with client id=${id} established`)
-    })
-
-    state.notification.onClose(() => {
-      console.info(`Socket connection with client id=${id} lost`)
-    })
-
-    state.notification.onError(() => {
-      console.error(`Error with socket connection(client id=${id})`)
-    })
   },
 
   // Forget mutation
   FORGET(state) {
 <%-rootOptions.scaffoldSetup.auth.buildForget()-%>
-
-    if (state.notification) {
-      state.notification.disconnect()
-      state.notification = null
-    }
 
     localStorage.removeItem('token')
   },

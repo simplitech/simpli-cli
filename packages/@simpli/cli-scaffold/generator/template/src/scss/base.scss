@@ -194,8 +194,12 @@ table {
 
 label {
   @extend .pal-black-70.text;
+
+  user-select: none;
   font-weight: 600;
   letter-spacing: 1.5px;
+  margin-left: 4px;
+  margin-bottom: 2px;
 
   &:hover {
     input[type=radio], input[type=checkbox] {
@@ -221,7 +225,7 @@ input:not([type=submit]):not([type=checkbox]):not([type=radio]), select, textare
   @extend .pal-black-10.bg;
   @extend .pal-black-70.text;
 
-  height: 45px;
+  height: 35px;
   border: none;
   border-radius: $radius-base;
   outline: none;
@@ -243,6 +247,14 @@ input:not([type=submit]):not([type=checkbox]):not([type=radio]), select, textare
   &:focus {
     @extend .pal-black-10.bg;
     @extend .pal-primary.box-shadow.highlight;
+
+    &.valid {
+      @extend .pal-success.box-shadow.highlight;
+    }
+  }
+
+  &.invalid {
+    @extend .pal-danger.box-shadow.highlight;
   }
 }
 
@@ -253,17 +265,15 @@ input[type=radio], input[type=checkbox] {
   & ~ span {
     position: relative;
     display: flex;
-    margin-left: 30px;
+    margin-left: 20px;
     cursor: pointer;
 
     &:after {
       @extend .transition;
       @extend .pal-black-10.bg;
-      font-family: sans-serif;
       cursor: pointer;
       content: " ";
       left: -20px;
-      top: calc(50% - 7.5px);
       position: absolute;
       width: 14px;
       height: 14px;
@@ -272,18 +282,6 @@ input[type=radio], input[type=checkbox] {
       padding-left: 1px;
       padding-top: 1px;
       font-size: 15px;
-    }
-
-    &.btn {
-      padding: 0 20px 0 30px;
-      text-transform: none;
-      font-size: 12px;
-      margin-left: 0;
-      margin-bottom: -10px;
-
-      &:after {
-        left: 10px;
-      }
     }
   }
 

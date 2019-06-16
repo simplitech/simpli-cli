@@ -119,8 +119,8 @@ module.exports = class Scaffold {
     auth.api.auth = apis.find((api) => api.name === 'authenticate')
     auth.model.loginHolder = models.find((model) => model.name === 'AuthRequest')
     auth.model.loginResp = models.find((model) => model.name === 'AuthResponse')
+    auth.model.recoverPasswordByMailRequest = models.find((model) => model.name === 'RecoverPasswordByMailRequest')
     auth.model.resetPasswordRequest = models.find((model) => model.name === 'ResetPasswordRequest')
-    auth.model.recoverPasswordRequest = models.find((model) => model.name === 'RecoverPasswordRequest')
     auth.model.changePasswordRequest = models.find((model) => model.name === 'ChangePasswordRequest')
 
     auth.setDependencies()
