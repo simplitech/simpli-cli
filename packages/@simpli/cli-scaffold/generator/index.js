@@ -76,7 +76,7 @@ module.exports = (api, options) => {
       'normalize-scss': '^7.0.1',
       'register-service-worker': '^1.5.2',
       'simple-line-icons': '^2.4.1',
-      'simpli-web-sdk': '^2.1.0-0',
+      'simpli-web-sdk': '^2.1.0',
       'vue': '^2.6.10',
       'vue-class-component': '^7.1.0',
       'vue-meta': '^1.6.0',
