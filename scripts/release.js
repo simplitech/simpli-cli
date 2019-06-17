@@ -4,7 +4,7 @@ const execa = require('execa')
 const semver = require('semver')
 const inquirer = require('inquirer')
 const { syncDeps } = require('./syncDeps')
-const cc = require('conventional-changelog')
+// const { buildEditorConfig } = require('./buildEditorConfig')
 
 const curVersion = require('../lerna.json').version
 
@@ -49,30 +49,36 @@ const release = async () => {
       skipPrompt: true
     })
     delete process.env.PREFIX
-    await execa('git', ['add', '-A'], { stdio: 'inherit' })
-    await execa('git', ['commit', '-m', 'chore: pre release sync'], { stdio: 'inherit' })
+
+    // buildEditorConfig()
+
+    try {
+      await execa('git', ['add', '-A'], { stdio: 'inherit' })
+      await execa('git', ['commit', '-m', 'chore: pre release sync'], { stdio: 'inherit' })
+    } catch (e) {
+      // if it's a patch release, there may be no local deps to sync
+    }
   }
 
-  await execa(require.resolve('lerna/bin/lerna'), [
-    'publish',
-    '--repo-version',
-    version
-  ], { stdio: 'inherit' })
+  const releaseType = semver.diff(curVersion, version)
 
-  const fileStream = require('fs').createWriteStream(`CHANGELOG.md`)
-  cc({
-    preset: 'angular',
-    releaseCount: 0,
-    pkg: {
-      transform (pkg) {
-        pkg.version = `v${version}`
-        return pkg
-      }
-    }
-  }).pipe(fileStream).on('close', async () => {
-    await execa('git', ['add', '-A'], { stdio: 'inherit' })
-    await execa('git', ['commit', '-m', `chore: ${version} changelog`], { stdio: 'inherit' })
-  })
+  let distTag = 'latest'
+  if (releaseType.startsWith('pre')) {
+    distTag = 'next'
+  }
+
+  const lernaArgs = [
+    'publish',
+    version,
+    '--dist-tag',
+    distTag
+  ]
+  // keep packages' minor version in sync
+  if (releaseType !== 'patch') {
+    lernaArgs.push('--force-publish')
+  }
+
+  await execa(require.resolve('lerna/cli'), lernaArgs, { stdio: 'inherit' })
 }
 
 release().catch(err => {
