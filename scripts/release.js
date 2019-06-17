@@ -62,16 +62,11 @@ const release = async () => {
 
   const releaseType = semver.diff(curVersion, version)
 
-  let distTag = 'latest'
-  if (releaseType.startsWith('pre')) {
-    distTag = 'next'
-  }
-
   const lernaArgs = [
     'publish',
     version,
     '--dist-tag',
-    distTag
+    'latest'
   ]
   // keep packages' minor version in sync
   if (releaseType !== 'patch') {
