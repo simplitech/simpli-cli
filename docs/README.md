@@ -192,6 +192,8 @@ Therefore, it should have those installed.
 
 Go to `localhost:8080`
 
+[Demo](http://beta.martinlabs.com.br/UsecaseServer)
+
 ![Server Running](./img/server-img3.png)
 
 Copy the swagger URL in order to generate the `Client Project`.
@@ -220,6 +222,8 @@ $ npm run build
 to build for `production mode`.
 
 When you enter on `dev`, you may see this screen at `localhost:8181`:
+
+[Demo](http://beta.martinlabs.com.br/usecase)
 
 ![Client Running](./img/client-img3.png)
 
