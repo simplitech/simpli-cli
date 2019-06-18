@@ -23,20 +23,23 @@ module.exports = class Model {
     // Attribute name //e.g user
     this.attrName = camelCase(name || '')
 
+    // Collection model name (null if not exists) //e.g UserCollection
+    this.collectionName = null
+
     // Model description (not mandatory)
     this.description = definition.description || null
 
     // Model module //e.g @/model/resource/User
     this.module = null
 
-    // Attributes
-    this.attrs = []
-
     // Model type
     this.type = ModelType.STANDARD
 
     // only for resource
     this.resource = new Resource()
+
+    // Attributes
+    this.attrs = []
 
     // APIs
     this.apis = []
@@ -264,6 +267,22 @@ module.exports = class Model {
     return this.type === type
   }
 
+  getApiByName (name) {
+    return this.apis.find((api) => api.name === name)
+  }
+
+  get populateApi () {
+    return this.apis.find((api) => api.methodUppercase === 'GET' && api.paths.find((path) => !!path.name.match(/^id\S*$/i))) || null
+  }
+
+  get persistApi () {
+    return this.apis.find((api) => ['POST', 'PUT'].includes(api.methodUppercase) && api.body.model === this.name) || null
+  }
+
+  get removeApi () {
+    return this.apis.find((api) => api.methodUppercase === 'DELETE' && api.paths.find((path) => !!path.name.match(/^id\S*$/i))) || null
+  }
+
   get isStandard () {
     return this.is(ModelType.STANDARD)
   }
@@ -441,10 +460,13 @@ module.exports = class Model {
    * Inject the collection of this model into a dependence
    */
   injectCollectionIntoDependence () {
-    const dependence = new Dependence(this.getCollectionModule())
-    dependence.addChild(`${this.name}Collection`)
+    if (this.collectionName) {
+      const dependence = new Dependence(this.getCollectionModule())
+      dependence.addChild(this.collectionName)
 
-    return dependence
+      return dependence
+    }
+    return ''
   }
 
   /**
@@ -738,14 +760,24 @@ module.exports = class Model {
     let result = ''
 
     this.nonForeignAtrrs.forEach((attr) => {
-      if (attr.isObjectOrigin && attr.isObjectResource) {
+      if (attr.isObjectOrigin) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        if (attr.isRequired) {
-          result += `        content: schema.model.${attr.name}.$id,\n`
+        if (attr.isObjectResource) {
+          if (attr.isRequired) {
+            result += `        content: schema.model.${attr.name}.$id,\n`
+          } else {
+            result += `        content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+          }
         } else {
-          result += `        content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+          if (attr.isRequired) {
+            result += `        // TODO: define the attribute\n`
+            result += `        // content: schema.model.${attr.name}.$id,\n`
+          } else {
+            result += `        // TODO: define the attribute\n`
+            result += `        // content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+          }
         }
         result += `      },\n`
         result += `    }),\n`
@@ -843,8 +875,14 @@ module.exports = class Model {
     let result = ''
 
     this.nonForeignAtrrs.forEach((attr) => {
-      if (attr.isObjectOrigin && attr.isObjectResource) {
-        result += `    ${attr.name}: (schema) => `
+      if (attr.isObjectOrigin) {
+        if (attr.isObjectResource) {
+          result += `    ${attr.name}: (schema) => `
+        } else {
+          result += `    // TODO: define the attribute\n`
+          result += `    // ${attr.name}: (schema) => `
+        }
+
         if (attr.isRequired) {
           result += `schema.model.${attr.name}.$id,\n`
         } else {

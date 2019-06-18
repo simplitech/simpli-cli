@@ -118,6 +118,13 @@ module.exports = class ScaffoldSetup {
     this.models = map(definition, (def, name) => new Model(name, def, path, this.apis)) || []
 
     this.models.forEach((model) => {
+      this.paginatedModels.forEach((paginatedModel) => {
+        const itemAttr = paginatedModel.attrs.find((attr) => attr.name === 'items')
+        if (itemAttr && itemAttr.type === model.name) {
+          model.collectionName = paginatedModel.name
+        }
+      })
+
       model.objectAtrrs.forEach((attr) => {
         const model = this.models.find((m) => m.name === attr.type)
         if (model) attr.isObjectResource = model.isResource

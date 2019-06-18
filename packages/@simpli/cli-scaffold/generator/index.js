@@ -12,40 +12,44 @@ module.exports = (api, options) => {
   standardModels.forEach((resource) => {
     const data = { model: resource }
 
+    api.renderFrom('./injected', 'src/model/Template.ts', `./${resource.name}.ts`, data)
+
     api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./model/${resource.name}/Input${resource.name}Schema.ts`, data)
     api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./model/${resource.name}/List${resource.name}Schema.ts`, data)
     api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./model/${resource.name}/Csv${resource.name}Schema.ts`, data)
-
-    api.renderFrom('./injected', 'src/model/Template.ts', `./${resource.name}.ts`, data)
   })
 
   requestModels.forEach((resource) => {
     const data = { model: resource }
 
-    api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./request/${resource.name}/Input${resource.name}Schema.ts`, data)
-
     api.renderFrom('./injected', 'src/model/Template.ts', `./request/${resource.name}.ts`, data)
+
+    api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./request/${resource.name}/Input${resource.name}Schema.ts`, data)
   })
 
   responseModels.forEach((resource) => {
     const data = { model: resource }
 
+    api.renderFrom('./injected', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
+
     api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./response/${resource.name}/List${resource.name}Schema.ts`, data)
     api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./response/${resource.name}/Csv${resource.name}Schema.ts`, data)
-
-    api.renderFrom('./injected', 'src/model/Template.ts', `./response/${resource.name}.ts`, data)
   })
 
   resourceModels.forEach((resource) => {
-    const data = { model: resource }
+    const collection = paginatedModels.find((paginatedModel) => resource.collectionName === paginatedModel.name) || null
+    const data = { model: resource, collection }
+
     api.renderFrom('./injected', 'src/model/Template.ts', `./resource/${resource.name}.ts`, data)
 
     api.renderFrom('./injected', 'src/schema/InputTemplateSchema.ts', `./resource/${resource.name}/Input${resource.name}Schema.ts`, data)
     api.renderFrom('./injected', 'src/schema/ListTemplateSchema.ts', `./resource/${resource.name}/List${resource.name}Schema.ts`, data)
     api.renderFrom('./injected', 'src/schema/CsvTemplateSchema.ts', `./resource/${resource.name}/Csv${resource.name}Schema.ts`, data)
 
-    api.renderFrom('./injected', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
-    api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+    if (collection) {
+      api.renderFrom('./injected', 'src/views/list/ListTemplateView.vue', `List${resource.name}View.vue`, data)
+      api.renderFrom('./injected', 'src/views/persist/PersistTemplateView.vue', `Persist${resource.name}View.vue`, data)
+    }
   })
 
   paginatedModels.forEach((resource) => {

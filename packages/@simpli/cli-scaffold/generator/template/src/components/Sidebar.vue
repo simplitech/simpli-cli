@@ -32,11 +32,13 @@
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
 <%_ var resources = rootOptions.scaffoldSetup.resourceModels _%>
 <%_ for (var i in resources) { var resource = resources[i] _%>
+<%_ if (resource.collectionName) { _%>
           <li>
             <router-link to="/<%-kebabCase(resource.name)%>/list" @click.native="menuOff" class="btn fluid flat contrast">
               {{ $t('resource.<%-resource.name%>') }}
             </router-link>
           </li>
+<%_ } _%>
 <%_ } _%>
 
           <div class="weight-1"></div>

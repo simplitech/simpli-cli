@@ -13,22 +13,28 @@ import {RouterOptions} from 'vue-router'
 import AuthLayout from '@/views/layouts/AuthLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
+
 import SignInView from '@/views/SignInView.vue'
 import RecoverPasswordByMailView from '@/views/RecoverPasswordByMailView.vue'
 import ResetPasswordView from '@/views/ResetPasswordView.vue'
-
 <%_ } _%>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
 <%_ var resourceModels = rootOptions.scaffoldSetup.resourceModels _%>
 <%_ if (resourceModels.length) { _%>
+
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
+<%_ if (resource.collectionName) { _%>
 import List<%-resource.name%>View from '@/views/list/List<%-resource.name%>View.vue'
 <%_ } _%>
-
+<%_ } _%>
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
+<%_ if (i === 0) { _%>
+
+<%_ } _%>
+<%_ if (resource.collectionName) { _%>
 import Persist<%-resource.name%>View from '@/views/persist/Persist<%-resource.name%>View.vue'
 <%_ } _%>
-
+<%_ } _%>
 <%_ } _%>
 /**
  * VUE Router Configuration
@@ -63,6 +69,7 @@ export const router: RouterOptions = {
           component: DashboardView,
         },
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
+<%_ if (resource.collectionName) { _%>
 
         {path: '/<%-kebabCase(resource.name)%>/list', component: List<%-resource.name%>View},
         {path: '/<%-kebabCase(resource.name)%>/new', component: Persist<%-resource.name%>View},
@@ -72,6 +79,7 @@ export const router: RouterOptions = {
           component: Persist<%-resource.name%>View,
           props: true,
         },
+<%_ } _%>
 <%_ } _%>
       ],
     },

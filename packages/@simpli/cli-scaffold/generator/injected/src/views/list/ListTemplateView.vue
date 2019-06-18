@@ -9,7 +9,11 @@
 
         <adap-searchfield :collection="collection" :placeholder="$t('app.search')"/>
 
-        <await name="list"></await>
+<%_ if (collection && collection.apis && collection.apis[0].name) { _%>
+        <await name="<%-collection.apis[0].name%>"/>
+<%_ } else { _%>
+        <await name="list"/>
+<%_ } _%>
 
         <div class="weight-1"></div>
 
@@ -17,12 +21,14 @@
           {{ $t('app.totalLines', {total: collection.total}) }}
         </span>
 
+<%_ if (collection && collection.getApiByName('listCsv')) { _%>
         <await name="listCsv">
           <button @click="downloadCsv">
             {{ $t('app.downloadCsv') }}
           </button>
         </await>
 
+<%_ } _%>
         <router-link to="/<%-kebabCase(model.name)%>/new" class="btn primary">
           {{ $t('app.add') }}
         </router-link>
@@ -102,25 +108,32 @@
     async mounted() {
       await this.query()
     }
-
 <%_ if (model.resource.deletable) { _%>
+
     openRemoveModal(item: <%-model.name%>) {
       this.toRemove = item
     }
 
     async removeItem() {
       if (this.toRemove) {
-        await this.toRemove.remove()
+<%_ if (model.removeApi) { _%>
+        await this.toRemove.<%-model.removeApi.name%>()
+<%_ } else { _%>
+        // TODO: define the remove method
+        // await this.toRemove.remove()
+<%_ } _%>
         this.toRemove = null
         await this.collection.list()
       }
     }
-
 <%_ } _%>
+<%_ if (collection && collection.getApiByName('listCsv')) { _%>
+
     async downloadCsv() {
       const csv = new <%-model.name%>Collection().whole()
       await csv.listCsv()
       new Csv<%-model.name%>Schema().downloadCsv(csv.all())
     }
+<%_ } _%>
   }
 </script>

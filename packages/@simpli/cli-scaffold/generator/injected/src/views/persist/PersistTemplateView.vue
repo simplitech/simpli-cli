@@ -8,7 +8,11 @@
     </section>
 
     <section class="self-center max-w-600 w-full">
+<%_ if (model.populateApi) { _%>
+      <await init name="<%-model.populateApi.name%>" class="m-20">
+<%_ } else { _%>
       <await init name="populate" class="m-20">
+<%_ } _%>
         <form class="elevated padded" @submit.prevent="persist">
 
           <div v-for="(field, i) in schema.allFields" :key="i">
@@ -21,7 +25,11 @@
 
           <hr>
 
+<%_ if (model.persistApi) { _%>
+          <await name="<%-model.persistApi.name%>" class="items-center">
+<%_ } else { _%>
           <await name="persist" class="items-center">
+<%_ } _%>
             <button type="submit" class="primary">{{ $t('app.submit') }}</button>
           </await>
 
@@ -69,15 +77,29 @@
       const <%-param%> = Number(this.<%-param%>) || null
 <%_ } _%>
       if (<%-model.resource.endpointParamsIfImploded%>) {
-        await this.<%-model.attrName%>.populate(<%-model.resource.endpointParamsMethodImploded%>)
+<%_ if (model.populateApi) { _%>
+        await this.<%-model.attrName%>.<%-model.populateApi.name%>(<%-model.resource.endpointParamsMethodImploded%>)
+<%_ } else { _%>
+        // TODO: define the populate method
+        // await this.<%-model.attrName%>.populate(<%-model.resource.endpointParamsMethodImploded%>)
+<%_ } _%>
       }
 
+<%_ if (model.populateApi) { _%>
+      $.await.done('<%-model.populateApi.name%>')
+<%_ } else { _%>
       $.await.done('populate')
+<%_ } _%>
     }
 
     async persist() {
       this.schema.validate(this.<%-model.attrName%>)
-      await this.<%-model.attrName%>.persist()
+<%_ if (model.persistApi) { _%>
+      await this.<%-model.attrName%>.<%-model.persistApi.name%>()
+<%_ } else { _%>
+      // TODO: define the persist method
+      // await this.<%-model.attrName%>.persist()
+<%_ } _%>
       Helper.successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
     }
   }
