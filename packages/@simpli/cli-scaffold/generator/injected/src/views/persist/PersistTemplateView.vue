@@ -1,38 +1,34 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
   <div class="verti">
-    <section class="header">
-      <h1 class="m-0">
+    <header class="header py-2 px-4">
+      <h1 class="my-0 text-4xl font-semibold">
         {{ $t('resource.<%-model.name%>') }}
       </h1>
-    </section>
+    </header>
 
-    <section class="self-center max-w-600 w-full">
+    <section class="weight-1 h-0 bg-black-100">
 <%_ if (model.populateApi) { _%>
-      <await init name="<%-model.populateApi.name%>" class="m-20">
+      <await init name="<%-model.populateApi.name%>" class="w-full h-full px-4 py-8 overflow-auto">
 <%_ } else { _%>
-      <await init name="populate" class="m-20">
+      <await init name="populate" class="w-full h-full px-4 py-8 overflow-auto">
 <%_ } _%>
-        <form class="elevated padded" @submit.prevent="persist">
-
+        <form class="container mx-auto p-3 md:p-8 bg-white shadow-md rounded-lg" @submit.prevent="persist">
           <div v-for="(field, i) in schema.allFields" :key="i">
 <%_ if (model.objectAtrrs.length || model.arrayAtrrs.length) { _%>
-            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" :items="resource[field]"/>
+            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" :items="resource[field]" class="mb-4"/>
 <%_ } else { _%>
-            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field"/>
+            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" class="mb-4"/>
 <%_ } _%>
           </div>
 
-          <hr>
-
 <%_ if (model.persistApi) { _%>
-          <await name="<%-model.persistApi.name%>" class="items-center">
+          <await name="<%-model.persistApi.name%>" class="items-center-center">
 <%_ } else { _%>
-          <await name="persist" class="items-center">
+          <await name="persist" class="items-center-center">
 <%_ } _%>
-            <button type="submit" class="primary">{{ $t('app.submit') }}</button>
+            <button type="submit" class="h-12 px-20 btn--contrast bg-primary">{{ $t('app.submit') }}</button>
           </await>
-
         </form>
       </await>
     </section>

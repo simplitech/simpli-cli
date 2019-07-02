@@ -1,17 +1,17 @@
 <template>
-  <modal name="modalRemove" v-model="value">
+  <modal name="modalRemove" v-model="openPayload">
     <div class="verti text-center">
       <div class="horiz">
-        <h4 class="weight-1 mt-0 mr-10">
+        <h4 class="weight-1 font-semibold text-lg">
           {{ $t("system.question.confirmRemove") }}
         </h4>
       </div>
 
-      <p>{{ value && value.$tag }}</p>
+      <p class="my-4 p-4 border border-black-100 rounded-lg">{{ value && value.$tag }}</p>
 
-      <div class="horiz items-center">
-        <button type="button" class="mr-10" @click="close">{{ $t("app.cancel") }}</button>
-        <button type="button" class="danger" @click="confirmEvent">{{ $t("app.remove") }}</button>
+      <div class="horiz items-center-center mb-2">
+        <button type="button" class="mr-2 btn" @click="openPayload = null">{{ $t("app.cancel") }}</button>
+        <button type="button" class="btn--contrast bg-danger" @click="$emit('confirm')">{{ $t("app.remove") }}</button>
       </div>
     </div>
   </modal>
@@ -19,18 +19,17 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import {Resource} from '@/simpli'
 
   @Component
   export default class ModalRemove extends Vue {
-    @Prop({required: true}) value!: Resource | null
+    @Prop({ default: null }) value!: any
 
-    close() {
-      this.$emit('input', null)
+    get openPayload() {
+      return this.value
     }
 
-    confirmEvent() {
-      this.$emit('confirm')
+    set openPayload(val: any) {
+      this.$emit('input', val)
     }
   }
 </script>

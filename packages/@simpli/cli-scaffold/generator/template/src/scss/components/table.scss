@@ -1,0 +1,12 @@
+.table {
+  @apply bg-transparent border-collapse;
+  min-width: 100%;
+
+  th {
+    @apply bg-primary border-b-2 border-tertiary whitespace-no-wrap align-bottom text-left p-3 pt-6;
+  }
+
+  td {
+    @apply align-top p-3 border-t border-black-100;
+  }
+}

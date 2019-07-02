@@ -76,11 +76,13 @@ module.exports = (api, options) => {
     },
     dependencies: {
       'font-awesome': '^4.7.0',
-      'linelay': '^2.1.3',
+      'lodash': '^4.17.11',
+      'moment': '^2.24.0',
       'normalize-scss': '^7.0.1',
+      'pretty-checkbox': '^3.0.3',
       'register-service-worker': '^1.5.2',
       'simple-line-icons': '^2.4.1',
-      'simpli-web-sdk': '^2.1.0',
+      'simpli-web-sdk': '^2.1.2',
       'vue': '^2.6.10',
       'vue-class-component': '^7.1.0',
       'vue-meta': '^1.6.0',
@@ -91,6 +93,7 @@ module.exports = (api, options) => {
       'vuex-class': '^0.3.1'
     },
     devDependencies: {
+      '@fullhuman/postcss-purgecss': '^1.2.0',
       '@types/jest': '^24.0.11',
       '@vue/cli-plugin-babel': '^3.3.0',
       '@vue/cli-plugin-e2e-cypress': '^3.3.0',
@@ -104,6 +107,9 @@ module.exports = (api, options) => {
       'lint-staged': '^8.1.0',
       'node-sass': '^4.11.0',
       'sass-loader': '^7.1.0',
+      'tailwind-css-variables': '^2.0.2',
+      'tailwindcss': '^1.0.4',
+      'tailwindcss-transition': '^1.0.5',
       'ts-jest': '^24.0.2',
       'typescript': '^3.4.4',
       'vue-template-compiler': '^2.6.10'

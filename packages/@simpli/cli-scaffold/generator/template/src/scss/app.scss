@@ -1,82 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "variables";
-
-/********************** VENDOR **************************/
-@import "~normalize-scss/sass/normalize";
-@import "~simple-line-icons/scss/simple-line-icons";
-@import "~linelay/defaultBuild";
-@import "~simpli-web-sdk/scss/main";
-@import "~simpli-web-sdk/scss/effect";
-/********************************************************/
-
+@import "vendor";
 @import "base";
-@import "font";
-@import "helper";
-@import "palette";
 
-@import "components/sidebar";
-
-.header {
-  padding: 10px 30px;
-
-  background: white;
-  box-shadow: 2px 4px 20px -4px rgba(0, 0, 0, .4);
-  z-index: 1;
-}
-
-.elevated {
-  @extend .pal-white-90.bg;
-  @extend .pal-black-10.box-shadow.deep-15;
-
-  border-radius: $radius-base;
-  padding: 0;
-
-  &.intense {
-    @extend .pal-black-30.box-shadow.deep-15;
-  }
-
-  &.square {
-    border-radius: 0;
-  }
-
-  &.padded {
-    padding: #{$padding-base * 2};
-
-    @media screen and (max-width: $display-small) {
-      padding: #{$padding-base};
-    }
-
-    &.wide {
-      padding: #{$padding-base * 3};
-
-      @media screen and (max-width: $display-medium) {
-        padding: #{$padding-base * 2};
-      }
-
-      @media screen and (max-width: $display-small) {
-        padding: #{$padding-base};
-      }
-    }
-  }
-}
-
-.await-screen {
-  z-index: 1;
-
-  &.await__spinner {
-    @extend .pal-white-80.bg;
-    align-self: center;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    &.transparent {
-      background: none;
-    }
-
-    &.contrast {
-      @extend .pal-black-80.bg;
-    }
-  }
-}
+// generic COMPONENTS that are NOT implemented as a vue-component or have MANY components associated with the same style
+@import "components/btn";
+@import "components/input";
+@import "components/table";
+@import "components/header";

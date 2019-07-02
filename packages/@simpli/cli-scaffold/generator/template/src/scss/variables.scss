@@ -1,39 +1,13 @@
-
-@import "simplipack/effect";
-@import "simplipack/modal";
-
-$primary-color: #21AEB6;
-$secondary-color: #21B685;
-$tertiary-color: #165B5F;
-
-$light-primary-color: lighten($primary-color, 20%);
-$light-secondary-color: lighten($secondary-color, 20%);
-$light-tertiary-color: lighten($tertiary-color, 20%);
-
-$dark-primary-color: darken($primary-color, 20%);
-$dark-secondary-color: darken($secondary-color, 20%);
-$dark-tertiary-color: darken($tertiary-color, 20%);
-
-$success-color: #6da544;
-$warning-color: #ffda44;
-$danger-color: #cd2626;
-
-$light-background-color: #F2F2F2;
-$dark-background-color: #221A2A;
-
-$display-small: 576px;
-$display-medium: 768px;
-$display-large: 992px;
-$display-extra-large: 1200px;
-
-$container-large-desktop: 1170px;
-$container-desktop: 970px;
-$container-tablet: 750px;
-
-$padding-base: 8px;
-$radius-base: 6px;
+// colors defined on .env and used on tailwind.config
+// a tailwind plugin compiles them to css variables
+// here we define sass variables to be used only by vendor
+// to work with those colors prefer calling @apply
+$primary-color: var(--color-primary);
+$secondary-color: var(--color-secondary);
+$tertiary-color: var(--color-tertiary);
+$success-color: var(--color-success);
+$danger-color: var(--color-danger);
 
 $img-path: "./assets/img/" !default;
 $font-path: "./assets/font/" !default;
 $simple-line-font-path: "~simple-line-icons/fonts/" !default;
-

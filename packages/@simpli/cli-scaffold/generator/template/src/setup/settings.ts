@@ -6,7 +6,8 @@
  */
 
 import Vue from 'vue'
-import {$, Schema, PageCollection, ToastConfig, InputText} from '@/simpli'
+import {$, Schema, PageCollection, ToastConfig} from '@/simpli'
+import {AppHelper} from '@/helpers'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import GridLoader from 'vue-spinner/src/GridLoader.vue'
@@ -46,7 +47,7 @@ $.await.addLoader('DotLoader', DotLoader)
 
 $.await.defaultTransition = 'fade'
 $.await.defaultSpinner = 'ScaleLoader'
-$.await.defaultSpinnerColor = '#21AEB6'
+$.await.defaultSpinnerColor = AppHelper.Color.PRIMARY
 $.await.defaultSpinnerPadding = '0'
 $.await.defaultSpinnerScale = 1
 

@@ -1,17 +1,18 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth && rootOptions.scaffoldSetup.auth.model.resetPasswordRequest) { _%>
 <template>
-  <div class="container verti w-window h-window items-center">
-    <form @submit.prevent="resetPassword(request)" class="des-w-300 tab-w-400 mob-w-full">
-      <await name="resetPassword" :spinnerScale="1.5">
-        <h2 class="text-center text-uppercase contrast">
+  <div class="verti w-screen h-screen items-center-center bg-black-100">
+    <img src="@/assets/img/logo.png" class="w-32 h-32 mb-4" alt="logo">
+    <form @submit.prevent="resetPassword(request)" class="w-full md:w-80 m-4 p-4 bg-white shadow-md rounded-lg">
+      <await name="resetPassword" :spinnerScale="1.5" class="verti">
+        <h2 class="font-semibold text-lg text-center uppercase">
           {{ $t('view.resetPassword.title') }}
         </h2>
 
         <div v-for="(field, i) in schema.allFields" :key="i">
-          <render-schema v-model="request" :schema="schema" :field="field"/>
+          <render-schema v-model="request" :schema="schema" :field="field" class="mb-4"/>
         </div>
 
-        <button class="secondary fluid" type="submit">
+        <button class="w-full h-12 btn--contrast bg-primary" type="submit">
           {{ $t('view.resetPassword.submit') }}
         </button>
       </await>

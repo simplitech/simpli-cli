@@ -1,0 +1,14 @@
+.btn {
+  @apply opacity-75 items-center-center bg-black-300 py-0 px-8 transition border-none rounded-full outline-none;
+  @apply text-black-700 font-semibold cursor-pointer no-underline uppercase;
+  min-height: 2rem;
+
+  &:hover {
+    @apply opacity-100;
+  }
+}
+
+.btn--contrast {
+  @extend .btn;
+  @apply text-white bg-white-300;
+}

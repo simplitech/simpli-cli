@@ -1,0 +1,35 @@
+.input {
+  @apply text-black-700 bg-black-100 border-none rounded-lg outline-none p-2 align-middle text-base transition;
+
+  &.multiselect {
+    @apply p-0;
+  }
+
+  &:disabled {
+    @apply bg-transparent text-black-200 cursor-not-allowed;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px $primary-color;
+  }
+
+  &.invalid {
+    box-shadow: 0 0 0 2px $danger-color;
+  }
+
+  &.valid {
+    box-shadow: 0 0 0 2px $success-color;
+  }
+}
+
+.input-group {
+  &.input-group--text {
+    .input-group__label {
+      @apply ml-1;
+    }
+  }
+
+  .input-group__input {
+    @extend .input;
+  }
+}

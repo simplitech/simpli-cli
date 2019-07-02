@@ -1,6 +1,6 @@
 <template>
-  <div class="horiz h-window items-center">
-    <img src="@/assets/img/logo.png" width="256" height="256" alt="logo">
+  <div class="horiz h-screen items-center-center">
+    <img src="@/assets/img/logo.png" class="w-64 h-64" alt="logo">
   </div>
 </template>
 

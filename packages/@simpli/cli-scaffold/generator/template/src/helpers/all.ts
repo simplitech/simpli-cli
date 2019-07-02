@@ -1,5 +1,5 @@
 // custom
-export * from './custom.helper'
+export * from './color.helper'
 
 // vuex
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>

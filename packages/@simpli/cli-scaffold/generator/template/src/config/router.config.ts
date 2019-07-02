@@ -10,7 +10,7 @@
 
 import {RouterOptions} from 'vue-router'
 
-import AuthLayout from '@/views/layouts/AuthLayout.vue'
+import DefaultLayout from '@/views/layouts/DefaultLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
@@ -53,7 +53,7 @@ export const router: RouterOptions = {
       component: RecoverPasswordByMailView,
     },
     {
-      path: '/password/recover/:hash',
+      path: '/password/reset/:hash',
       name: 'resetPassword',
       component: ResetPasswordView,
       props: true,
@@ -61,7 +61,7 @@ export const router: RouterOptions = {
 <%_ } _%>
     {
       path: '/dashboard',
-      component: AuthLayout,
+      component: DefaultLayout,
       children: [
         {
           path: '/dashboard',

@@ -584,6 +584,8 @@ module.exports = class Model {
           result += `      is: Component.InputCheckbox,\n`
           result += `      bind: {\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        class: 'pretty p-default p-curve p-smooth',\n`
+          result += `        labelClass: 'state',\n`
           result += `      },\n`
         } else if (attr.isUrl) {
           result += `      is: Component.InputText,\n`
@@ -609,6 +611,8 @@ module.exports = class Model {
           result += `      is: Component.InputCheckbox,\n`
           result += `      bind: {\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        class: 'pretty p-default p-curve p-smooth',\n`
+          result += `        labelClass: 'state',\n`
           result += `      },\n`
         } else if (attr.isDate) {
           result += `      is: Component.InputText,\n`

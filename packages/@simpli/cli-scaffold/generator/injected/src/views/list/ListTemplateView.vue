@@ -1,42 +1,40 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
   <div class="verti">
-    <section class="header">
-      <div class="horiz items-center gutter-10">
-        <h1 class="m-0">
-          {{$t('resource.<%-model.name%>')}}
-        </h1>
+    <header class="header horiz flex-wrap items-center py-2 px-4 children:mx-4">
+      <h1 class="my-0 text-4xl font-semibold">
+        {{$t('resource.<%-model.name%>')}}
+      </h1>
 
-        <adap-searchfield :collection="collection" :placeholder="$t('app.search')"/>
+      <adap-searchfield :collection="collection" :placeholder="$t('app.search')" class="input h-8"/>
 
 <%_ if (collection && collection.apis && collection.apis[0].name) { _%>
-        <await name="<%-collection.apis[0].name%>"/>
+      <await name="<%-collection.apis[0].name%>"/>
 <%_ } else { _%>
-        <await name="list"/>
+      <await name="list"/>
 <%_ } _%>
 
-        <div class="weight-1"></div>
+      <div class="weight-1"></div>
 
-        <span v-if="collection.size()">
-          {{ $t('app.totalLines', {total: collection.total}) }}
-        </span>
+      <span v-if="collection.size()">
+        {{ $t('app.totalLines', {total: collection.total}) }}
+      </span>
 
 <%_ if (collection && collection.getApiByName('listCsv')) { _%>
-        <await name="listCsv">
-          <button @click="downloadCsv">
-            {{ $t('app.downloadCsv') }}
-          </button>
-        </await>
+      <await name="listCsv">
+        <button @click="downloadCsv" class="btn">
+          {{ $t('app.downloadCsv') }}
+        </button>
+      </await>
 
 <%_ } _%>
-        <router-link to="/<%-kebabCase(model.name)%>/new" class="btn primary">
-          {{ $t('app.add') }}
-        </router-link>
-      </div>
-    </section>
+      <router-link to="/<%-kebabCase(model.name)%>/new" class="btn--contrast bg-primary">
+        {{ $t('app.add') }}
+      </router-link>
+    </header>
 
-    <section>
-      <await init name="query" class="rel h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+    <section class="weight-1 h-0">
+      <await init name="query" class="relative verti w-full h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
         <template v-if="!collection.size()">
           <h3 class="p-20 text-center">
             {{ $t('app.noDataToShow') }}
@@ -44,8 +42,8 @@
         </template>
 
         <template v-else>
-          <div class="elevated square intense x-scroll">
-            <table>
+          <div class="verti w-full weight-1 h-0 overflow-auto">
+            <table class="table">
               <thead>
               <tr>
                 <th></th>
@@ -58,8 +56,8 @@
 
               <tbody>
               <tr v-for="(item, i) in collection.all()" :key="i">
-                <td class="horiz nowrap">
-                  <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="icon icon-pencil"></a>
+                <td class="horiz flex-no-wrap">
+                  <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="icon icon-pencil mr-4"></a>
 <%_ if (model.resource.deletable) { _%>
                   <a @click="openRemoveModal(item)" class="icon icon-trash"></a>
 <%_ } _%>
@@ -73,10 +71,12 @@
             </table>
           </div>
 
-          <adap-pagination :collection="collection"/>
+          <footer class="items-center-center bg-black-100">
+            <adap-pagination :collection="collection" class="m-4"/>
+          </footer>
         </template>
 
-        <await name="adapQuery" class="await-screen"/>
+        <await name="adapQuery" class="await__spinner--screen-light"/>
       </await>
     </section>
 <%_ if (model.resource.deletable) { _%>
