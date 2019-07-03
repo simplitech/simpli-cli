@@ -1,14 +1,14 @@
-// postcss.config.js
 const purgecss = require('@fullhuman/postcss-purgecss')({
-  // Specify the paths to all of the template files in your project
   content: [
     './src/**/*.html',
     './src/**/*.vue',
     './src/**/*.jsx',
-    // etc.
+    './src/**/*.scss',
+    './node_modules/simpli-web-sdk/**/*.css',
+    './node_modules/normalize-scss/**/*.scss',
+    './node_modules/pretty-checkbox/**/*.scss',
   ],
-
-  // Include any special characters you're using in this regular expression
+  whitelistPatterns: [/^v-[A-Za-z0-9-_:/]+/, /^icon-[A-Za-z0-9-_:/]+/, /^fa-[A-Za-z0-9-_:/]+/],
   defaultExtractor: content => content.match(/[A-Za-z0-9-_:/]+/g) || []
 })
 
