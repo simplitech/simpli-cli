@@ -3,10 +3,7 @@ package <%-packageAddress%>.dao
 
 <%_ if (!table.isPivot) { _%>
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
-import java.sql.Connection
-import java.util.ArrayList
-import br.com.simpli.model.LanguageHolder
-import br.com.simpli.sql.Dao
+import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
 <%_ } else { _%>
 <%_ var cache = [] _%>
@@ -16,9 +13,7 @@ import <%-packageAddress%>.model.resource.<%-column.foreign.referencedTableModel
 <%_ cache.push(column.foreign.referencedTableModelName) _%>
 <%_ } _%>
 <%_ } _%>
-import java.sql.Connection
-import br.com.simpli.model.LanguageHolder
-import br.com.simpli.sql.Dao
+import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
 <%_ } _%>
 
@@ -26,8 +21,8 @@ import br.com.simpli.sql.Query
  * Data Access Object of <%-table.modelName%> from table <%-table.name%>
  * @author Simpli CLI generator
  */
-class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
-    
+class <%-table.modelName%>Dao(con: AbstractConnector) {
+
 <%_ if (!table.isPivot) { _%>
     fun getOne(<%-table.primariesByParam()%>): <%-table.modelName%>? {
         // TODO: review generated method
@@ -36,7 +31,9 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .from("<%-table.name%>")
                 <%-table.primariesByWhere()%>
 
-        return getOne(query) { <%-table.modelName%>(it) }
+        return con.getOne(query) {
+            <%-table.modelName%>(it)
+        }
     }
 
     fun getList(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): MutableList<<%-table.modelName%>> {
@@ -73,9 +70,11 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             query.limit(index, it)
         }
 
-        return getList(query) { <%-table.modelName%>(it) }
+        return con.getList(query) {
+            <%-table.modelName%>(it)
+        }
     }
-    
+
     fun count(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): Int {
         // TODO: review generated method
         val query = Query()
@@ -95,7 +94,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
             }
         }
 
-        return getFirstInt(query) ?: 0
+        return con.getFirstInt(query) ?: 0
     }
 
     fun update(<%-table.instanceName%>: <%-table.modelName%>): Int {
@@ -105,7 +104,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .updateSet(<%-table.instanceName%>.updateSet())
                 <%-table.primariesByWhere(false, table.instanceName)%>
 
-        return execute(query).affectedRows
+        return con.execute(query).affectedRows
     }
 
     fun insert(<%-table.instanceName%>: <%-table.modelName%>): Long {
@@ -114,7 +113,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .insertInto("<%-table.name%>")
                 .insertValues(<%-table.instanceName%>.insertValues())
 
-        return execute(query).key
+        return con.execute(query).key
     }
 
     fun exist(<%-table.primariesByParam()%>): Boolean {
@@ -124,7 +123,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .from("<%-table.name%>")
                 <%-table.primariesByWhere()%>
 
-        return exist(query)
+        return con.exist(query)
     }
 
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
@@ -136,7 +135,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .whereEq("<%-column.field%>", <%-column.name%>)
                 <%-table.primariesByWhere(true)%>
 
-        return exist(query)
+        return con.exist(query)
     }
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
@@ -148,7 +147,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .updateSet("<%-table.removableColumn.field%>" to false)
                 <%-table.primariesByWhere()%>
 
-        return execute(query).affectedRows
+        return con.execute(query).affectedRows
     }
 <%_ } _%>
 <%_ } else if (table.isPivot) { _%>
@@ -165,7 +164,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
 <%_ } _%>
                 )
 
-        return execute(query).key
+        return con.execute(query).key
     }
 
 <%_ var cache = [] _%>
@@ -179,7 +178,7 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .deleteFrom("<%-table.name%>")
                 .whereEq("<%-columnRef.field%>", <%-columnRef.name%>)
 
-        return execute(query).affectedRows
+        return con.execute(query).affectedRows
     }
 
     fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): MutableList<<%-columnRef.foreign.referencedTableModelName%>> {
@@ -190,7 +189,9 @@ class <%-table.modelName%>Dao(con: Connection, lang: LanguageHolder) : Dao(con, 
                 .innerJoin("<%-table.name%>", "<%-columnRef.foreign.referencedTableName%>.<%-columnRef.foreign.referencedColumnName%>", "<%-table.name%>.<%-columnRef.field%>")
                 .whereEq("<%-table.name%>.<%-columnCross.field%>", <%-columnCross.name%>)
 
-        return getList(query) { <%-columnRef.foreign.referencedTableModelName%>(it) }
+        return con.getList(query) {
+            <%-columnRef.foreign.referencedTableModelName%>(it)
+        }
     }
 
 <%_ cache.push(columnRef.foreign.referencedTableModelName) _%>

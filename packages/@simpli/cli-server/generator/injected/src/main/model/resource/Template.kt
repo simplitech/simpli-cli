@@ -5,7 +5,6 @@ package <%-packageAddress%>.model.resource
 import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.param.DefaultParam
-import <%-packageAddress%>.wrapper.ModelWrapper
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.getDouble
 import br.com.simpli.sql.getDoubleOrNull
@@ -38,7 +37,7 @@ import javax.ws.rs.PathParam
 <%_ } else { _%>
 @ApiModel
 <%_ } _%>
-class <%-table.modelName%> : ModelWrapper<<%-table.modelName%>Dao> {
+class <%-table.modelName%> {
     constructor()
 
 <%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>

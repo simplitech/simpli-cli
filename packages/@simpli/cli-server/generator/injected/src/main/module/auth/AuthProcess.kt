@@ -36,7 +36,7 @@ class AuthProcess : ProcessWrapper() {
     lateinit var dao: AuthDao
 
     override fun onAssign() {
-        dao = AuthDao(con, lang)
+        dao = AuthDao(con)
     }
 
     /**

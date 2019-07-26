@@ -4,8 +4,8 @@ package <%-packageAddress%>.wrapper
 import <%-packageAddress%>.app.Env.DEBUG_MODE
 import <%-packageAddress%>.app.Env.DS_NAME
 import <%-packageAddress%>.exception.HttpException
-import br.com.simpli.sql.ConnectionPipe
-import br.com.simpli.sql.TransactionPipe
+import br.com.simpli.sql.ReadConPipe
+import br.com.simpli.sql.TransacConPipe
 import java.util.logging.Level
 import java.util.logging.Logger
 import javax.ws.rs.core.MediaType
@@ -18,8 +18,8 @@ import javax.ws.rs.ext.ExceptionMapper
  * @author Simpli CLI generator
  */
 abstract class RouterWrapper : ExceptionMapper<Throwable> {
-    private val connectionPipe = ConnectionPipe(DS_NAME)
-    private val transactionPipe = TransactionPipe(DS_NAME)
+    private val connectionPipe = ReadConPipe(DS_NAME)
+    private val transactionPipe = TransacConPipe(DS_NAME)
 
     /**
      * Open the MySQL connection without rollback

@@ -7,7 +7,7 @@ import <%-packageAddress%>.param.DefaultParam
 import <%-packageAddress%>.wrapper.GatewayWrapper
 import <%-packageAddress%>.wrapper.ProcessWrapper
 import br.com.simpli.model.LanguageHolder
-import java.sql.Connection
+import br.com.simpli.sql.AbstractConnector
 
 /**
  * Router Gateway
@@ -21,7 +21,7 @@ open class GuestGateway : GatewayWrapper() {
      * Use this function to throw exceptions or change values according to the app conditions
      * For instance: check if the client version is acceptable
      */
-    fun middleware(con: Connection, param: DefaultParam) {
+    fun middleware(con: AbstractConnector, param: DefaultParam) {
         // TODO: review generated method
         val lang = getLang(param.lang)
         val clientVersion = param.clientVersion
@@ -42,7 +42,7 @@ open class GuestGateway : GatewayWrapper() {
      */
     fun <T> route(
             param: DefaultParam,
-            c: (con: Connection, lang: LanguageHolder, clientVersion: String) -> T
+            c: (con: AbstractConnector, lang: LanguageHolder, clientVersion: String) -> T
     ): T {
         return pipe.handle { con ->
             val language = param.lang

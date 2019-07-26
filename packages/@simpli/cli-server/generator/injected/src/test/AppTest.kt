@@ -6,6 +6,7 @@ import <%-packageAddress%>.app.Env.TESTER_CLIENT_VERSION
 import <%-packageAddress%>.app.Env.TESTER_DATABASE
 import br.com.simpli.model.EnglishLanguage
 import br.com.simpli.sql.DaoTest
+import br.com.simpli.sql.TransacConnector
 import java.sql.SQLException
 import javax.naming.NamingException
 
@@ -15,7 +16,7 @@ import javax.naming.NamingException
  */
 open class AppTest @Throws(NamingException::class, SQLException::class)
 constructor() : DaoTest(DS_NAME, TESTER_DATABASE) {
-    protected val con = getConnection()
+    protected val con = TransacConnector(getConnection())
     protected val lang = EnglishLanguage()
     protected val clientVersion = TESTER_CLIENT_VERSION
 }

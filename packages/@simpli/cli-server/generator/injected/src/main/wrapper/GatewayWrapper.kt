@@ -4,10 +4,8 @@ package <%-packageAddress%>.wrapper
 import <%-packageAddress%>.app.Env.AVAILABLE_LANGUAGES
 import <%-packageAddress%>.enums.Lang
 import <%-packageAddress%>.locale.EnUs
-import <%-packageAddress%>.param.DefaultParam
 import br.com.simpli.model.LanguageHolder
-import br.com.simpli.sql.ConnectionPipe
-import java.sql.Connection
+import br.com.simpli.sql.AbstractConPipe
 import java.util.regex.Pattern
 
 /**
@@ -16,11 +14,11 @@ import java.util.regex.Pattern
  * @author Simpli CLI generator
  */
 abstract class GatewayWrapper {
-    lateinit var pipe: ConnectionPipe
+    lateinit var pipe: AbstractConPipe
 
     open fun onAssign() {/**/}
 
-    fun assign(pipe: ConnectionPipe) {
+    fun assign(pipe: AbstractConPipe) {
         this.pipe = pipe
         onAssign()
     }

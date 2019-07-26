@@ -4,13 +4,12 @@ package <%-packageAddress%>.<%-moduleName%>.gateway
 
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
 import <%-packageAddress%>.<%-moduleName%>.auth.AuthProcess
-import <%-packageAddress%>.enums.Lang
 import <%-packageAddress%>.exception.response.UnauthorizedException
 import <%-packageAddress%>.param.DefaultParam
 import <%-packageAddress%>.wrapper.GatewayWrapper
 import <%-packageAddress%>.wrapper.ProcessWrapper
 import br.com.simpli.model.LanguageHolder
-import java.sql.Connection
+import br.com.simpli.sql.AbstractConnector
 
 /**
  * Authentication Gateway
@@ -24,7 +23,7 @@ open class AuthGateway : GatewayWrapper() {
      * Use this function to throw exceptions or change values according to the app conditions
      * For instance: check if the user belongs to a premium account
      */
-    fun middleware(con: Connection, auth: AuthResponse, param: DefaultParam.Auth) {
+    fun middleware(con: AbstractConnector, auth: AuthResponse, param: DefaultParam.Auth) {
         // TODO: review generated method
         val lang = getLang(param.lang)
         val clientVersion = param.clientVersion
@@ -45,7 +44,7 @@ open class AuthGateway : GatewayWrapper() {
      */
     fun <T> route(
             param: DefaultParam.Auth,
-            c: (auth: AuthResponse, con: Connection, lang: LanguageHolder, clientVersion: String) -> T
+            c: (auth: AuthResponse, con: AbstractConnector, lang: LanguageHolder, clientVersion: String) -> T
     ): T {
         return pipe.handle { con ->
             val language = param.lang

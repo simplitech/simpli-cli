@@ -23,7 +23,7 @@ class <%-table.modelName%>Process : ProcessWrapper() {
     lateinit var dao: <%-table.modelName%>Dao
 
     override fun onAssign() {
-        dao = <%-table.modelName%>Dao(con, lang)
+        dao = <%-table.modelName%>Dao(con)
     }
 
     @Throws(BadRequestException::class, NotFoundException::class)
@@ -38,7 +38,7 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 <%_ } _%>
 
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con, lang)
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con)
 
 <%_ } _%>
 <%_ if (table.manyToMany.length) { _%>
@@ -84,7 +84,7 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 
 <%_ } _%>
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con, lang)
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con)
 
         <%-m2m.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(model.id)
 

@@ -16,7 +16,7 @@ import kotlin.test.assertNull
  */
 class <%-table.modelName%>Test: AppTest() {
     private val model = <%-table.modelName%>()
-    private val dao = <%-table.modelName%>Dao(con, lang)
+    private val dao = <%-table.modelName%>Dao(con)
 
     init {
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>

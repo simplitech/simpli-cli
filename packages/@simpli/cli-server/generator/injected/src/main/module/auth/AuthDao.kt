@@ -6,13 +6,11 @@
 package <%-packageAddress%>.<%-moduleName%>.auth
 
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
-import br.com.simpli.model.LanguageHolder
-import br.com.simpli.sql.Dao
+import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
-import java.sql.Connection
 
 /**
- * Responsible for database authentication operations
+ * Authentication business logic
  * @author Simpli CLI generator
  */
 class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
@@ -24,7 +22,7 @@ class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
                 .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
                 .where("<%-passwordColumn.field%> = SHA2(?, 256)", <%-passwordColumn.name%>)
 
-        return getFirstLong(query)
+        return con.getFirstLong(query)
     }
 
     fun get<%-userTable.modelName%>(<%-userTable.idColumn.name%>: <%-userTable.idColumn.kotlinType%>): <%-userTable.modelName%>? {
@@ -33,7 +31,9 @@ class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
                 .from("<%-userTable.name%>")
                 .whereEq("<%-userTable.idColumn.field%>", <%-userTable.idColumn.name%>)
 
-        return getOne(query) { <%-userTable.modelName%>(it) }
+        return con.getOne(query) {
+            <%-userTable.modelName%>(it)
+        }
     }
 
     fun get<%-userTable.modelName%>ByEmail(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>): <%-userTable.modelName%>? {
@@ -42,7 +42,9 @@ class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
                 .from("<%-userTable.name%>")
                 .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
 
-        return getOne(query) { <%-userTable.modelName%>(it) }
+        return con.getOne(query) {
+            <%-userTable.modelName%>(it)
+        }
     }
 
     fun update<%-userTable.modelName%>Password(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>): Int {
@@ -53,7 +55,7 @@ class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
                 )
                 .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
 
-        return execute(query).affectedRows
+        return con.execute(query).affectedRows
     }
 
 }
