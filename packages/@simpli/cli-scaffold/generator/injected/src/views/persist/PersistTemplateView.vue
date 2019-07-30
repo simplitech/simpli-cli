@@ -15,11 +15,7 @@
 <%_ } _%>
         <form class="container mx-auto p-3 md:p-8 bg-white shadow-md rounded-lg" @submit.prevent="persist">
           <div v-for="(field, i) in schema.allFields" :key="i">
-<%_ if (model.objectAtrrs.length || model.arrayAtrrs.length) { _%>
-            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" :items="resource[field]" class="mb-4"/>
-<%_ } else { _%>
             <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" class="mb-4"/>
-<%_ } _%>
           </div>
 
 <%_ if (model.persistApi) { _%>
@@ -39,9 +35,6 @@
   import {Component, Prop, Watch, Vue} from 'vue-property-decorator'
   import {$, Helper} from '@/simpli'
   <%-model.injectIntoDependence().build()%>
-<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-  <%-dependence.buildAsCollection()%>
-<%_ } _%>
   <%-model.injectSchemaIntoDependence('Input').build()%>
 
   @Component
@@ -53,25 +46,18 @@
     schema = new Input<%-model.name%>Schema()
     <%-model.attrName%> = new <%-model.name%>()
 
+    async mounted() {
 <%_ if (model.resolvedPersistDependencies.length) { _%>
-<%-model.buildPersistResourceInstances()%>
-    get resource() {
-      return {
-<%-model.buildPersistResource()%>
-      }
+      this.schema.populateResource()
+<%_ } _%>
+      await this.populate()
     }
 
-<%_ } _%>
-    async mounted() {
-<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-      await this.collection<%-dependence.children[0]%>.list()
-<%_ } _%>
-<%_ if (model.resolvedPersistDependencies.length) { _%>
-
-<%_ } _%>
+    async populate() {
 <%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>
       const <%-param%> = Number(this.<%-param%>) || null
 <%_ } _%>
+
       if (<%-model.resource.endpointParamsIfImploded%>) {
 <%_ if (model.populateApi) { _%>
         await this.<%-model.attrName%>.<%-model.populateApi.name%>(<%-model.resource.endpointParamsMethodImploded%>)

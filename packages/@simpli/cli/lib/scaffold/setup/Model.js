@@ -571,6 +571,7 @@ module.exports = class Model {
             result += `        required: true,\n`
           }
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        items: this.collection${attr.type}.all(),\n`
           result += `      },\n`
         } else if (attr.isArrayOrigin) {
           result += `      is: Component.InputSelect,\n`
@@ -579,6 +580,7 @@ module.exports = class Model {
             result += `        required: true,\n`
           }
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        items: this.collection${attr.type}.all(),\n`
           result += `      },\n`
         } else if (attr.isSoftDelete) {
           result += `      is: Component.InputCheckbox,\n`
@@ -992,7 +994,7 @@ module.exports = class Model {
     let result = ''
 
     this.persistDependencies.forEach((dep) => {
-      result += `    collection${dep.children[0]} = new ${dep.children[0]}Collection().whole()\n`
+      result += `  collection${dep.children[0]} = new ${dep.children[0]}Collection().whole()\n`
     })
 
     return result
