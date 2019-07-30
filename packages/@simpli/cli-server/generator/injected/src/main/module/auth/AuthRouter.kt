@@ -30,8 +30,6 @@ import javax.ws.rs.core.MediaType
 @Produces(MediaType.APPLICATION_JSON)
 class AuthRouter : RouterWrapper() {
 
-    val process = AuthProcess()
-
     val guestGateway = GuestGateway()
     val authGateway = AuthGateway()
 
@@ -44,6 +42,7 @@ class AuthRouter : RouterWrapper() {
     @POST
     @ApiOperation(tags = ["AuthRequest"], value = "Submits the user authentication")
     fun signIn(@BeanParam param: DefaultParam, request: AuthRequest): AuthResponse {
+        val process = AuthProcess()
         return connection(guestGateway).handle(process, param) {
             it.signIn(request)
         }
@@ -53,6 +52,7 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["RecoverPasswordByMailRequest"], value = "Sends an email requesting to change the password")
     fun recoverPasswordByMail(@BeanParam param: DefaultParam, request: RecoverPasswordByMailRequest): Long {
+        val process = AuthProcess()
         return connection(guestGateway).handle(process, param) {
             it.recoverPasswordByMail(request)
         }
@@ -62,6 +62,7 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["ResetPasswordRequest"], value = "Recovers the password with a given hash")
     fun resetPassword(@BeanParam param: DefaultParam, request: ResetPasswordRequest): String {
+        val process = AuthProcess()
         return transaction(guestGateway).handle(process, param) {
             it.resetPassword(request)
         }
@@ -71,6 +72,7 @@ class AuthRouter : RouterWrapper() {
     @Path("/me/password")
     @ApiOperation(tags = ["ChangePasswordRequest"], value = "Changes the password with a given new password")
     fun changePassword(@BeanParam param: DefaultParam.Auth, request: ChangePasswordRequest): Long {
+        val process = AuthProcess()
         return transaction(authGateway).handleWithAuth(process, param) { it, auth ->
             it.changePassword(request, auth)
         }

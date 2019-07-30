@@ -10,10 +10,10 @@ import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
 
 /**
- * Authentication business logic
+ * Data Access Object of Auth
  * @author Simpli CLI generator
  */
-class AuthDao(con: Connection, lang: LanguageHolder) : Dao(con, lang) {
+class AuthDao(val con: AbstractConnector) {
 
     fun getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>): Long? {
         val query = Query()

@@ -21,7 +21,7 @@ import br.com.simpli.sql.Query
  * Data Access Object of <%-table.modelName%> from table <%-table.name%>
  * @author Simpli CLI generator
  */
-class <%-table.modelName%>Dao(con: AbstractConnector) {
+class <%-table.modelName%>Dao(val con: AbstractConnector) {
 
 <%_ if (!table.isPivot) { _%>
     fun getOne(<%-table.primariesByParam()%>): <%-table.modelName%>? {

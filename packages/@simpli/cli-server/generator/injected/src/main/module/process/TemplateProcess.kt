@@ -143,7 +143,7 @@ class <%-table.modelName%>Process : ProcessWrapper() {
         val id = request.id ?: throw BadRequestException()
 <%_ } else { _%>
 <%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        val id<%-i%> = request.<%-column.name%> ?: throw BadRequestException()
+        val id<%-(Number(i) + 1)%> = request.<%-(Number(i) + 1)%> ?: throw BadRequestException()
 <%_ } _%>
 <%_ } _%>
 

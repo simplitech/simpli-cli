@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType
 @Produces(MediaType.APPLICATION_JSON)
 class <%-table.modelName%>Router : RouterWrapper() {
 
-    val process = <%-table.modelName%>Process()
     val authGateway = AuthGateway()
 
     @GET
@@ -37,6 +36,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Gets a instance of a given ID from <%-table.modelName%>")
     fun populate(@BeanParam param: <%-table.modelName%>.GetParam): <%-table.modelName%> {
         // TODO: review generated method
+        val process = <%-table.modelName%>Process()
         return connection(authGateway).handle(process, param) {
 			it.get(param)
 		}
@@ -46,6 +46,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%>")
     fun list(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
+        val process = <%-table.modelName%>Process()
         return connection(authGateway).handle(process, param) {
 			it.list(param)
 		}
@@ -56,6 +57,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%> to use it in a CSV file")
     fun listCsv(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
+        val process = <%-table.modelName%>Process()
         return connection(authGateway).handle(process, param) {
 			it.list(param)
 		}
@@ -66,6 +68,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Persists a new instance from <%-table.modelName%>", notes = "Use ID = 0 to create a new one, or ID > 0 to update a current one")
     fun persist(@BeanParam param: <%-table.modelName%>.PersistParam, model: <%-table.modelName%>): Long {
         // TODO: review generated method
+        val process = <%-table.modelName%>Process()
         return transaction(authGateway).handle(process, param) {
 			it.persist(model)
 		}
@@ -78,6 +81,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Deletes a instance of a given ID from <%-table.modelName%>")
     fun remove(@BeanParam param: <%-table.modelName%>.GetParam): Long {
         // TODO: review generated method
+        val process = <%-table.modelName%>Process()
         return transaction(authGateway).handle(process, param) {
 			it.remove(param)
 		}

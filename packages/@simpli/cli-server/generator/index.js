@@ -69,7 +69,6 @@ module.exports = (api, options) => {
     // main/wrapper
     api.renderFrom('./injected', 'src/main/wrapper/GatewayWrapper.kt', `../kotlin/${dir}/wrapper/GatewayWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/MailWrapper.kt', `../kotlin/${dir}/wrapper/MailWrapper.kt`)
-    api.renderFrom('./injected', 'src/main/wrapper/ModelWrapper.kt', `../kotlin/${dir}/wrapper/ModelWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/ProcessWrapper.kt', `../kotlin/${dir}/wrapper/ProcessWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/RouterWrapper.kt', `../kotlin/${dir}/wrapper/RouterWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/SocketWrapper.kt', `../kotlin/${dir}/wrapper/SocketWrapper.kt`)

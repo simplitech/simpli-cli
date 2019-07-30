@@ -121,7 +121,7 @@ class <%-table.modelName%> {
 <%_ } _%>
 <%_ } _%>
     @Throws(BadRequestException::class)
-    override fun validate(updating: Boolean, dao: <%-table.modelName%>Dao, lang: LanguageHolder) {
+    fun validate(updating: Boolean, dao: <%-table.modelName%>Dao, lang: LanguageHolder) {
         // TODO: review generated method
         if (updating) {
             if (!dao.exist(<%-table.primariesByParamCall()%>)) {
