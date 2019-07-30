@@ -29,15 +29,13 @@ import javax.ws.rs.core.MediaType
 @Produces(MediaType.APPLICATION_JSON)
 class <%-table.modelName%>Router : RouterWrapper() {
 
-    val authGateway = AuthGateway()
-
     @GET
     @Path("<%-table.primariesBySlash()%>")
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Gets a instance of a given ID from <%-table.modelName%>")
     fun populate(@BeanParam param: <%-table.modelName%>.GetParam): <%-table.modelName%> {
         // TODO: review generated method
         val process = <%-table.modelName%>Process()
-        return connection(authGateway).handle(process, param) {
+        return connection(AuthGateway()).handle(process, param) {
 			it.get(param)
 		}
     }
@@ -47,7 +45,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     fun list(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         val process = <%-table.modelName%>Process()
-        return connection(authGateway).handle(process, param) {
+        return connection(AuthGateway()).handle(process, param) {
 			it.list(param)
 		}
     }
@@ -58,7 +56,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     fun listCsv(@BeanParam param: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         val process = <%-table.modelName%>Process()
-        return connection(authGateway).handle(process, param) {
+        return connection(AuthGateway()).handle(process, param) {
 			it.list(param)
 		}
     }
@@ -69,7 +67,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     fun persist(@BeanParam param: <%-table.modelName%>.PersistParam, model: <%-table.modelName%>): Long {
         // TODO: review generated method
         val process = <%-table.modelName%>Process()
-        return transaction(authGateway).handle(process, param) {
+        return transaction(AuthGateway()).handle(process, param) {
 			it.persist(model)
 		}
     }
@@ -82,7 +80,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     fun remove(@BeanParam param: <%-table.modelName%>.GetParam): Long {
         // TODO: review generated method
         val process = <%-table.modelName%>Process()
-        return transaction(authGateway).handle(process, param) {
+        return transaction(AuthGateway()).handle(process, param) {
 			it.remove(param)
 		}
     }
