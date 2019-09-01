@@ -1,14 +1,48 @@
 .btn {
-  @apply opacity-75 items-center-center bg-black-300 py-0 px-8 transition border-none rounded-full outline-none;
-  @apply text-black-700 font-semibold cursor-pointer no-underline uppercase;
+  @apply items-center-center bg-black-300 py-0 px-8 transition border-none;
+  @apply text-xs text-black-700 font-semibold cursor-pointer no-underline uppercase;
   min-height: 2rem;
+  border-radius: 20px;
 
-  &:hover {
-    @apply opacity-100;
+  &:disabled {
+    @apply opacity-25;
   }
-}
 
-.btn--contrast {
-  @extend .btn;
-  @apply text-white bg-white-300;
+  &:focus {
+    @apply outline-none;
+  }
+
+  &.btn--icon {
+    @apply w-8 h-8 p-0;
+  }
+
+  &.btn--contrast {
+    @apply text-white bg-white-300 shadow-btn;
+
+    &:not(:disabled):hover {
+      transform: scale(1.07)
+    }
+  }
+
+  &.btn--border {
+    @apply bg-transparent text-secondary border-gray-300 border-2 border-solid;
+
+    &:not(:disabled):hover {
+      @apply bg-secondary text-white border-secondary shadow-btn;
+    }
+  }
+
+  &.btn--solid {
+    @extend .btn--border;
+    @apply text-black-700 bg-white;
+
+    &:not(:disabled):hover {
+      @apply bg-secondary text-white border-secondary shadow-btn;
+    }
+  }
+
+  &.btn--flat {
+    @extend .btn--border;
+    @apply border-0;
+  }
 }

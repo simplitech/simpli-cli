@@ -1,0 +1,6 @@
+.card {
+  @apply p-3 bg-white shadow-md rounded-lg;
+  @screen lg {
+    @apply p-8;
+  }
+}

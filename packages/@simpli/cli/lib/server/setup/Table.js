@@ -2,7 +2,6 @@ const Column = require('./Column')
 const Relation = require('./Relation')
 const uniqBy = require('lodash.uniqby')
 const camelCase = require('lodash.camelcase')
-const startCase = require('lodash.startcase')
 const kebabCase = require('lodash.kebabcase')
 
 module.exports = class Table {
@@ -77,6 +76,14 @@ module.exports = class Table {
       column = this.columns.filter((column) => column.isForeign) || new Column()
     }
     return column
+  }
+
+  get hasUniqueDefaultId () {
+    const columns = this.idsColumn
+    if (columns.length === 1) {
+      return columns[0].kotlinType === 'Long'
+    }
+    return false
   }
 
   get removableColumn () {
@@ -176,10 +183,13 @@ module.exports = class Table {
     return columns.map((column, index) => columns.length <= 1 ? printId(column.name) : printId(column.name, index)).join(', ')
   }
 
-  primariesByParam (forceNullable = false) {
+  primariesByParam (forceNullable = false, simpleId = false) {
     const columns = this.idsColumn
     const qMark = (column) => column.isRequired && forceNullable ? '?' : ''
     if (columns.length === 0) columns.push(new Column())
+    if (simpleId) {
+      return columns.map((column, index) => `id${columns.length === 1 ? '' : (index + 1)}: ${column.kotlinType + qMark(column)}`).join(', ')
+    }
     return columns.map((column) => `${column.name}: ${column.kotlinType + qMark(column)}`).join(', ')
   }
 
@@ -257,48 +267,48 @@ module.exports = class Table {
     if (!this.hasID) {
       this.foreignColumns.forEach((column) => {
         result += `        if (${column.name} == 0L) {\n`
-        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `            throw BadRequestException(lang.cannotBeNull(lang["${this.modelName}.${column.name}"]))\n`
         result += `        }\n`
       })
     }
     this.exceptPrimaryColumns.forEach((column) => {
       if (column.isLong && column.isRequired) {
         result += `        if (${column.name} == 0L) {\n`
-        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `            throw BadRequestException(lang.cannotBeNull(lang["${this.modelName}.${column.name}"]))\n`
         result += `        }\n`
       } else if (column.isString) {
         if (column.isRequired) {
           result += `        if (${column.name}.isEmpty()) {\n`
-          result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+          result += `            throw BadRequestException(lang.cannotBeNull(lang["${this.modelName}.${column.name}"]))\n`
           result += `        }\n`
         }
         if (column.size) {
           if (column.isRequired) {
             result += `        if (${column.name}.length > ${column.size}) {\n`
-            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}))\n`
+            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan(lang["${this.modelName}.${column.name}"], ${column.size}))\n`
             result += `        }\n`
           } else {
             result += `        if (${column.name}?.length ?: 0 > ${column.size}) {\n`
-            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan("${startCase(column.name)}", ${column.size}))\n`
+            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan(lang["${this.modelName}.${column.name}"], ${column.size}))\n`
             result += `        }\n`
           }
         }
         if (column.isEmail) {
           result += `        if (${column.name} != null && !Validator.isEmail(${column.name})) {\n`
-          result += `            throw BadRequestException(lang.isNotAValidEmail("${startCase(column.name)}"))\n`
+          result += `            throw BadRequestException(lang.isNotAValidEmail(lang["${this.modelName}.${column.name}"]))\n`
           result += `        }\n`
         } else if (column.isCpf) {
           result += `        if (${column.name} != null && !Validator.isCPF(${column.name})) {\n`
-          result += `            throw BadRequestException(lang.isNotAValidCPF("${startCase(column.name)}"))\n`
+          result += `            throw BadRequestException(lang.isNotAValidCPF(lang["${this.modelName}.${column.name}"]))\n`
           result += `        }\n`
         } else if (column.isCnpj) {
           result += `        if (${column.name} != null && !Validator.isCNPJ(${column.name} ?: "")) {\n`
-          result += `            throw BadRequestException(lang.isNotAValidCNPJ("${startCase(column.name)}"))\n`
+          result += `            throw BadRequestException(lang.isNotAValidCNPJ(lang["${this.modelName}.${column.name}"]))\n`
           result += `        }\n`
         }
       } else if (column.isRequired && !column.isBoolean && !column.isDouble) {
         result += `        if (${column.name} == null) {\n`
-        result += `            throw BadRequestException(lang.cannotBeNull("${startCase(column.name)}"))\n`
+        result += `            throw BadRequestException(lang.cannotBeNull(lang["${this.modelName}.${column.name}"]))\n`
         result += `        }\n`
       }
     })

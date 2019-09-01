@@ -12,6 +12,7 @@ export default {
     export: 'Export',
     select: 'Select',
     remove: 'Remove',
+    confirm: 'Confirm',
     cancel: 'Cancel',
     noDataToShow: 'No data to show',
     downloadCsv: 'Download CSV',

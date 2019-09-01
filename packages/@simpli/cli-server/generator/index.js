@@ -21,6 +21,9 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/app/AppProvider.kt', `../kotlin/${dir}/app/AppProvider.kt`)
     api.renderFrom('./injected', 'src/main/app/Cast.kt', `../kotlin/${dir}/app/Cast.kt`)
     api.renderFrom('./injected', 'src/main/app/Env.kt', `../kotlin/${dir}/app/Env.kt`)
+    api.renderFrom('./injected', 'src/main/app/EnvDebug.kt', `../kotlin/${dir}/app/EnvDebug.kt`)
+    api.renderFrom('./injected', 'src/main/app/EnvProduction.kt', `../kotlin/${dir}/app/EnvProduction.kt`)
+    api.renderFrom('./injected', 'src/main/app/PropertyHelper.kt', `../kotlin/${dir}/app/PropertyHelper.kt`)
     api.renderFrom('./injected', 'src/main/app/RequestLogger.kt', `../kotlin/${dir}/app/RequestLogger.kt`)
     api.renderFrom('./injected', 'src/main/app/SwaggerInit.kt', `../kotlin/${dir}/app/SwaggerInit.kt`)
 
@@ -61,15 +64,14 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/locale/PtBr.kt', `../kotlin/${dir}/locale/PtBr.kt`)
 
     // main/model/collection
+    api.renderFrom('./injected', 'src/main/model/collection/ListFilter.kt', `../../kotlin/${dir}/model/collection/ListFilter.kt`)
     api.renderFrom('./injected', 'src/main/model/collection/PageCollection.kt', `../../kotlin/${dir}/model/collection/PageCollection.kt`)
 
     // main/param
     api.renderFrom('./injected', 'src/main/param/DefaultParam.kt', `../kotlin/${dir}/param/DefaultParam.kt`)
 
     // main/wrapper
-    api.renderFrom('./injected', 'src/main/wrapper/GatewayWrapper.kt', `../kotlin/${dir}/wrapper/GatewayWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/MailWrapper.kt', `../kotlin/${dir}/wrapper/MailWrapper.kt`)
-    api.renderFrom('./injected', 'src/main/wrapper/ProcessWrapper.kt', `../kotlin/${dir}/wrapper/ProcessWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/RouterWrapper.kt', `../kotlin/${dir}/wrapper/RouterWrapper.kt`)
     api.renderFrom('./injected', 'src/main/wrapper/SocketWrapper.kt', `../kotlin/${dir}/wrapper/SocketWrapper.kt`)
 
@@ -78,12 +80,13 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/module/auth/AuthProcess.kt', `../../kotlin/${dir}/${moduleName}/auth/AuthProcess.kt`)
     api.renderFrom('./injected', 'src/main/module/auth/AuthRouter.kt', `../../kotlin/${dir}/${moduleName}/auth/AuthRouter.kt`)
 
-    // main/module/gateway
-    api.renderFrom('./injected', 'src/main/module/gateway/AuthGateway.kt', `../../kotlin/${dir}/${moduleName}/gateway/AuthGateway.kt`)
-    api.renderFrom('./injected', 'src/main/module/gateway/GuestGateway.kt', `../../kotlin/${dir}/${moduleName}/gateway/GuestGateway.kt`)
-
     // main/module/mail
     api.renderFrom('./injected', 'src/main/module/mail/RecoverPasswordMail.kt', `../../kotlin/${dir}/${moduleName}/mail/RecoverPasswordMail.kt`)
+
+    // main/module/context
+    api.renderFrom('./injected', 'src/main/module/context/AuthPipe.kt', `../../kotlin/${dir}/${moduleName}/context/AuthPipe.kt`)
+    api.renderFrom('./injected', 'src/main/module/context/GuestPipe.kt', `../../kotlin/${dir}/${moduleName}/context/GuestPipe.kt`)
+    api.renderFrom('./injected', 'src/main/module/context/RequestContext.kt', `../../kotlin/${dir}/${moduleName}/context/RequestContext.kt`)
 
     // main/module/request
     api.renderFrom('./injected', 'src/main/module/request/AuthRequest.kt', `../../kotlin/${dir}/${moduleName}/request/AuthRequest.kt`)

@@ -28,7 +28,9 @@ class EnUs : EnglishLanguage() {
                 "user_not_found" to "UserRouter Not Found",
                 "wrong_password" to "Wrong password",
                 "password_no_match" to "The field password must match",
-                "something_went_wrong" to "Something wend wrong. Contact the admin!"
+                "something_went_wrong" to "Something wend wrong. Contact the admin!",
+
+<%-options.serverSetup.buildLangValues()-%>
         )
     }
 }

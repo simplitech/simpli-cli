@@ -9,9 +9,9 @@
 
       <p class="my-4 p-4 border border-black-100 rounded-lg">{{ value && value.$tag }}</p>
 
-      <div class="horiz items-center-center mb-2">
-        <button type="button" class="mr-2 btn" @click="openPayload = null">{{ $t("app.cancel") }}</button>
-        <button type="button" class="btn--contrast bg-danger" @click="$emit('confirm')">{{ $t("app.remove") }}</button>
+      <div class="grid grid-columns-2 grid-gap-2">
+        <button type="button" class="btn btn--solid" @click="openPayload = null">{{ $t("app.cancel") }}</button>
+        <button type="button" class="btn btn--contrast bg-danger" @click="$emit('confirm')">{{ $t("app.remove") }}</button>
       </div>
     </div>
   </modal>

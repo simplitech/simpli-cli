@@ -2,6 +2,7 @@
 package <%-packageAddress%>.dao
 
 <%_ if (!table.isPivot) { _%>
+import <%-packageAddress%>.model.collection.ListFilter
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
@@ -36,7 +37,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
         }
     }
 
-    fun getList(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): MutableList<<%-table.modelName%>> {
+    fun getList(filter: ListFilter): MutableList<<%-table.modelName%>> {
         // TODO: review generated method
         val query = Query()
                 .selectAll()
@@ -45,7 +46,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
                 .whereEq("<%-table.removableColumn.field%>", true)
 <%_ } _%>
 
-        param.query?.also {
+        filter.query?.also {
             if (it.isNotEmpty()) {
                 query.where(Query()
 <%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
@@ -55,18 +56,12 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
             }
         }
 
-        val orderMap = mapOf(
-<%_ for (var i in table.exceptPasswordColumns) { var column = table.exceptPasswordColumns[i] _%>
-                "<%-column.name%>" to "<%-table.name%>.<%-column.field%>"<%-i < table.exceptPasswordColumns.length - 1 ? ',' : ''%>
-<%_ } _%>
-        )
-
-        orderMap[param.orderBy]?.also {
-            query.orderByAsc(it, param.ascending)
+        <%-table.modelName%>.orderMap[filter.orderBy]?.also {
+            query.orderByAsc(it, filter.ascending)
         }
 
-        param.limit?.also {
-            val index = (param.page ?: 0) * it
+        filter.limit?.also {
+            val index = (filter.page ?: 0) * it
             query.limit(index, it)
         }
 
@@ -75,7 +70,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
         }
     }
 
-    fun count(param: <%-table.modelName%>.ListParam = <%-table.modelName%>.ListParam()): Int {
+    fun count(filter: ListFilter): Int {
         // TODO: review generated method
         val query = Query()
                 .countRaw("DISTINCT <%-table.idColumn.field%>")
@@ -84,7 +79,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
                 .whereEq("<%-table.removableColumn.field%>", true)
 <%_ } _%>
 
-        param.query?.also {
+        filter.query?.also {
             if (it.isNotEmpty()) {
                 query.where(Query()
 <%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>

@@ -1,9 +1,7 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.wrapper
 
-import <%-packageAddress%>.app.Env.APP_DEFAULT_ORIGIN
-import <%-packageAddress%>.app.Env.EMAIL_AWS_REGION
-import <%-packageAddress%>.app.Env.EMAIL_SENDER_PROVIDER
+import <%-packageAddress%>.app.Env
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.ws.AWSSendEmailRequest
 import java.util.HashMap
@@ -13,12 +11,12 @@ import java.util.HashMap
  * Extended class of e-mail processes
  * @author Simpli CLI generator
  */
-abstract class MailWrapper(protected val lang: LanguageHolder) : AWSSendEmailRequest(EMAIL_AWS_REGION) {
+abstract class MailWrapper(protected val lang: LanguageHolder) : AWSSendEmailRequest(Env.props.emailAwsRegion) {
     protected var data = HashMap<String, String>()
-    protected val appUrl = APP_DEFAULT_ORIGIN
+    protected val appUrl = Env.props.appDefaultOrigin
 
     init {
-        from = EMAIL_SENDER_PROVIDER
+        from = Env.props.emailSenderProvider
         name = lang["email_sender_name"]
 
         data["appUrl"] = appUrl

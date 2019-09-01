@@ -1,8 +1,7 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.wrapper
 
-import <%-packageAddress%>.app.Env.DEBUG_MODE
-import <%-packageAddress%>.app.Env.DS_NAME
+import <%-packageAddress%>.app.Env
 import <%-packageAddress%>.exception.HttpException
 import br.com.simpli.sql.ReadConPipe
 import br.com.simpli.sql.TransacConPipe
@@ -18,26 +17,8 @@ import javax.ws.rs.ext.ExceptionMapper
  * @author Simpli CLI generator
  */
 abstract class RouterWrapper : ExceptionMapper<Throwable> {
-    private val connectionPipe = ReadConPipe(DS_NAME)
-    private val transactionPipe = TransacConPipe(DS_NAME)
-
-    /**
-     * Open the MySQL connection without rollback
-     * Usually used for http GET methods
-     */
-    protected fun <G : GatewayWrapper> connection(gateway: G): G {
-        gateway.assign(connectionPipe)
-        return gateway
-    }
-
-    /**
-     * Open the MySQL connection with rollback in case of an exception
-     * Usually used for http POST, PUT or DELETE methods
-     */
-    protected fun <G : GatewayWrapper> transaction(gateway: G): G {
-        gateway.assign(transactionPipe)
-        return gateway
-    }
+    val connectionPipe = ReadConPipe(Env.props.dsName)
+    val transactionPipe = TransacConPipe(Env.props.dsName)
 
     override fun toResponse(e: Throwable): Response {
         Logger.getLogger(RouterWrapper::class.java.name).log(Level.SEVERE, e.message, e)
@@ -50,7 +31,7 @@ abstract class RouterWrapper : ExceptionMapper<Throwable> {
                         .build()
             }
             else -> {
-                val message = if (DEBUG_MODE && !e.message.isNullOrEmpty()) e.message else "Unexpected Error"
+                val message = if (Env.props.detailedLog && !e.message.isNullOrEmpty()) e.message else "Unexpected Error"
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(ExceptionModel(message))
                         .type(MediaType.APPLICATION_JSON)

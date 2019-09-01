@@ -28,7 +28,9 @@ class PtBr : PortugueseLanguage() {
                 "user_not_found" to "Usuário Não Encontrado",
                 "wrong_password" to "Senha inválida",
                 "password_no_match" to "Os campos senha precisam ser iguais",
-                "something_went_wrong" to "Algo saiu errado. Contate o admin!"
+                "something_went_wrong" to "Algo saiu errado. Contate o admin!",
+
+<%-options.serverSetup.buildLangValues()-%>
         )
     }
 }

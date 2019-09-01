@@ -12,7 +12,7 @@
           <render-schema v-model="request" :schema="schema" :field="field" class="mb-4"/>
         </div>
 
-        <button class="w-full h-12 btn--contrast bg-primary" type="submit">
+        <button class="w-full h-12 btn btn--contrast bg-primary" type="submit">
           {{ $t('view.resetPassword.submit') }}
         </button>
       </await>

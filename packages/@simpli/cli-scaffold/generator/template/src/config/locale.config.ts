@@ -51,6 +51,14 @@ export const localeVueI18n: LocaleOptions = {
 }
 
 /**
+ * vee-i18n locale
+ */
+export const localeVeeValidate: LocaleOptions = {
+  [Lang.EN_US]: require('vee-validate/dist/locale/en'),
+  [Lang.PT_BR]: require('vee-validate/dist/locale/pt_BR'),
+}
+
+/**
  * ajv-i18n locale
  */
 export const localeAjvI18n: LocaleOptions = {

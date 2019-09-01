@@ -1,12 +1,13 @@
 <template>
   <await name="authenticate" spinner="FadeLoader">
-    <main class="verti md:horiz w-screen h-screen">
-      <sidebar class="w-full md:w-56 lg:h-full"/>
+    <main class="verti lg:horiz min-h-screen w-screen">
+      <sidebar class="z-20 w-full lg:w-56 lg:h-screen"/>
+
       <transition name="fade-down" mode="out-in">
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-        <router-view v-if="authorized" class="weight-1 h-0 md:h-auto md:w-0"/>
+        <router-view v-if="authorized" class="weight-1"/>
 <%_ } else { _%>
-        <router-view class="weight-1 h-0 md:h-auto md:w-0"/>
+        <router-view class="weight-1"/>
 <%_ } _%>
       </transition>
     </main>

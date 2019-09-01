@@ -3,6 +3,9 @@
     <transition name="blur" mode="out-in">
       <router-view/>
     </transition>
+
+    <modal-dialog name="dialog"/>
+
     <vue-snotify :class="ToastConfig.ToastDefaultStyle"/>
   </div>
 </template>
@@ -16,13 +19,17 @@ import {MetaInfo} from 'vue-meta'
 import {Component, Vue} from 'vue-property-decorator'
 import {Mutation} from 'vuex-class'
 import {$, ToastConfig} from '@/simpli'
+import ModalDialog from '@/components/modals/ModalDialog.vue'
 
 const metaInfo = (): MetaInfo => ({
   title: $.t('app.subtitle') as string,
   titleTemplate: `%s | ${$.t('app.title')}`,
 })
 
-@Component({metaInfo})
+@Component({
+  metaInfo,
+  components: {ModalDialog},
+})
 export default class App extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
   @Mutation('auth/POPULATE_TOKEN') populateToken!: Function

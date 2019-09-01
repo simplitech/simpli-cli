@@ -98,7 +98,7 @@ class <%-table.modelName%> {
     var <%-column.name%>: <%-column.kotlinType%>
         get() = <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> ?: <%-column.isString ? '\"\"' : '0'%>
         set(<%-column.name%>) {
-            if (<%-column.foreign.name%> === null) {
+            if (<%-column.foreign.name%> == null) {
                 <%-column.foreign.name%> = <%-column.foreign.referencedTableModelName%>()
             }
             <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> = <%-column.name%>
@@ -108,11 +108,11 @@ class <%-table.modelName%> {
     var <%-column.name%>: <%-column.kotlinType%>?
         get() = <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%>
         set(<%-column.name%>) {
-            if (<%-column.name%> === null) {
+            if (<%-column.name%> == null) {
                 <%-column.foreign.name%> = null
                 return
             }
-            if (<%-column.foreign.name%> === null) {
+            if (<%-column.foreign.name%> == null) {
                 <%-column.foreign.name%> = <%-column.foreign.referencedTableModelName%>()
             }
             <%-column.foreign.name%>?.<%-column.foreign.referencedColumnName%> = <%-column.name%>
@@ -121,38 +121,13 @@ class <%-table.modelName%> {
 <%_ } _%>
 <%_ } _%>
     @Throws(BadRequestException::class)
-    fun validate(updating: Boolean, dao: <%-table.modelName%>Dao, lang: LanguageHolder) {
+    fun validate(lang: LanguageHolder) {
         // TODO: review generated method
-        if (updating) {
-            if (!dao.exist(<%-table.primariesByParamCall()%>)) {
-                throw BadRequestException(lang["does_not_exist"])
-            }
-        } else {
-            if (dao.exist(<%-table.primariesByParamCall()%>)) {
-                throw BadRequestException(lang["already_exists"])
-            }
-        }
-
-<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-        <%-column.name%>?.also {
-            if (dao.exist<%-column.capitalizedName%>(it, <%-table.primariesByParamCall()%>)) {
-                throw BadRequestException(lang.alreadyExist("<%-startCase(column.name)%>"))
-            }
-        }
-
-<%_ } _%>
 <%-table.buildValidate()-%>
     }
 
-<%-table.buildConstructor()-%>
-
-<%-table.buildUpdateSet()-%>
-
-<%-table.buildInsertValues()-%>
-
-    open class ListParam : DefaultParam.AuthPaged()
-
-    open class GetParam : DefaultParam.Auth() {
+<%_ if (!table.hasUniqueDefaultId) { _%>
+    open class RequiredPathId : DefaultParam.Auth() {
 <%_ if (!table.idsColumn.length) { _%>
         @PathParam("id")
         @ApiParam(required = true)
@@ -173,5 +148,18 @@ class <%-table.modelName%> {
 <%_ } _%>
     }
 
-    open class PersistParam : DefaultParam.Auth()
+<%_ } _%>
+<%-table.buildConstructor()-%>
+
+<%-table.buildUpdateSet()-%>
+
+<%-table.buildInsertValues()-%>
+
+    companion object {
+        val orderMap = mapOf(
+<%_ for (var i in table.exceptPasswordColumns) { var column = table.exceptPasswordColumns[i] _%>
+                "<%-column.name%>" to "<%-table.name%>.<%-column.field%>"<%-i < table.exceptPasswordColumns.length - 1 ? ',' : ''%>
+<%_ } _%>
+        )
+    }
 }

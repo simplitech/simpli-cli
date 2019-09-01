@@ -194,6 +194,25 @@ module.exports = class ServerSetup {
     return kebabCase(str)
   }
 
+  buildLangValues () {
+    let result = ''
+
+    this.tables.forEach((table) => {
+      result += `                /**\n`
+      result += `                 * ${table.modelName}\n`
+      result += `                 */\n`
+      table.columns.forEach((column) => {
+        result += `                "${table.modelName}.${column.name}" to "${startCase(column.name)}",\n`
+      })
+      result += `\n`
+    })
+
+    result = result.slice(0, -3) // remove the last line and comma
+    result += `\n`
+
+    return result
+  }
+
   dataFactory () {
     let result = ''
     const samples = this.seedSamples || 1

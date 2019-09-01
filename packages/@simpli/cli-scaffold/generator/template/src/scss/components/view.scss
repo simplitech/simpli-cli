@@ -1,0 +1,7 @@
+.view {
+  @apply verti h-0 min-w-0;
+
+  @screen lg {
+    @apply .h-auto;
+  }
+}

@@ -1,12 +1,30 @@
-.table {
-  @apply bg-transparent border-collapse;
-  min-width: 100%;
+@import "../variables";
 
-  th {
-    @apply bg-primary border-b-2 border-tertiary whitespace-no-wrap align-bottom text-left p-3 pt-6;
+.table {
+  @apply bg-white border-collapse mb-16 shadow min-w-full;
+
+  thead {
+    @apply shadow;
   }
 
-  td {
-    @apply align-top p-3 border-t border-black-100;
+  tr {
+    &:nth-child(even) {
+      background-color: $tertiary-color;
+    }
+
+    th {
+      @apply bg-primary shadow-lg whitespace-no-wrap align-bottom text-left p-3 pt-6;
+
+      .adap-orderby {
+        @apply transition;
+        &:hover {
+          transform: translateY(3px);
+        }
+      }
+    }
+
+    td {
+      @apply align-middle p-3;
+    }
   }
 }

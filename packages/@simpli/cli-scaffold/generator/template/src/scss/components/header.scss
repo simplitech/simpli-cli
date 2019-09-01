@@ -1,4 +1,15 @@
 .header {
-  @apply z-10;
-  box-shadow: 2px 4px 20px -4px rgba(0, 0, 0, .4);
+  @apply z-10 shadow-lg bg-white;
+
+  .header__title {
+    @apply my-0 pt-1 text-center text-2xl font-light w-full;
+  }
+
+  .header__items {
+    @apply horiz flex-wrap items-center-center;
+
+    > * {
+      @apply m-2;
+    }
+  }
 }

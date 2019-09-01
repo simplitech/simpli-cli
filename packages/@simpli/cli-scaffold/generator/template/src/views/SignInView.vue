@@ -16,7 +16,7 @@
           {{ $t('view.signIn.forgotPassword') }}
         </router-link>
 
-        <button class="w-full h-12 btn--contrast bg-primary" type="submit">
+        <button class="w-full h-12 btn btn--contrast bg-primary" type="submit">
           {{ $t('view.signIn.signin') }}
         </button>
       </await>

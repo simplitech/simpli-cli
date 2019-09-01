@@ -10,6 +10,8 @@
 
 // generic COMPONENTS that are NOT implemented as a vue-component or have MANY components associated with the same style
 @import "components/btn";
+@import "components/card";
+@import "components/header";
 @import "components/input";
 @import "components/table";
-@import "components/header";
+@import "components/view";

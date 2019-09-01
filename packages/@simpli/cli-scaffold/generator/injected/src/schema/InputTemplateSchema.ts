@@ -18,12 +18,4 @@ export class Input<%-model.name%>Schema extends Schema {
   readonly fieldSet: FieldSet<<%-model.name%>> = {
 <%-model.buildInputSchema()%>
   }
-<%_ if (model.resolvedPersistDependencies.length) { _%>
-
-  populateResource() {
-<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-    this.collection<%-dependence.children[0]%>.list()
-<%_ } _%>
-  }
-<%_ } _%>
 }

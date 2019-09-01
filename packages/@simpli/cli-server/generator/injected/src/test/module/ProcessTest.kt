@@ -7,11 +7,10 @@
 package <%-packageAddress%>.<%-moduleName%>
 
 import <%-packageAddress%>.AppTest
+import <%-packageAddress%>.<%-moduleName%>.context.RequestContext
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
-import <%-packageAddress%>.app.Env.TESTER_ID
-import <%-packageAddress%>.app.Env.TESTER_LOGIN
-import <%-packageAddress%>.app.Env.TESTER_PASSWORD
+import <%-packageAddress%>.app.Env
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.tools.SecurityUtils.sha256
 
@@ -20,15 +19,21 @@ import br.com.simpli.tools.SecurityUtils.sha256
  * @author Simpli CLI generator
  */
 open class ProcessTest: AppTest() {
-    protected val <%-userTable.instanceName%> = <%-userTable.modelName%>()
+    protected val context = RequestContext(transacConnector, param)
 
-    init {
-        <%-userTable.instanceName%>.<%-userTable.idColumn.name%> = TESTER_ID
-        <%-userTable.instanceName%>.<%-accountColumn.name%> = TESTER_LOGIN
-        <%-userTable.instanceName%>.<%-passwordColumn.name%> = sha256(TESTER_PASSWORD)
+    protected val <%-userTable.instanceName%> = <%-userTable.modelName%>().apply {
+        <%-userTable.idColumn.name%> = Env.props.testerId
+        <%-accountColumn.name%> = Env.props.testerLogin
+        <%-passwordColumn.name%> = sha256(Env.props.testerPassword)
     }
 
-    protected val authRequest = AuthRequest(<%-userTable.instanceName%>.<%-accountColumn.name%>, <%-userTable.instanceName%>.<%-passwordColumn.name%>)
-    protected val token = authRequest.toToken()
-    protected val auth = AuthResponse(token, <%-userTable.instanceName%>)
+    protected val authRequest: AuthRequest
+    protected val token: String
+    protected val auth: AuthResponse
+
+    init {
+        authRequest = AuthRequest(<%-userTable.instanceName%>.<%-accountColumn.name%>, <%-userTable.instanceName%>.<%-passwordColumn.name%>)
+        token = authRequest.toToken()
+        auth = AuthResponse(token, <%-userTable.instanceName%>)
+    }
 }

@@ -4,6 +4,7 @@ package <%-packageAddress%>.model.resource
 import <%-packageAddress%>.AppTest
 import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 import <%-packageAddress%>.exception.response.BadRequestException
+import <%-packageAddress%>.locale.EnUs
 import java.util.Date
 import org.apache.commons.lang3.RandomStringUtils
 import org.junit.Test
@@ -15,8 +16,8 @@ import kotlin.test.assertNull
  * @author Simpli CLI generator
  */
 class <%-table.modelName%>Test: AppTest() {
+    private val lang = EnUs()
     private val model = <%-table.modelName%>()
-    private val dao = <%-table.modelName%>Dao(con)
 
     init {
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
@@ -42,7 +43,7 @@ class <%-table.modelName%>Test: AppTest() {
         model.<%-column.name%> = null
 <%_ } _%>
 
-        model.validate(true, dao, lang)
+        model.validate(lang)
     }
 
 <%_ } _%>
@@ -51,7 +52,7 @@ class <%-table.modelName%>Test: AppTest() {
     fun testValidate<%-column.capitalizedName%>LengthFail() {
         model.<%-column.name%> = RandomStringUtils.randomAlphabetic(<%-Number(column.size) + 1%>)
 
-        model.validate(true, dao, lang)
+        model.validate(lang)
     }
 
 <%_ } _%>
@@ -60,7 +61,7 @@ class <%-table.modelName%>Test: AppTest() {
     fun testValidate<%-column.capitalizedName%>InvalidEmailFail() {
         model.<%-column.name%> = "notAnEmail"
 
-        model.validate(true, dao, lang)
+        model.validate(lang)
     }
 
 <%_ } _%>
@@ -78,6 +79,6 @@ class <%-table.modelName%>Test: AppTest() {
 <%_ } _%>
     @Test
     fun testValidateSuccess() {
-        model.validate(true, dao, lang)
+        model.validate(lang)
     }
 }

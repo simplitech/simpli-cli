@@ -1,48 +1,50 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
-  <div class="verti">
-    <header class="header horiz flex-wrap items-center py-2 px-4 children:mx-4">
-      <h1 class="my-0 text-4xl font-semibold">
+  <div class="view">
+    <header class="header">
+      <h1 class="header__title">
         {{$t('resource.<%-model.name%>')}}
       </h1>
 
-      <adap-searchfield :collection="collection" :placeholder="$t('app.search')" class="input h-8"/>
+      <div class="header__items">
+        <adap-searchfield :collection="collection" :placeholder="$t('app.search')" class="input h-8"/>
 
 <%_ if (collection && collection.apis && collection.apis[0].name) { _%>
-      <await name="<%-collection.apis[0].name%>"/>
+        <await name="<%-collection.apis[0].name%>" :spinnerScale="0.8"/>
 <%_ } else { _%>
-      <await name="list"/>
+        <await name="list" :spinnerScale="0.8"/>
 <%_ } _%>
 
-      <div class="weight-1"></div>
+        <div class="weight-1"></div>
 
-      <span v-if="collection.size()">
-        {{ $t('app.totalLines', {total: collection.total}) }}
-      </span>
+        <span v-if="collection.size()">
+          {{ $t('app.totalLines', {total: collection.total}) }}
+        </span>
 
 <%_ if (collection && collection.getApiByName('listCsv')) { _%>
-      <await name="listCsv">
-        <button @click="downloadCsv" class="btn">
-          {{ $t('app.downloadCsv') }}
-        </button>
-      </await>
+        <await name="listCsv" :spinnerScale="0.8">
+          <button @click="downloadCsv" class="btn btn--solid">
+            {{ $t('app.downloadCsv') }}
+          </button>
+        </await>
 
 <%_ } _%>
-      <router-link to="/<%-kebabCase(model.name)%>/new" class="btn--contrast bg-primary">
-        {{ $t('app.add') }}
-      </router-link>
+        <router-link to="/<%-kebabCase(model.name)%>/new" class="btn btn--contrast bg-secondary">
+          {{ $t('app.add') }}
+        </router-link>
+      </div>
     </header>
 
-    <section class="weight-1 h-0">
-      <await init name="query" class="relative verti w-full h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+    <section class="weight-1 bg-black-100">
+      <await init name="query" class="relative w-full h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
         <template v-if="!collection.size()">
-          <h3 class="p-20 text-center">
+          <div class="p-4 text-lg text-gray-700 text-center">
             {{ $t('app.noDataToShow') }}
-          </h3>
+          </div>
         </template>
 
         <template v-else>
-          <div class="verti w-full weight-1 h-0 overflow-auto">
+          <div class="absolute inset-0 overflow-auto bg-primary">
             <table class="table">
               <thead>
               <tr>
@@ -56,11 +58,13 @@
 
               <tbody>
               <tr v-for="(item, i) in collection.all()" :key="i">
-                <td class="horiz flex-no-wrap">
-                  <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="icon icon-pencil mr-4"></a>
+                <td>
+                  <div class="grid grid-columns-2 grid-gap-1">
+                    <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="btn btn--flat btn--icon icon icon-pencil mr-4"></a>
 <%_ if (model.resource.deletable) { _%>
-                  <a @click="openRemoveModal(item)" class="icon icon-trash"></a>
+                    <a @click="openRemoveModal(item)" class="btn btn--flat btn--icon icon icon-trash"></a>
 <%_ } _%>
+                  </div>
                 </td>
 
                 <td v-for="(field, j) in schema.allFields" :key="j">
@@ -71,12 +75,14 @@
             </table>
           </div>
 
-          <footer class="items-center-center bg-black-100">
-            <adap-pagination :collection="collection" class="m-4"/>
+          <footer class="absolute z-10 inset-x-0 bottom-0">
+            <div class="items-center-center">
+              <adap-pagination :collection="collection" class="m-4"/>
+            </div>
           </footer>
         </template>
 
-        <await name="adapQuery" class="await__spinner--screen-light"/>
+        <await name="adapQuery" class="z-20 await__spinner--screen-light"/>
       </await>
     </section>
 <%_ if (model.resource.deletable) { _%>
@@ -105,7 +111,7 @@
     toRemove: <%-model.name%> | null = null
 
 <%_ } _%>
-    async mounted() {
+    async created() {
       await this.query()
     }
 <%_ if (model.resource.deletable) { _%>

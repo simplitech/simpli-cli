@@ -4,8 +4,8 @@
 <%_ var accountColumn = options.serverSetup.accountColumn _%>
 package <%-packageAddress%>.<%-moduleName%>.socket
 
-import <%-packageAddress%>.<%-moduleName%>.gateway.AuthGateway
-import <%-packageAddress%>.app.Env.DEBUG_MODE
+import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
+import <%-packageAddress%>.app.Env
 import <%-packageAddress%>.app.RequestLogger
 import <%-packageAddress%>.param.DefaultParam
 import <%-packageAddress%>.wrapper.RouterWrapper
@@ -27,8 +27,6 @@ import javax.websocket.server.ServerEndpoint
 @ServerEndpoint("/ws/<%-moduleNameKebabCase%>/notification/{token}")
 class NotificationSocket: RouterWrapper() {
 
-    val authGateway = AuthGateway()
-
     companion object {
         val socket = SocketWrapper<String>()
     }
@@ -41,14 +39,14 @@ class NotificationSocket: RouterWrapper() {
         param.clientVersion = "ws.auth"
         param.authorization = """Bearer $token"""
 
-        connection(authGateway).route(param) { auth, _, _, _ ->
+        AuthPipe.handle(connectionPipe, param) { _, auth ->
             session.userProperties["token"] = auth.token
             session.userProperties["<%-accountColumn.name%>"] = auth.<%-accountColumn.name%>
 
             socket.attachSession(session, auth.id)
         }
 
-        if (DEBUG_MODE) {
+        if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
             ===== CLIENT SOCKET CONNECTION ESTABLISHED =====
             CLIENT ID: ${session.userProperties["id"]}
@@ -62,7 +60,7 @@ class NotificationSocket: RouterWrapper() {
     fun onDisconnect(session: Session) {
         socket.detachSession(session)
 
-        if (DEBUG_MODE) {
+        if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
             ===== CLIENT SOCKET CONNECTION LOST =====
             CLIENT ID: ${session.userProperties["id"]}

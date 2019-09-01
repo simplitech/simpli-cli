@@ -1,21 +1,27 @@
 <template>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
-  <div class="verti">
-    <header class="header py-2 px-4">
-      <h1 class="my-0 text-4xl font-semibold">
+  <div class="view">
+    <header class="header">
+      <h1 class="header__title mb-1">
         {{ $t('resource.<%-model.name%>') }}
       </h1>
     </header>
 
-    <section class="weight-1 h-0 bg-black-100">
+    <section class="relative weight-1 bg-black-100">
 <%_ if (model.populateApi) { _%>
-      <await init name="<%-model.populateApi.name%>" class="w-full h-full px-4 py-8 overflow-auto">
+      <await name="<%-model.populateApi.name%>" class="absolute inset-0 px-4 py-8 overflow-y-auto">
 <%_ } else { _%>
-      <await init name="populate" class="w-full h-full px-4 py-8 overflow-auto">
+      <await name="populate" class="absolute inset-0 px-4 py-8 overflow-y-auto">
 <%_ } _%>
-        <form class="container mx-auto p-3 md:p-8 bg-white shadow-md rounded-lg" @submit.prevent="persist">
-          <div v-for="(field, i) in schema.allFields" :key="i">
-            <render-schema v-model="<%-model.attrName%>" :schema="schema" :field="field" class="mb-4"/>
+        <form class="container card" @submit.prevent="persist">
+          <div class="mb-8 grid grid-columns lg:grid-columns-2 grid-gap-4">
+            <render-schema
+                    v-for="field in schema.allFields"
+                    v-model="<%-model.attrName%>"
+                    :schema="schema"
+                    :field="field"
+                    :key="field"
+            />
           </div>
 
 <%_ if (model.persistApi) { _%>
@@ -23,7 +29,9 @@
 <%_ } else { _%>
           <await name="persist" class="items-center-center">
 <%_ } _%>
-            <button type="submit" class="h-12 px-20 btn--contrast bg-primary">{{ $t('app.submit') }}</button>
+            <button type="submit" class="h-12 px-20 btn btn--contrast bg-secondary">
+              {{ $t('app.submit') }}
+            </button>
           </await>
         </form>
       </await>
@@ -46,12 +54,20 @@
     schema = new Input<%-model.name%>Schema()
     <%-model.attrName%> = new <%-model.name%>()
 
-    async mounted() {
+    async created() {
 <%_ if (model.resolvedPersistDependencies.length) { _%>
-      this.schema.populateResource()
+      this.populateResource()
 <%_ } _%>
       await this.populate()
     }
+<%_ if (model.resolvedPersistDependencies.length) { _%>
+
+    populateResource() {
+  <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
+      this.schema.collection<%-dependence.children[0]%>.list()
+  <%_ } _%>
+    }
+  <%_ } _%>
 
     async populate() {
 <%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>

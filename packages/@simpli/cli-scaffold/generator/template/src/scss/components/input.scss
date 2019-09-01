@@ -1,9 +1,9 @@
-.input {
-  @apply text-black-700 bg-black-100 border-none rounded-lg outline-none p-2 align-middle text-base transition;
+@import "../variables";
 
-  &.multiselect {
-    @apply p-0;
-  }
+.input {
+  @apply text-black rounded-lg outline-none p-2 align-middle text-base transition;
+  caret-color: $secondary-color;
+  box-shadow: 0 0 0 2px $tertiary-color;
 
   &:disabled {
     @apply bg-transparent text-black-200 cursor-not-allowed;
@@ -20,16 +20,107 @@
   &.valid {
     box-shadow: 0 0 0 2px $success-color;
   }
+
+  &.multiselect {
+    @apply p-0 bg-transparent rounded-lg;
+
+    .multiselect__select {
+      @apply h-full;
+      &:before {
+        @apply relative h-4 w-4 border-0;
+        content: '';
+        background-image: url('#{$img-path}down-arrow.svg');
+        background-size: 100% 100%;
+        display: inline-block;
+
+        top: calc(50% - 10px);
+      }
+    }
+
+    .multiselect__tags {
+      @apply h-full;
+
+      .multiselect__input {
+        @apply h-full;
+      }
+
+      .multiselect__single {
+        @apply bg-transparent h-full top-0 text-sm text-black-700 uppercase horiz items-center font-semibold;
+      }
+
+      .multiselect__tag {
+        .multiselect__tag-icon {
+          &:hover {
+            background: $secondary-color;
+          }
+        }
+      }
+    }
+
+    .multiselect__content-wrapper {
+      &::-webkit-scrollbar-thumb {
+        background: $secondary-color;
+      }
+
+      ul.multiselect__content {
+        li.multiselect__element {
+          .multiselect__option {
+            @apply uppercase text-sm;
+
+            &.multiselect__option--highlight {
+              @apply bg-secondary text-white opacity-75;
+            }
+
+            &.multiselect__option--selected {
+              @apply bg-secondary text-white;
+            }
+
+            &:hover {
+              @apply bg-secondary text-white opacity-75;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.multiselect--disabled {
+    .multiselect__current, .multiselect__select {
+      @apply bg-transparent opacity-50;
+    }
+  }
 }
 
 .input-group {
+  @apply verti;
+
+  .input-group__label {
+    @apply mb-1 text-sm text-black-700;
+  }
+
+  .input-group__input {
+    @extend .input;
+  }
+
   &.input-group--text {
     .input-group__label {
       @apply ml-1;
     }
   }
 
-  .input-group__input {
-    @extend .input;
+  &.input-group--select {
+    .input-group__input {
+      min-height: 2.5rem !important;
+    }
+
+    .input-group__label {
+      min-height: 1.5rem !important;
+    }
+  }
+
+  &.input-group--nolabel {
+    .input-group__label {
+      @apply hidden;
+    }
   }
 }

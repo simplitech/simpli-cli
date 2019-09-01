@@ -22,9 +22,9 @@
     ],
     "password": [
       "senha",
-      "senhaAtual",
-      "novaSenha",
-      "confirmarSenha",
+      "senha_atual",
+      "nova_senha",
+      "confirmar_senha",
       "secreto"
     ],
     "email": [

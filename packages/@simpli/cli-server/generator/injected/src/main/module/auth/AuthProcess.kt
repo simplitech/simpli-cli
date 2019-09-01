@@ -5,45 +5,39 @@
 <%_ var passwordColumn = options.serverSetup.passwordColumn _%>
 package <%-packageAddress%>.<%-moduleName%>.auth
 
-import <%-packageAddress%>.app.Env.ENCRYPT_HASH
-import <%-packageAddress%>.app.Env.FORGOTTEN_PASSWORD_TOKEN_LIFE
-import <%-packageAddress%>.wrapper.ProcessWrapper
+import <%-packageAddress%>.app.Cast
+import <%-packageAddress%>.app.Env
+import <%-packageAddress%>.param.DefaultParam
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.exception.response.UnauthorizedException
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
-import <%-packageAddress%>.app.Cast.classToJson
-import <%-packageAddress%>.app.Cast.jsonToClass
+import <%-packageAddress%>.<%-moduleName%>.context.RequestContext
 import <%-packageAddress%>.<%-moduleName%>.mail.RecoverPasswordMail
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ResetPasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.RecoverPasswordByMailRequest
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
-import br.com.simpli.tools.SecurityUtils.decode
-import br.com.simpli.tools.SecurityUtils.decrypt
-import br.com.simpli.tools.SecurityUtils.encode
-import br.com.simpli.tools.SecurityUtils.encrypt
+import br.com.simpli.tools.SecurityUtils
+import java.util.regex.Pattern
 import java.util.Date
 import java.util.Calendar
 
 /**
- * Authentication business logic
+ * Responsible for Authentication operations
  * @author Simpli CLI generator
  */
-class AuthProcess : ProcessWrapper() {
+class AuthProcess(val context: RequestContext) {
 
-    lateinit var dao: AuthDao
-
-    override fun onAssign() {
-        dao = AuthDao(con)
-    }
+    val dao = AuthDao(context.con)
 
     /**
      * Get the authentication information by the token
      */
     @Throws(UnauthorizedException::class)
-    fun auth(token: String): AuthResponse {
+    fun authenticate(param: DefaultParam.Auth): AuthResponse {
+        val token = extractToken(param.authorization ?: "") ?: throw UnauthorizedException(context.lang["invalid_token"])
         try {
             val request = tokenToRequest(token)
             val id = getId(request)
@@ -51,9 +45,9 @@ class AuthProcess : ProcessWrapper() {
 
             return AuthResponse(token, <%-userTable.instanceName%>)
         } catch (e: BadRequestException) {
-            throw UnauthorizedException(lang.pleaseLogin())
+            throw UnauthorizedException(context.lang.pleaseLogin())
         } catch (e: NotFoundException) {
-            throw UnauthorizedException(lang.pleaseLogin())
+            throw UnauthorizedException(context.lang.pleaseLogin())
         }
     }
 
@@ -69,7 +63,7 @@ class AuthProcess : ProcessWrapper() {
 
             return AuthResponse(token, <%-userTable.instanceName%>)
         } catch (e: NotFoundException) {
-            throw UnauthorizedException(lang.invalidLogin())
+            throw UnauthorizedException(context.lang.invalidLogin())
         }
     }
 
@@ -80,15 +74,15 @@ class AuthProcess : ProcessWrapper() {
      */
     @Throws(BadRequestException::class)
     fun recoverPasswordByMail(request: RecoverPasswordByMailRequest): Long {
-        request.validate(lang)
+        request.validate(context.lang)
 
-        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail("${request.<%-accountColumn.name%>}") ?: throw BadRequestException(lang.emailNotFound())
+        val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail("${request.<%-accountColumn.name%>}") ?: throw BadRequestException(context.lang.emailNotFound())
 
-        val json = classToJson(TokenForgottenPassword("${<%-userTable.instanceName%>.<%-accountColumn.name%>}"))
-        val encrypted = encrypt(json, ENCRYPT_HASH)
+        val json = Cast.classToJson(TokenForgottenPassword("${<%-userTable.instanceName%>.<%-accountColumn.name%>}"))
+        val encrypted = SecurityUtils.encrypt(json, Env.props.encryptHash)
         val hash = encrypted?.replace("/", "%2F") ?: "invalid_hash"
 
-        RecoverPasswordMail(lang, <%-userTable.instanceName%>, hash).send()
+        RecoverPasswordMail(context.lang, <%-userTable.instanceName%>, hash).send()
 
         return 1L
     }
@@ -98,19 +92,19 @@ class AuthProcess : ProcessWrapper() {
      */
     @Throws(BadRequestException::class)
     fun resetPassword(request: ResetPasswordRequest): String {
-        request.validate(lang)
+        request.validate(context.lang)
 
         val hashResolved = request.hash?.replace(" ", "+") ?: ""
-        val token = decrypt(hashResolved, ENCRYPT_HASH) ?: throw BadRequestException(lang.invalidToken())
+        val token = SecurityUtils.decrypt(hashResolved, Env.props.encryptHash) ?: throw BadRequestException(context.lang.invalidToken())
 
-        val tokenForgottenPassword = jsonToClass(token, TokenForgottenPassword::class.java)
+        val tokenForgottenPassword = Cast.jsonToClass(token, TokenForgottenPassword::class.java)
 
         val calendar = Calendar.getInstance()
         calendar.time = tokenForgottenPassword.date
-        calendar.add(Calendar.DAY_OF_MONTH, FORGOTTEN_PASSWORD_TOKEN_LIFE)
+        calendar.add(Calendar.DAY_OF_MONTH, Env.props.forgottenPasswordTokenLife)
 
         // token expires after x days
-        if (calendar.time.before(Date())) throw BadRequestException(lang.expiredToken())
+        if (calendar.time.before(Date())) throw BadRequestException(context.lang.expiredToken())
 
         request.newPassword?.also {
             dao.update<%-userTable.modelName%>Password(tokenForgottenPassword.<%-accountColumn.name%>, it)
@@ -126,14 +120,14 @@ class AuthProcess : ProcessWrapper() {
     fun changePassword(request: ChangePasswordRequest, auth: AuthResponse): Long {
         val id = auth.id
         val <%-userTable.instanceName%> = auth.<%-userTable.instanceName%>
-        val <%-accountColumn.name%> = <%-userTable.instanceName%>.<%-accountColumn.name%> ?: throw BadRequestException(lang.cannotBeNull("<%-accountColumn.name%>"))
+        val <%-accountColumn.name%> = <%-userTable.instanceName%>.<%-accountColumn.name%>
 
-        request.validate(lang)
+        request.validate(context.lang)
 
         request.newPassword?.also { newPassword ->
             request.currentPassword?.also { currentPassword ->
                 val idVerify = dao.getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>, currentPassword)
-                if (id != idVerify) throw BadRequestException(lang["wrong_password"])
+                if (id != idVerify) throw BadRequestException(context.lang["wrong_password"])
 
                 dao.update<%-userTable.modelName%>Password(<%-accountColumn.name%>, newPassword)
             }
@@ -147,9 +141,9 @@ class AuthProcess : ProcessWrapper() {
      */
     @Throws(BadRequestException::class, NotFoundException::class)
     fun getId(request: AuthRequest): Long {
-        request.validate(lang)
+        request.validate(context.lang)
 
-        return dao.getIdOf<%-userTable.modelName%>("${request.<%-accountColumn.name%>}", "${request.<%-passwordColumn.name%>}") ?: throw NotFoundException(lang["user_id_not_found"])
+        return dao.getIdOf<%-userTable.modelName%>("${request.<%-accountColumn.name%>}", "${request.<%-passwordColumn.name%>}") ?: throw NotFoundException(context.lang["user_id_not_found"])
     }
 
     /**
@@ -157,19 +151,19 @@ class AuthProcess : ProcessWrapper() {
      */
     @Throws(NotFoundException::class)
     fun get<%-userTable.modelName%>(<%-userTable.idColumn.name%>: <%-userTable.idColumn.kotlinType%>): <%-userTable.modelName%> {
-        return dao.get<%-userTable.modelName%>(<%-userTable.idColumn.name%>) ?: throw NotFoundException(lang["user_not_found"])
+        return dao.get<%-userTable.modelName%>(<%-userTable.idColumn.name%>) ?: throw NotFoundException(context.lang["user_not_found"])
     }
 
     companion object {
         /**
-         * Transform AuthRequest object into token string
+         * Transforms AuthRequest object into token string
          */
         fun requestToToken(request: AuthRequest): String {
             val empty = "invalid_token"
             return try {
-                val json = classToJson(request)
-                val encrypted = encrypt(json, ENCRYPT_HASH) ?: empty
-                val token = encode(encrypted, "UTF-8") ?: empty
+                val json = Cast.classToJson(request)
+                val encrypted = SecurityUtils.encrypt(json, Env.props.encryptHash) ?: empty
+                val token = SecurityUtils.encode(encrypted, "UTF-8") ?: empty
 
                 token
             } catch (e: Exception) {
@@ -178,19 +172,27 @@ class AuthProcess : ProcessWrapper() {
         }
 
         /**
-         * Transform token string into AuthRequest object
+         * Transforms token string into AuthRequest object
          */
         fun tokenToRequest(token: String): AuthRequest {
             val empty = AuthRequest(null, null)
             return try {
-                val encrypted = decode(token, "UTF-8")
-                val json = decrypt(encrypted ?: return empty, ENCRYPT_HASH)
-                val request = jsonToClass(json ?: return empty, AuthRequest::class.java)
+                val encrypted = SecurityUtils.decode(token, "UTF-8")
+                val json = SecurityUtils.decrypt(encrypted ?: return empty, Env.props.encryptHash)
+                val request = Cast.jsonToClass(json ?: return empty, AuthRequest::class.java)
 
                 request
             } catch (e: Exception) {
                 empty
             }
+        }
+
+        /**
+         * Extracts token from the header
+         */
+        fun extractToken(authorization: String): String? {
+            val matcher = Pattern.compile("Bearer (.*)").matcher(authorization)
+            return if (matcher.find()) matcher.group(1) else null
         }
     }
 }

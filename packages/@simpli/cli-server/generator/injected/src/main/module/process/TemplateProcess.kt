@@ -2,43 +2,40 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 package <%-packageAddress%>.<%-moduleName%>.process
 
+import <%-packageAddress%>.<%-moduleName%>.context.RequestContext
 import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 <%_ if (m2m.pivotModelName !== table.modelName) { _%>
 import <%-packageAddress%>.dao.<%-m2m.pivotModelName%>Dao
 <%_ } _%>
 <%_ } _%>
+import <%-packageAddress%>.model.collection.ListFilter
 import <%-packageAddress%>.model.collection.PageCollection
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
-import <%-packageAddress%>.wrapper.ProcessWrapper
 
 /**
  * <%-table.modelName%> business logic
  * @author Simpli CLI generator
  */
-class <%-table.modelName%>Process : ProcessWrapper() {
+class <%-table.modelName%>Process(val context: RequestContext) {
 
-    lateinit var dao: <%-table.modelName%>Dao
-
-    override fun onAssign() {
-        dao = <%-table.modelName%>Dao(con)
-    }
+    val dao = <%-table.modelName%>Dao(context.con)
 
     @Throws(BadRequestException::class, NotFoundException::class)
-    fun get(request: <%-table.modelName%>.GetParam): <%-table.modelName%> {
+    fun get(<%-table.primariesByParam(true, true)%>): <%-table.modelName%> {
         // TODO: review generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
-        val id = request.id ?: throw BadRequestException()
+        if (id == null) throw BadRequestException()
 <%_ } else { _%>
 <%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        val id<%-(Number(i) + 1)%> = request.id<%-(Number(i) + 1)%> ?: throw BadRequestException()
+        if (id<%-(Number(i) + 1)%> == null) throw BadRequestException()
 <%_ } _%>
 <%_ } _%>
 
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con)
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(context.con)
 
 <%_ } _%>
 <%_ if (table.manyToMany.length) { _%>
@@ -53,10 +50,10 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 <%_ } _%>
     }
 
-    fun list(request: <%-table.modelName%>.ListParam): PageCollection<<%-table.modelName%>> {
+    fun list(filter: ListFilter): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
-        val items = dao.getList(request)
-        val total = dao.count(request)
+        val items = dao.getList(filter)
+        val total = dao.count(filter)
 
         return PageCollection(items, total)
     }
@@ -84,7 +81,7 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 
 <%_ } _%>
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
-        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(con)
+        val <%-m2m.pivotInstanceName%>Dao = <%-m2m.pivotModelName%>Dao(context.con)
 
         <%-m2m.pivotInstanceName%>Dao.removeAllFrom<%-table.modelName%>(model.id)
 
@@ -107,7 +104,8 @@ class <%-table.modelName%>Process : ProcessWrapper() {
     @Throws(BadRequestException::class)
     fun create(model: <%-table.modelName%>): Long {
         // TODO: review generated method
-        model.validate(false, dao, lang)
+        validate(model, false)
+        model.validate(context.lang)
 
 <%_ if (table.idsColumn.length <= 1) { _%>
         model.id = dao.insert(model)
@@ -123,7 +121,8 @@ class <%-table.modelName%>Process : ProcessWrapper() {
     @Throws(BadRequestException::class)
     fun update(model: <%-table.modelName%>): Long {
         // TODO: review generated method
-        model.validate(true, dao, lang)
+        validate(model, true)
+        model.validate(context.lang)
 
         dao.update(model)
 
@@ -134,16 +133,42 @@ class <%-table.modelName%>Process : ProcessWrapper() {
 <%_ } _%>
     }
 
+    private fun validate(model: <%-table.modelName%>, updating: Boolean) {
+<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
+<%_ if (column.isRequired) { _%>
+        if (dao.existUnico(model.<%-column.name%>, <%-table.primariesByParamCall('model')%>)) {
+            throw BadRequestException(context.lang.alreadyExist(context.lang["<%-table.modelName%>.<%-column.name%>"]))
+        }
+<%_ } else { _%>
+        <%-column.name%>?.also {
+            if (dao.exist<%-column.capitalizedName%>(it, <%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(lang.alreadyExist(context.lang["<%-table.modelName%>.<%-column.name%>"]))
+            }
+        }
+<%_ } _%>
+
+<%_ } _%>
+        if (updating) {
+            if (!dao.exist(<%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(context.lang["does_not_exist"])
+            }
+        } else {
+            if (dao.exist(<%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(context.lang["already_exists"])
+            }
+        }
+    }
+
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
     @Throws(BadRequestException::class, NotFoundException::class)
-    fun remove(request: <%-table.modelName%>.GetParam): Long {
+    fun remove(<%-table.primariesByParam(true, true)%>): Long {
         // TODO: review generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
-        val id = request.id ?: throw BadRequestException()
+        if (id == null) throw BadRequestException()
 <%_ } else { _%>
 <%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        val id<%-(Number(i) + 1)%> = request.<%-(Number(i) + 1)%> ?: throw BadRequestException()
+        if (id<%-(Number(i) + 1)%> == null) throw BadRequestException()
 <%_ } _%>
 <%_ } _%>
 

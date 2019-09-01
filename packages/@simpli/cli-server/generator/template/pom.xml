@@ -10,6 +10,7 @@
     <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <kotlin.version>1.2.71</kotlin.version>
+    <buildType>debug</buildType>
   </properties>
 
   <dependencies>
@@ -37,7 +38,7 @@
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-sql</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.3</version>
     </dependency>
     <dependency>
       <groupId>com.google.api.client</groupId>
@@ -155,41 +156,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.1.201405082137</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>check</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <rule implementation="org.jacoco.maven.RuleConfiguration">
-                  <element>BUNDLE</element>
-                </rule>
-              </rules>
-              <excludes>
-                <exclude>**/Router.*</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
         <version>${kotlin.version}</version>
@@ -214,6 +180,22 @@
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
               </sourceDirs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>${project.build.outputDirectory}/maven.properties</outputFile>
             </configuration>
           </execution>
         </executions>

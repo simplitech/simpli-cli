@@ -1,7 +1,6 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.app
 
-import <%-packageAddress%>.app.Env.DEBUG_MODE
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -32,7 +31,7 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
 
     @Throws(IOException::class)
     override fun filter(request: ContainerRequestContext, response: ContainerResponseContext) {
-        if (DEBUG_MODE) {
+        if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
             REQUEST URI: ${request.uriInfo.requestUri}
             REQUEST METHOD: ${sr?.method}
@@ -50,7 +49,7 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
         val body = BufferedReader(InputStreamReader(ist)).lines()
                 .collect(Collectors.joining("\n")) // getting the body
 
-        if (DEBUG_MODE) {
+        if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
             REQUEST BODY: $body
             """)

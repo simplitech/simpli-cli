@@ -2,8 +2,8 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 package <%-packageAddress%>.<%-moduleName%>.auth
 
-import <%-packageAddress%>.<%-moduleName%>.gateway.AuthGateway
-import <%-packageAddress%>.<%-moduleName%>.gateway.GuestGateway
+import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
+import <%-packageAddress%>.<%-moduleName%>.context.GuestPipe
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ResetPasswordRequest
@@ -33,15 +33,16 @@ class AuthRouter : RouterWrapper() {
     @GET
     @ApiOperation(tags = ["AuthRequest"], value = "Gets the user authentication")
     fun authenticate(@BeanParam param: DefaultParam.Auth): AuthResponse {
-        return connection(AuthGateway()).route(param) { auth, _, _, _ -> auth }
+        return GuestPipe.handle(connectionPipe, param) { context ->
+            AuthProcess(context).authenticate(param)
+        }
     }
 
     @POST
     @ApiOperation(tags = ["AuthRequest"], value = "Submits the user authentication")
     fun signIn(@BeanParam param: DefaultParam, request: AuthRequest): AuthResponse {
-        val process = AuthProcess()
-        return connection(GuestGateway()).handle(process, param) {
-            it.signIn(request)
+        return GuestPipe.handle(connectionPipe, param) { context ->
+            AuthProcess(context).signIn(request)
         }
     }
 
@@ -49,9 +50,8 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["RecoverPasswordByMailRequest"], value = "Sends an email requesting to change the password")
     fun recoverPasswordByMail(@BeanParam param: DefaultParam, request: RecoverPasswordByMailRequest): Long {
-        val process = AuthProcess()
-        return connection(GuestGateway()).handle(process, param) {
-            it.recoverPasswordByMail(request)
+        return GuestPipe.handle(connectionPipe, param) { context ->
+            AuthProcess(context).recoverPasswordByMail(request)
         }
     }
 
@@ -59,9 +59,8 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["ResetPasswordRequest"], value = "Recovers the password with a given hash")
     fun resetPassword(@BeanParam param: DefaultParam, request: ResetPasswordRequest): String {
-        val process = AuthProcess()
-        return transaction(GuestGateway()).handle(process, param) {
-            it.resetPassword(request)
+        return GuestPipe.handle(transactionPipe, param) { context ->
+            AuthProcess(context).resetPassword(request)
         }
     }
 
@@ -69,9 +68,8 @@ class AuthRouter : RouterWrapper() {
     @Path("/me/password")
     @ApiOperation(tags = ["ChangePasswordRequest"], value = "Changes the password with a given new password")
     fun changePassword(@BeanParam param: DefaultParam.Auth, request: ChangePasswordRequest): Long {
-        val process = AuthProcess()
-        return transaction(AuthGateway()).handleWithAuth(process, param) { it, auth ->
-            it.changePassword(request, auth)
+        return AuthPipe.handle(transactionPipe, param) { context, auth ->
+            AuthProcess(context).changePassword(request, auth)
         }
     }
 }

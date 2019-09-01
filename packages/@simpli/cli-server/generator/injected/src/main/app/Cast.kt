@@ -24,7 +24,7 @@ import javax.ws.rs.WebApplicationException
 object Cast {
 
     val builder: Gson = GsonBuilder()
-            .setDateFormat(Env.DATE_FORMAT)
+            .setDateFormat(Env.props.dateFormat)
             .registerTypeAdapter(DateTime::class.java, DateTimeTypeAdapter())
             .create()
 
@@ -51,7 +51,7 @@ object Cast {
     }
 
     internal class DateTimeTypeAdapter : JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
-        private val simpleDateFormat = SimpleDateFormat(Env.DATE_FORMAT)
+        private val simpleDateFormat = SimpleDateFormat(Env.props.dateFormat)
 
         @Throws(JsonParseException::class)
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): DateTime {

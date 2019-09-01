@@ -7,6 +7,7 @@ import <%-packageAddress%>.<%-moduleName%>.ProcessTest
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
+import <%-packageAddress%>.param.DefaultParam
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 <%_ if (m2m.crossRelationModelName !== table.modelName) { _%>
 import <%-packageAddress%>.model.resource.<%-m2m.crossRelationModelName%>
@@ -35,16 +36,11 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 <%_ } _%>
     private val model = <%-table.modelName%>()
 
-    private object Request {
-        val get = <%-table.modelName%>.GetParam()
-        val list = <%-table.modelName%>.ListParam()
-    }
+    private val listFilter = DefaultParam.AuthPaged()
 
-    private val subject = <%-table.modelName%>Process()
+    private val subject = <%-table.modelName%>Process(context)
 
     init {
-        subject.assign(con, lang, clientVersion)
-
 <%_ for (var i in table.requiredColumns) { var column = table.requiredColumns[i] _%>
         model.<%-column.name%> = <%-column.testValue%>
 <%_ } _%>
@@ -58,33 +54,25 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 
     @Test
     fun testList() {
-        val result = subject.list(Request.list)
+        val result = subject.list(listFilter)
         assertFalse(result.items.isEmpty())
         assertNotEquals(0, result.total)
     }
 
     @Test
     fun testListPaginated() {
-        Request.list.page = 0
-        Request.list.limit = 1
+        listFilter.page = 0
+        listFilter.limit = 1
 
-        val result = subject.list(Request.list)
+        val result = subject.list(listFilter)
         assertFalse(result.items.isEmpty())
         assertNotEquals(0, result.total)
-        assertTrue(result.items.size <= Request.list.limit ?: 0)
+        assertTrue(result.items.size <= listFilter.limit ?: 0)
     }
 
     @Test
     fun testGetSuccess() {
-<%_ if (table.idsColumn.length <= 1) { _%>
-        Request.get.id = id
-<%_ } else { _%>
-<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        Request.get.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
-<%_ } _%>
-<%_ } _%>
-
-        val result = subject.get(Request.get)
+        val result = subject.get(<%-table.primariesByParamCall()%>)
 <%_ if (table.idsColumn.length <= 1) { _%>
         assertNotSame(<%-table.idColumn.isString ? '\"0\"' : '0'%>, result.id)
 <%_ } else { _%>
@@ -99,15 +87,11 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 
     @Test(expected = NotFoundException::class)
     fun testGetFail() {
-<%_ if (table.idsColumn.length <= 1) { _%>
-        Request.get.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
-<%_ } else { _%>
+<%_ var values = [] _%>
 <%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        Request.get.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ values.push(column.isString ? '\"0\"' : '0') _%>
 <%_ } _%>
-<%_ } _%>
-
-        subject.get(Request.get)
+        subject.get(<%-values.join(', ')%>)
     }
 <%_ if (table.hasPersist) { _%>
 
@@ -172,28 +156,16 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 
     @Test
     fun testRemoveSuccess() {
-<%_ if (table.idsColumn.length <= 1) { _%>
-        Request.get.id = id
-<%_ } else { _%>
-<%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        Request.get.id<%-(Number(i) + 1)%> = id<%-(Number(i) + 1)%>
-<%_ } _%>
-<%_ } _%>
-
-        subject.remove(Request.get)
+        subject.remove(<%-table.primariesByParamCall()%>)
     }
 
     @Test(expected = NotFoundException::class)
     fun testRemoveFail() {
-<%_ if (table.idsColumn.length <= 1) { _%>
-        Request.get.id = <%-table.idColumn.isString ? '\"0\"' : '0'%>
-<%_ } else { _%>
+<%_ var values = [] _%>
 <%_ for (var i in table.idsColumn) { var column = table.idsColumn[i] _%>
-        Request.get.id<%-(Number(i) + 1)%> = <%-table.idColumn.isString ? '\"0\"' : '0'%>
+<%_ values.push(column.isString ? '\"0\"' : '0') _%>
 <%_ } _%>
-<%_ } _%>
-
-        subject.remove(Request.get)
+        subject.remove(<%-values.join(', ')%>)
     }
 <%_ } _%>
 }

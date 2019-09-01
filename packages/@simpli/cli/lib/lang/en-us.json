@@ -22,9 +22,9 @@
     ],
     "password": [
       "password",
-      "currentPassword",
-      "newPassword",
-      "confirmPassword",
+      "current_password",
+      "new_password",
+      "confirm_password",
       "secret"
     ],
     "email": [
@@ -90,6 +90,12 @@
       "longitude",
       "latitude"
     ],
+    "cpf": [
+      "personal_document"
+    ],
+    "cnpj": [
+      "corporate_document"
+    ],
     "updatedAt": [
       "updated_at",
       "date_updated",
@@ -101,7 +107,8 @@
     "createdAt": [
       "created_at",
       "date_created",
-      "created_date"
+      "created_date",
+      "creation_date"
     ],
     "deletedAt": [
       "deleted_at",

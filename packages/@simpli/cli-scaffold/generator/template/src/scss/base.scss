@@ -1,8 +1,7 @@
 // keep this file as minimal as possible, prefer creating a component style instead of styling an element
 
 body {
-  @apply font-display; // defined in tailwind.config
-  font-size: 12px;
+  @apply font-display text-xs; // defined in tailwind.config
 }
 
 a {
