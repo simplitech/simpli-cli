@@ -35,16 +35,16 @@
       </div>
     </header>
 
-    <section class="weight-1 bg-black-100">
-      <await init name="query" class="relative w-full h-full" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+    <section class="weight-1 h-full bg-black-100">
+      <await init name="query" class="relative verti items-center" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
         <template v-if="!collection.size()">
-          <div class="p-4 text-lg text-gray-700 text-center">
+          <div class="mt-10 uppercase text-center text-black-600 text-lg font-light">
             {{ $t('app.noDataToShow') }}
           </div>
         </template>
 
         <template v-else>
-          <div class="absolute inset-0 overflow-auto bg-primary">
+          <div class="weight-1 w-full overflow-auto bg-primary">
             <table class="table">
               <thead>
               <tr>
@@ -75,11 +75,9 @@
             </table>
           </div>
 
-          <footer class="absolute z-10 inset-x-0 bottom-0">
-            <div class="items-center-center">
-              <adap-pagination :collection="collection" class="m-4"/>
-            </div>
-          </footer>
+          <div class="absolute bottom-4">
+            <adap-pagination :collection="collection" class="m-auto"/>
+          </div>
         </template>
 
         <await name="adapQuery" class="z-20 await__spinner--screen-light"/>
@@ -136,7 +134,16 @@
 <%_ if (collection && collection.getApiByName('listCsv')) { _%>
 
     async downloadCsv() {
-      const csv = new <%-model.name%>Collection().whole()
+      const {params} = this.collection
+      delete params.ascending
+      delete params.orderBy
+      delete params.page
+      delete params.limit
+
+      const csv = new <%-model.name%>Collection()
+        .clearFilters()
+        .addFilter(params)
+
       await csv.listCsv()
       new Csv<%-model.name%>Schema().downloadCsv(csv.all())
     }

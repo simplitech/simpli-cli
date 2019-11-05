@@ -10,10 +10,11 @@ import <%-packageAddress%>.dao.<%-m2m.pivotModelName%>Dao
 <%_ } _%>
 <%_ } _%>
 import <%-packageAddress%>.model.collection.ListFilter
-import <%-packageAddress%>.model.collection.PageCollection
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
+import br.com.simpli.model.PageCollection
+import java.util.Date
 
 /**
  * <%-table.modelName%> business logic
@@ -60,7 +61,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 
 <%_ if (table.hasPersist) { _%>
     /**
-     * Use this to handle similarities between create and persist
+     * Use this to handle similarities between create and update
      */
     fun persist(model: <%-table.modelName%>): Long {
 <%_ if (table.idsColumn.length <= 1) { _%>
@@ -104,58 +105,31 @@ class <%-table.modelName%>Process(val context: RequestContext) {
     @Throws(BadRequestException::class)
     fun create(model: <%-table.modelName%>): Long {
         // TODO: review generated method
-        validate(model, false)
-        model.validate(context.lang)
-
+<%-table.buildCreateApplyModel()%>
 <%_ if (table.idsColumn.length <= 1) { _%>
-        model.id = dao.insert(model)
+        model.id = dao.run {
+            validate(model, updating = false)
+            insert(model)
+        }
 
         return model.id
 <%_ } else { _%>
-        dao.insert(model)
+        dao.run {
+            validate(model, updating = false)
+            insert(model)
+        }
 
-        return model.id1
+        return 1L
 <%_ } _%>
     }
 
     @Throws(BadRequestException::class)
-    fun update(model: <%-table.modelName%>): Long {
+    fun update(model: <%-table.modelName%>): Int {
         // TODO: review generated method
-        validate(model, true)
-        model.validate(context.lang)
-
-        dao.update(model)
-
-<%_ if (table.idsColumn.length <= 1) { _%>
-        return model.id
-<%_ } else { _%>
-        return model.id1
-<%_ } _%>
-    }
-
-    private fun validate(model: <%-table.modelName%>, updating: Boolean) {
-<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
-<%_ if (column.isRequired) { _%>
-        if (dao.existUnico(model.<%-column.name%>, <%-table.primariesByParamCall('model')%>)) {
-            throw BadRequestException(context.lang.alreadyExist(context.lang["<%-table.modelName%>.<%-column.name%>"]))
-        }
-<%_ } else { _%>
-        <%-column.name%>?.also {
-            if (dao.exist<%-column.capitalizedName%>(it, <%-table.primariesByParamCall('model')%>)) {
-                throw BadRequestException(lang.alreadyExist(context.lang["<%-table.modelName%>.<%-column.name%>"]))
-            }
-        }
-<%_ } _%>
-
-<%_ } _%>
-        if (updating) {
-            if (!dao.exist(<%-table.primariesByParamCall('model')%>)) {
-                throw BadRequestException(context.lang["does_not_exist"])
-            }
-        } else {
-            if (dao.exist(<%-table.primariesByParamCall('model')%>)) {
-                throw BadRequestException(context.lang["already_exists"])
-            }
+<%-table.buildUpdateApplyModel()%>
+        return dao.run {
+            validate(model, updating = true)
+            update(model)
         }
     }
 
@@ -180,6 +154,28 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 <%_ } else { _%>
         return id1
 <%_ } _%>
+    }
+
+<%_ } _%>
+<%_ if (table.hasPersist) { _%>
+    private fun <%-table.modelName%>Dao.validate(model: <%-table.modelName%>, updating: Boolean) {
+<%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
+        model.<%-column.name%>?.also {
+            if (exist<%-column.capitalizedName%>(it, <%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(context.lang.alreadyExist(context.lang["<%-table.modelName%>.<%-column.name%>"]))
+            }
+        }
+
+<%_ } _%>
+        if (updating) {
+            if (!exist(<%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(context.lang["does_not_exist"])
+            }
+        } else {
+            if (exist(<%-table.primariesByParamCall('model')%>)) {
+                throw BadRequestException(context.lang["already_exists"])
+            }
+        }
     }
 
 <%_ } _%>

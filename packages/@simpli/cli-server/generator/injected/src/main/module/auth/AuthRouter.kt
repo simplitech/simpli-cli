@@ -3,7 +3,7 @@
 package <%-packageAddress%>.<%-moduleName%>.auth
 
 import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
-import <%-packageAddress%>.<%-moduleName%>.context.GuestPipe
+import <%-packageAddress%>.<%-moduleName%>.context.PublicPipe
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ResetPasswordRequest
@@ -33,7 +33,7 @@ class AuthRouter : RouterWrapper() {
     @GET
     @ApiOperation(tags = ["AuthRequest"], value = "Gets the user authentication")
     fun authenticate(@BeanParam param: DefaultParam.Auth): AuthResponse {
-        return GuestPipe.handle(connectionPipe, param) { context ->
+        return PublicPipe.handle(connectionPipe, param) { context ->
             AuthProcess(context).authenticate(param)
         }
     }
@@ -41,7 +41,7 @@ class AuthRouter : RouterWrapper() {
     @POST
     @ApiOperation(tags = ["AuthRequest"], value = "Submits the user authentication")
     fun signIn(@BeanParam param: DefaultParam, request: AuthRequest): AuthResponse {
-        return GuestPipe.handle(connectionPipe, param) { context ->
+        return PublicPipe.handle(connectionPipe, param) { context ->
             AuthProcess(context).signIn(request)
         }
     }
@@ -50,7 +50,7 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["RecoverPasswordByMailRequest"], value = "Sends an email requesting to change the password")
     fun recoverPasswordByMail(@BeanParam param: DefaultParam, request: RecoverPasswordByMailRequest): Long {
-        return GuestPipe.handle(connectionPipe, param) { context ->
+        return PublicPipe.handle(connectionPipe, param) { context ->
             AuthProcess(context).recoverPasswordByMail(request)
         }
     }
@@ -59,7 +59,7 @@ class AuthRouter : RouterWrapper() {
     @Path("/password")
     @ApiOperation(tags = ["ResetPasswordRequest"], value = "Recovers the password with a given hash")
     fun resetPassword(@BeanParam param: DefaultParam, request: ResetPasswordRequest): String {
-        return GuestPipe.handle(transactionPipe, param) { context ->
+        return PublicPipe.handle(transactionPipe, param) { context ->
             AuthProcess(context).resetPassword(request)
         }
     }

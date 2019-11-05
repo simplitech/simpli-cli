@@ -42,19 +42,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
         val query = Query()
                 .selectAll()
                 .from("<%-table.name%>")
-<%_ if (table.isRemovable) { _%>
-                .whereEq("<%-table.removableColumn.field%>", true)
-<%_ } _%>
-
-        filter.query?.also {
-            if (it.isNotEmpty()) {
-                query.where(Query()
-<%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
-                        .orLike("<%-table.name%>.<%-column.field%>", "%$it%")
-<%_ } _%>
-                )
-            }
-        }
+                .applyListFilter(filter)
 
         <%-table.modelName%>.orderMap[filter.orderBy]?.also {
             query.orderByAsc(it, filter.ascending)
@@ -75,19 +63,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
         val query = Query()
                 .countRaw("DISTINCT <%-table.idColumn.field%>")
                 .from("<%-table.name%>")
-<%_ if (table.isRemovable) { _%>
-                .whereEq("<%-table.removableColumn.field%>", true)
-<%_ } _%>
-
-        filter.query?.also {
-            if (it.isNotEmpty()) {
-                query.where(Query()
-<%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
-                        .orLike("<%-table.name%>.<%-column.field%>", "%$it%")
-<%_ } _%>
-                )
-            }
-        }
+                .applyListFilter(filter)
 
         return con.getFirstInt(query) ?: 0
     }
@@ -145,6 +121,25 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
         return con.execute(query).affectedRows
     }
 <%_ } _%>
+
+    private fun Query.applyListFilter(filter: ListFilter): Query {
+<%_ if (table.isRemovable) { _%>
+        whereEq("<%-table.removableColumn.field%>", true)
+<%_ } _%>
+
+        filter.query?.also {
+            if (it.isNotEmpty()) {
+                whereSome {
+<%_ for (var i in table.queryColumns) { var column = table.queryColumns[i] _%>
+                    whereLike("<%-table.name%>.<%-column.field%>", "%$it%")
+<%_ } _%>
+                }
+            }
+        }
+
+        return this
+    }
+
 <%_ } else if (table.isPivot) { _%>
 <%_ var foreignColumns = table.foreignColumns _%>
 <%_ var columnRef1 = foreignColumns[0] _%>

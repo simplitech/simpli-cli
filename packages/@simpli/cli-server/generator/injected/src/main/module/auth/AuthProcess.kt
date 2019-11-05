@@ -120,7 +120,7 @@ class AuthProcess(val context: RequestContext) {
     fun changePassword(request: ChangePasswordRequest, auth: AuthResponse): Long {
         val id = auth.id
         val <%-userTable.instanceName%> = auth.<%-userTable.instanceName%>
-        val <%-accountColumn.name%> = <%-userTable.instanceName%>.<%-accountColumn.name%>
+        val <%-accountColumn.name%> = <%-userTable.instanceName%>.<%-accountColumn.name%> ?: throw BadRequestException()
 
         request.validate(context.lang)
 

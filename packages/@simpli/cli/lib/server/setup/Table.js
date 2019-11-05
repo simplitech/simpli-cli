@@ -278,20 +278,14 @@ module.exports = class Table {
         result += `        }\n`
       } else if (column.isString) {
         if (column.isRequired) {
-          result += `        if (${column.name}.isEmpty()) {\n`
+          result += `        if (${column.name}.isNullOrBlank()) {\n`
           result += `            throw BadRequestException(lang.cannotBeNull(lang["${this.modelName}.${column.name}"]))\n`
           result += `        }\n`
         }
         if (column.size) {
-          if (column.isRequired) {
-            result += `        if (${column.name}.length > ${column.size}) {\n`
-            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan(lang["${this.modelName}.${column.name}"], ${column.size}))\n`
-            result += `        }\n`
-          } else {
-            result += `        if (${column.name}?.length ?: 0 > ${column.size}) {\n`
-            result += `            throw BadRequestException(lang.lengthCannotBeMoreThan(lang["${this.modelName}.${column.name}"], ${column.size}))\n`
-            result += `        }\n`
-          }
+          result += `        if (${column.name}?.length ?: 0 > ${column.size}) {\n`
+          result += `            throw BadRequestException(lang.lengthCannotBeMoreThan(lang["${this.modelName}.${column.name}"], ${column.size}))\n`
+          result += `        }\n`
         }
         if (column.isEmail) {
           result += `        if (${column.name} != null && !Validator.isEmail(${column.name})) {\n`
@@ -320,18 +314,14 @@ module.exports = class Table {
     let result = ''
 
     result += `    @Throws(SQLException::class)\n`
-    result += `    constructor(rs: ResultSet, alias: String = "${this.name}") {\n`
+    result += `    constructor(rs: ResultSet, alias: String = "${this.name}") : this() {\n`
     this.columns.forEach((column) => {
       if (column.isLong) {
         result += `        ${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDouble) {
         result += `        ${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isString) {
-        if (column.isRequired) {
-          result += `        ${column.name} = rs.getString(alias, "${column.field}").toString()\n`
-        } else {
-          result += `        ${column.name} = rs.getString(alias, "${column.field}")\n`
-        }
+        result += `        ${column.name} = rs.getString(alias, "${column.field}")\n`
       } else if (column.isBoolean) {
         result += `        ${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
       } else if (column.isDate) {
@@ -343,6 +333,23 @@ module.exports = class Table {
     return result
   }
 
+  buildUpdateApplyModel () {
+    let result = ''
+
+    result += `        model.apply {\n`
+    this.exceptIDColumns.forEach((column) => {
+      if (column.isSoftDelete) {
+        result += `            ${column.field} = true\n`
+      } else if (column.isUpdatedAt) {
+        result += `            ${column.field} = Date()\n`
+      }
+    })
+    result += `            validate(context.lang)`
+    result += `\n        }\n`
+
+    return result
+  }
+
   buildUpdateSet () {
     let result = ''
 
@@ -350,16 +357,29 @@ module.exports = class Table {
     this.exceptIDColumns.forEach((column) => {
       if (column.isPassword) {
         result += `            "${column.field}" to Query("IF(? IS NOT NULL, SHA2(?, 256), ${column.field})", ${column.name}, ${column.name}),\n`
-      } else if (column.isSoftDelete) {
-        result += `            "${column.field}" to true,\n`
-      } else if (column.isUpdatedAt) {
-        result += `            "${column.field}" to Date(),\n`
       } else if (!column.isCreatedAt) {
         result += `            "${column.field}" to ${column.name},\n`
       }
     })
     result = result.slice(0, -2) // remove last line
     result += `\n    )\n`
+
+    return result
+  }
+
+  buildCreateApplyModel () {
+    let result = ''
+
+    result += `        model.apply {\n`
+    this.exceptIDColumns.forEach((column) => {
+      if (column.isSoftDelete) {
+        result += `            ${column.field} = true\n`
+      } else if (column.isCreatedAt) {
+        result += `            ${column.field} = Date()\n`
+      }
+    })
+    result += `            validate(context.lang)`
+    result += `\n        }\n`
 
     return result
   }
@@ -371,10 +391,6 @@ module.exports = class Table {
     this.exceptAutoIncrementColumns.forEach((column) => {
       if (column.isPassword) {
         result += `            "${column.field}" to Query("SHA2(?, 256)", ${column.name}),\n`
-      } else if (column.isSoftDelete) {
-        result += `            "${column.field}" to true,\n`
-      } else if (column.isCreatedAt) {
-        result += `            "${column.field}" to Date(),\n`
       } else if (!column.isUpdatedAt) {
         result += `            "${column.field}" to ${column.name},\n`
       }

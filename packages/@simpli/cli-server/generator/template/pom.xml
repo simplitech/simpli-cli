@@ -23,22 +23,22 @@
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-model</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-tools</artifactId>
-      <version>1.0.0</version>
+      <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-ws</artifactId>
-      <version>1.0.0</version>
+      <version>1.2.4</version>
     </dependency>
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-sql</artifactId>
-      <version>3.0.3</version>
+      <version>3.1.2</version>
     </dependency>
     <dependency>
       <groupId>com.google.api.client</groupId>

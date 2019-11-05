@@ -65,7 +65,6 @@ module.exports = (api, options) => {
 
     // main/model/collection
     api.renderFrom('./injected', 'src/main/model/collection/ListFilter.kt', `../../kotlin/${dir}/model/collection/ListFilter.kt`)
-    api.renderFrom('./injected', 'src/main/model/collection/PageCollection.kt', `../../kotlin/${dir}/model/collection/PageCollection.kt`)
 
     // main/param
     api.renderFrom('./injected', 'src/main/param/DefaultParam.kt', `../kotlin/${dir}/param/DefaultParam.kt`)
@@ -85,7 +84,7 @@ module.exports = (api, options) => {
 
     // main/module/context
     api.renderFrom('./injected', 'src/main/module/context/AuthPipe.kt', `../../kotlin/${dir}/${moduleName}/context/AuthPipe.kt`)
-    api.renderFrom('./injected', 'src/main/module/context/GuestPipe.kt', `../../kotlin/${dir}/${moduleName}/context/GuestPipe.kt`)
+    api.renderFrom('./injected', 'src/main/module/context/PublicPipe.kt', `../../kotlin/${dir}/${moduleName}/context/PublicPipe.kt`)
     api.renderFrom('./injected', 'src/main/module/context/RequestContext.kt', `../../kotlin/${dir}/${moduleName}/context/RequestContext.kt`)
 
     // main/module/request

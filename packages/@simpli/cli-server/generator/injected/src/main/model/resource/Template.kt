@@ -37,9 +37,7 @@ import javax.ws.rs.PathParam
 <%_ } else { _%>
 @ApiModel
 <%_ } _%>
-class <%-table.modelName%> {
-    constructor()
-
+class <%-table.modelName%>() {
 <%_ for (var i in table.validRelations) { var relation = table.validRelations[i] _%>
 <%_ if (!relation.isManyToMany) { _%>
     var <%-relation.name%>: <%-relation.referencedTableModelName%>? = null

@@ -50,25 +50,15 @@ module.exports = class Column {
   }
 
   get qMark () {
-    if (!this.isRequired) return '?'
     if (this.isID) return ''
-    if (this.isString) return ''
-    if (this.isLong) return ''
-    if (this.isDouble) return ''
-    if (this.isBoolean) return ''
     return '?'
   }
 
   get defaultValue () {
-    if (!this.isRequired) return 'null'
     if (this.isID) {
       if (this.isString) return '\"\"'
       return '0'
     }
-    if (this.isString) return '\"\"'
-    if (this.isLong) return '0'
-    if (this.isDouble) return '0.0'
-    if (this.isBoolean) return 'false'
     return 'null'
   }
 

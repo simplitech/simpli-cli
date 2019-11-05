@@ -243,9 +243,9 @@ module.exports = class Attr {
   }
 
   get typeBuild () {
-    let nullType = ''
-    if (!this.isRequired && !this.isTAG && !this.fromResp) nullType = ' | null'
-    if (this.isID || this.isForeign) return `ID`
+    let nullType = ' | null'
+    if (this.isID) nullType = ''
+
     if (this.isInteger || this.isDouble) return `number${nullType}`
     if (this.isBoolean) return `boolean${nullType}`
     if (this.isObjectOrigin) return `${this.type + nullType}`
@@ -255,22 +255,13 @@ module.exports = class Attr {
   }
 
   get valueBuild () {
-    if (
-      !this.isRequired &&
-      !this.fromResp &&
-      !this.isID &&
-      !this.isForeign &&
-      !this.isTAG &&
-      !this.isArrayOrigin
-    ) return 'null'
-    if (this.isID || this.isForeign) return '0'
-    if (this.isInteger || this.isDouble) return '0'
-    if (this.isBoolean) return 'false'
-    if (this.isDate || this.isDatetime) return 'moment().format()'
+    if (this.isID) {
+      if (this.isString) return '\'\''
+      return '0'
+    }
     if (this.isObjectOrigin) return `new ${this.type}()`
     if (this.isArrayOrigin) return `[]`
-
-    return '\'\''
+    return 'null'
   }
 
   /**

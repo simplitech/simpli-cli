@@ -7,9 +7,9 @@ package <%-packageAddress%>.<%-moduleName%>.router
 import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
 import <%-packageAddress%>.<%-moduleName%>.process.<%-table.modelName%>Process
 import <%-packageAddress%>.wrapper.RouterWrapper
-import <%-packageAddress%>.model.collection.PageCollection
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import <%-packageAddress%>.param.DefaultParam
+import br.com.simpli.model.PageCollection
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import javax.ws.rs.BeanParam
@@ -32,7 +32,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
     @GET
     @Path("<%-table.primariesBySlash()%>")
-    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Gets a instance of a given ID from <%-table.modelName%>")
+    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Gets a instance of a given ID of <%-table.modelName%>")
     fun populate(@BeanParam param: <%-table.hasUniqueDefaultId ? 'DefaultParam' : table.modelName%>.RequiredPathId): <%-table.modelName%> {
         // TODO: review generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
@@ -51,7 +51,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
     @GET
     @Path("/csv")
-    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances from <%-table.modelName%> to use it in a CSV file")
+    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Lists the instances of <%-table.modelName%> to use it in a CSV file")
     fun listCsv(@BeanParam param: DefaultParam.AuthPaged): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
@@ -61,7 +61,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
 <%_ if (table.hasPersist) { _%>
     @POST
-    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Persists a new instance from <%-table.modelName%>", notes = "Use ID = 0 to create a new one, or ID > 0 to update a current one")
+    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Persists a new instance of <%-table.modelName%>", notes = "Use ID = 0 to create a new one, or ID > 0 to update a current one")
     fun persist(@BeanParam param: DefaultParam.AuthPaged, model: <%-table.modelName%>): Long {
         // TODO: review generated method
         return AuthPipe.handle(transactionPipe, param) { context, _ ->
@@ -73,7 +73,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 <%_ if (table.isRemovable) { _%>
     @DELETE
     @Path("<%-table.primariesBySlash()%>")
-    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Deletes a instance of a given ID from <%-table.modelName%>")
+    @ApiOperation(tags = ["<%-table.modelName%>"], value = "Deletes a instance of a given ID of <%-table.modelName%>")
     fun remove(@BeanParam param: <%-table.hasUniqueDefaultId ? 'DefaultParam' : table.modelName%>.RequiredPathId): Long {
         // TODO: review generated method
         return AuthPipe.handle(transactionPipe, param) { context, _ ->

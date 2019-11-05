@@ -148,6 +148,13 @@ module.exports = {
         'box-md': '0 0 10px rgba(0, 0, 0, 0.5)',
         'box-lg': '0 0 15px rgba(0, 0, 0, 0.5)',
       },
+      inset: {
+        '2': '0.5rem',
+        '4': '1rem',
+        '6': '1.5rem',
+        '8': '2rem',
+        '10': '2.5rem',
+      },
       weight: theme => ({
         '1': [1],
         '2': [2],
