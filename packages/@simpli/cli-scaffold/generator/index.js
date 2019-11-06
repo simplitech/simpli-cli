@@ -94,6 +94,8 @@ module.exports = (api, options) => {
       'vuex-class': '^0.3.1'
     },
     devDependencies: {
+      '@babel/plugin-proposal-nullish-coalescing-operator': '^7.4.4',
+      '@babel/plugin-proposal-optional-chaining': '^7.6.0',
       '@fullhuman/postcss-purgecss': '^1.2.0',
       '@types/jest': '^24.0.11',
       '@vue/cli-plugin-babel': '^3.3.0',
@@ -112,7 +114,7 @@ module.exports = (api, options) => {
       'tailwindcss': '^1.0.4',
       'tailwindcss-transition': '^1.0.5',
       'ts-jest': '^24.0.2',
-      'typescript': '^3.4.4',
+      'typescript': '^3.7.2',
       'vue-template-compiler': '^2.6.10'
     },
     'gitHooks': {

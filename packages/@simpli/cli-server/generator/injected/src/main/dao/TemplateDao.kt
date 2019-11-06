@@ -124,7 +124,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
 
     private fun Query.applyListFilter(filter: ListFilter): Query {
 <%_ if (table.isRemovable) { _%>
-        whereEq("<%-table.removableColumn.field%>", true)
+        whereEq("<%-table.name%>.<%-table.removableColumn.field%>", true)
 <%_ } _%>
 
         filter.query?.also {

@@ -62,7 +62,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 <%_ if (table.hasPersist) { _%>
     @POST
     @ApiOperation(tags = ["<%-table.modelName%>"], value = "Persists a new instance of <%-table.modelName%>", notes = "Use ID = 0 to create a new one, or ID > 0 to update a current one")
-    fun persist(@BeanParam param: DefaultParam.AuthPaged, model: <%-table.modelName%>): Long {
+    fun persist(@BeanParam param: DefaultParam.Auth, model: <%-table.modelName%>): Long {
         // TODO: review generated method
         return AuthPipe.handle(transactionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).persist(model)

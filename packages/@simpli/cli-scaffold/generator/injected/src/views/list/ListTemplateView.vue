@@ -36,7 +36,7 @@
     </header>
 
     <section class="weight-1 h-full bg-black-100">
-      <await init name="query" class="relative verti items-center" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
+      <await init name="query" class="relative h-full verti items-center" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
         <template v-if="!collection.size()">
           <div class="mt-10 uppercase text-center text-black-600 text-lg font-light">
             {{ $t('app.noDataToShow') }}

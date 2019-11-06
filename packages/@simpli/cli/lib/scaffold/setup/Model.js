@@ -236,8 +236,8 @@ module.exports = class Model {
     this.type = ModelType.RESOURCE
     this.resource.setEndpoint(wsEndpoint)
 
-    const attrID = this.attrs.find((attr) => attr.type === 'ID')
-    const attrTAG = this.attrs.find((attr) => attr.type === 'TAG')
+    const attrID = this.attrs.find((attr) => attr.isID)
+    const attrTAG = this.attrs.find((attr) => attr.isTAG)
 
     this.resource.setKeys(attrID && attrID.name, attrTAG && attrTAG.name)
 
@@ -382,11 +382,7 @@ module.exports = class Model {
     dep.addChild('Request')
     if (this.isResource) {
       dep.addChild('Resource')
-      dep.addChild('ID')
-      if (this.resource.keyTAG) dep.addChild('TAG')
     } else {
-      const hasID = !!this.attrs.find((attr) => attr.isID || attr.isForeign)
-      if (hasID) dep.addChild('ID')
       dep.addChild('Model')
     }
   }
@@ -513,7 +509,7 @@ module.exports = class Model {
     }
     result += `  }\n`
 
-    result += `  set $id(val: ID) {\n`
+    result += `  set $id(val) {\n`
     if (attrFromID && !attrFromID.isArrayOrigin) {
       if (attrFromID.isObjectOrigin) {
         if (!attrFromID.isRequired && !attrFromID.fromResp) {
@@ -536,18 +532,9 @@ module.exports = class Model {
         }
         result += `    return this.${attrFromTAG.name}.$tag\n`
         result += `  }\n`
-        result += `  set $tag(val: TAG) {\n`
-        if (!attrFromTAG.isRequired && !attrFromID.fromResp) {
-          result += `    if (!this.${attrFromTAG.name}) this.${attrFromTAG.name} = new ${attrFromTAG.type}()\n`
-        }
-        result += `    this.${attrFromTAG.name}.$tag = val\n`
-        result += `  }\n`
       } else {
         result += `  get $tag() {\n`
-        result += `    return this.${this.resource.keyTAG}\n`
-        result += `  }\n`
-        result += `  set $tag(val: TAG) {\n`
-        result += `    this.${this.resource.keyTAG} = val\n`
+        result += `    return String(this.${this.resource.keyTAG})\n`
         result += `  }\n`
       }
     }
@@ -774,7 +761,7 @@ module.exports = class Model {
           if (attr.isRequired) {
             result += `        content: schema.model.${attr.name}.$id,\n`
           } else {
-            result += `        content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+            result += `        content: schema.model.${attr.name}?.$id,\n`
           }
         } else {
           if (attr.isRequired) {
@@ -782,7 +769,7 @@ module.exports = class Model {
             result += `        // content: schema.model.${attr.name}.$id,\n`
           } else {
             result += `        // TODO: define the attribute\n`
-            result += `        // content: schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+            result += `        // content: schema.model.${attr.name}?.$id,\n`
           }
         }
         result += `      },\n`
@@ -892,7 +879,7 @@ module.exports = class Model {
         if (attr.isRequired) {
           result += `schema.model.${attr.name}.$id,\n`
         } else {
-          result += `schema.model.${attr.name} && schema.model.${attr.name}.$id,\n`
+          result += `schema.model.${attr.name}?.$id ?? null,\n`
         }
       } else if (attr.isArrayOrigin) {
       } else if (attr.isSoftDelete) {
@@ -994,7 +981,7 @@ module.exports = class Model {
     let result = ''
 
     this.persistDependencies.forEach((dep) => {
-      result += `  collection${dep.children[0]} = new ${dep.children[0]}Collection().whole()\n`
+      result += `  collection${dep.children[0]} = new ${dep.children[0]}Collection().noPagination()\n`
     })
 
     return result

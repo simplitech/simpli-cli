@@ -39,13 +39,7 @@ module.exports = class Attr {
   }
 
   setType (entry) {
-    if (this.name.match(/^(id)\w+(Pk)$/) || (this.name || '').toLowerCase() === 'id') {
-      this.type = 'ID'
-    } else if (this.name.match(/^(id)\w+(Fk)$/)) {
-      this.type = 'foreign'
-    } else if (this.isTAG && !entry.$ref) {
-      this.type = 'TAG'
-    } else if (this.isEmail && !entry.$ref) {
+    if (this.isEmail && !entry.$ref) {
       this.type = 'email'
     } else if (this.isPassword && !entry.$ref) {
       this.type = 'password'
@@ -74,8 +68,19 @@ module.exports = class Attr {
   }
 
   // Type Primary
-  get isID () { return this.isPrimaryOrigin && this.type === 'ID' }
-  get isForeign () { return this.isPrimaryOrigin && this.type === 'foreign' }
+  get isID () {
+    const name = this.name || ''
+    const idMatch = name.match(/^(id)\w+(Pk)$/)
+    const idEquals = name.toLowerCase() === 'id'
+
+    return this.isPrimaryOrigin && (idMatch || idEquals)
+  }
+  get isForeign () {
+    const name = this.name || ''
+    const idMatch = name.match(/^(id)\w+(Fk)$/)
+
+    return this.isPrimaryOrigin && idMatch
+  }
   get isString () { return this.isPrimaryOrigin && this.type === 'string' }
   get isInteger () { return this.isPrimaryOrigin && this.type === 'integer' }
   get isDouble () { return this.isPrimaryOrigin && this.type === 'double' }
@@ -248,8 +253,8 @@ module.exports = class Attr {
 
     if (this.isInteger || this.isDouble) return `number${nullType}`
     if (this.isBoolean) return `boolean${nullType}`
-    if (this.isObjectOrigin) return `${this.type + nullType}`
-    if (this.isArrayOrigin) return `${this.type}[]`
+    if (this.isObjectOrigin) return `${this.type}${nullType}`
+    if (this.isArrayOrigin) return `${this.type}[]${nullType}`
 
     return `string${nullType}`
   }
@@ -259,8 +264,6 @@ module.exports = class Attr {
       if (this.isString) return '\'\''
       return '0'
     }
-    if (this.isObjectOrigin) return `new ${this.type}()`
-    if (this.isArrayOrigin) return `[]`
     return 'null'
   }
 
@@ -289,11 +292,11 @@ module.exports = class Attr {
       }
       result += `    return this.${this.foreign}.$id\n`
       result += `  }\n`
-      result += `  set ${this.name}(${this.name}: ID) {\n`
+      result += `  set ${this.name}(val) {\n`
       if (!this.foreignIsRequired) {
         result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
       }
-      result += `    this.${this.foreign}.$id = ${this.name}\n`
+      result += `    this.${this.foreign}.$id = val\n`
       result += `  }\n`
     }
 
