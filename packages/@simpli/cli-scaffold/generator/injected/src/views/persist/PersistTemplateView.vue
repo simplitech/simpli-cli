@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Watch, Vue} from 'vue-property-decorator'
+  import {Component, Prop, Watch, Provide, Vue} from 'vue-property-decorator'
   import {$, Helper} from '@/simpli'
   <%-model.injectIntoDependence().build()%>
   <%-model.injectSchemaIntoDependence('Input').build()%>
@@ -50,6 +50,8 @@
 <%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>
     @Prop() <%-param%>?: string
 <%_ } _%>
+
+    @Provide('validator') validator = this.$validator
 
     schema = new Input<%-model.name%>Schema()
     <%-model.attrName%> = new <%-model.name%>()
@@ -91,14 +93,19 @@
     }
 
     async persist() {
-      this.schema.validate(this.<%-model.attrName%>)
+      const isValid = await this.validator.validateAll()
+
+      if (!isValid) {
+        Helper.abort('system.error.validation')
+      }
+
 <%_ if (model.persistApi) { _%>
       await this.<%-model.attrName%>.<%-model.persistApi.name%>()
 <%_ } else { _%>
       // TODO: define the persist method
       // await this.<%-model.attrName%>.persist()
 <%_ } _%>
-      Helper.successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
+      await Helper.successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
     }
   }
 </script>

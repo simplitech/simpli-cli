@@ -554,20 +554,20 @@ module.exports = class Model {
         if (attr.isObjectOrigin && attr.isObjectResource) {
           result += `      is: Component.InputSelect,\n`
           result += `      bind: {\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        items: this.collection${attr.type}.all(),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
-          result += `        items: this.collection${attr.type}.all(),\n`
           result += `      },\n`
         } else if (attr.isArrayOrigin) {
           result += `      is: Component.InputSelect,\n`
           result += `      bind: {\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
+          result += `        items: this.collection${attr.type}.all(),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
-          result += `        items: this.collection${attr.type}.all(),\n`
           result += `      },\n`
         } else if (attr.isSoftDelete) {
           result += `      is: Component.InputCheckbox,\n`
@@ -580,21 +580,27 @@ module.exports = class Model {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          if (attr.isRequired) {
-            result += `        required: true,\n`
-          }
           result += `        maxlength: 255,\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+            result += `        validation: 'required|url',\n`
+          } else {
+            result += `        validation: 'url',\n`
+          }
           result += `      },\n`
         } else if (attr.isImageUrl) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          if (attr.isRequired) {
-            result += `        required: true,\n`
-          }
           result += `        maxlength: 255,\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+            result += `        validation: 'required|url',\n`
+          } else {
+            result += `        validation: 'url',\n`
+          }
           result += `      },\n`
         } else if (attr.isBoolean) {
           result += `      is: Component.InputCheckbox,\n`
@@ -604,41 +610,39 @@ module.exports = class Model {
           result += `        labelClass: 'relative state',\n`
           result += `      },\n`
         } else if (attr.isDate) {
-          result += `      is: Component.InputText,\n`
+          result += `      is: Component.InputDate,\n`
           result += `      bind: {\n`
-          result += `        type: 'mask',\n`
-          result += `        maskPreset: 'date',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isDatetime) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'datetime',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isMoney) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'currency',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isInteger || attr.isDouble) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'number',\n`
-          if (attr.isRequired) {
-            result += `        required: true,\n`
-          }
           result += `        maxlength: 255,\n`
           if (attr.isInteger) {
             result += `        step: 1,\n`
@@ -646,97 +650,108 @@ module.exports = class Model {
             result += `        step: 'any',\n`
           }
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+            result += `        validation: 'required',\n`
+          }
           result += `      },\n`
         } else if (attr.isEmail) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'email',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required|email',\n`
+          } else {
+            result += `        validation: 'email',\n`
           }
-          if (this.isRequest) {
-            result += `        class: 'contrast',\n`
-          }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isPassword) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'password',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required',\n`
           }
-          if (this.isRequest) {
-            result += `        class: 'contrast',\n`
-          }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isPhone) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'phone',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required|phone',\n`
+          } else {
+            result += `        validation: 'phone',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isZipcode) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'zipcode',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required|cep',\n`
+          } else {
+            result += `        validation: 'cep',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isCpf) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'cpf',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required|cpf',\n`
+          } else {
+            result += `        validation: 'cpf',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isCnpj) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'cnpj',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required|cnpj',\n`
+          } else {
+            result += `        validation: 'cnpj',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else if (attr.isRg) {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'mask',\n`
           result += `        maskPreset: 'rg',\n`
+          result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
+            result += `        validation: 'required',\n`
           }
-          result += `        label: this.translateFrom(schema.fieldName),\n`
           result += `      },\n`
         } else {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          if (attr.isRequired) {
-            result += `        required: true,\n`
-          }
-          if (this.isRequest) {
-            result += `        class: 'contrast',\n`
-          }
           result += `        maxlength: 255,\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
+          if (attr.isRequired) {
+            result += `        required: true,\n`
+            result += `        validation: 'required',\n`
+          }
           result += `      },\n`
         }
-
-        result += this.buildAjv(attr)
 
         result += `    }),\n`
       }
@@ -914,6 +929,7 @@ module.exports = class Model {
 
   /**
    * Print the AJV
+   * @deprecated
    */
   buildAjv (attr = new Attr()) {
     let result = ''

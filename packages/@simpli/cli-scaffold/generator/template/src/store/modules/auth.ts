@@ -58,7 +58,7 @@ const actions: ActionTree<AuthState, RootState> = {
     commit('POPULATE_TOKEN')
 
     const uri = getters.cachePath && $.route.name !== 'signIn' ? getters.cachePath : '/dashboard'
-    Helper.infoAndPush('system.info.welcome', uri)
+    await Helper.infoAndPush('system.info.welcome', uri)
 
     commit('SET_CACHE_PATH', null)
 
@@ -210,7 +210,7 @@ const actions: ActionTree<AuthState, RootState> = {
 const mutations: MutationTree<AuthState> = {
   // Populate token mutation
   POPULATE_TOKEN(state) {
-    state.token = localStorage.getItem('token') || null
+    state.token = localStorage.getItem('token') ?? null
   },
 
   // Populate user mutation

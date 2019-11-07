@@ -10,9 +10,6 @@
 <%_ for (var i in model.resolvedDependencies) { var dependence = model.resolvedDependencies[i] _%>
 <%-dependence.build()%>
 <%_ } _%>
-<%_ if (model.isRequest) { _%>
-<%-model.injectSchemaIntoDependence('Input', false).build()%>
-<%_ } _%>
 
 /* TODO: review generated class */
 export class <%-model.name%> extends <%-model.isResource ? 'Resource' : 'Model'%> {

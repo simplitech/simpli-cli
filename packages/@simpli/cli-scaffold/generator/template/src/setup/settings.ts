@@ -47,7 +47,7 @@ $.await.addLoader('DotLoader', DotLoader)
 
 $.await.defaultTransition = 'fade'
 $.await.defaultSpinner = 'ScaleLoader'
-$.await.defaultSpinnerColor = AppHelper.Color.PRIMARY
+$.await.defaultSpinnerColor = AppHelper.Env.PRIMARY_COLOR
 $.await.defaultSpinnerPadding = '0'
 $.await.defaultSpinnerScale = 1
 
@@ -72,7 +72,5 @@ Schema.defaultI18nPath = 'schema.{schemaName}.{fieldName}'
 PageCollection.defaultMinCharToSearch = 3
 PageCollection.defaultCurrentPage = 0
 PageCollection.defaultPerPage = 10
-
-// $.ajv.instance.addFormat('customValidationFormat', new RegExp(/.+/))
 
 // InputText.addPreset('customMaskPreset', CustomMaskPreset)

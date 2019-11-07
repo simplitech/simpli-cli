@@ -1,5 +1,6 @@
 <%_ var config = rootOptions.scaffoldSetup _%>
 NODE_ENV=production
+VUE_APP_ENV=beta
 
 VUE_APP_API_URL=<%-config.apiUrlProd%>
 VUE_APP_SOCKET_URL=<%-config.socketUrlProd%>

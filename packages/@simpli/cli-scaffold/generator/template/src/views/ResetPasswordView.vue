@@ -36,7 +36,7 @@
     request = new <%-resetPasswordRequestModel.name%>()
 
     created() {
-      this.request.hash = this.hash || null
+      this.request.hash = this.hash ?? null
     }
   }
 </script>

@@ -16,14 +16,14 @@ import {AppHelper} from '@/helpers'
  * Web Server request & response config
  */
 const axiosInstance = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
+  baseURL: AppHelper.Env.API_URL,
 })
 
 /**
  * Socket Server config
  */
 const socketInstance = socket.create({
-  baseURL: process.env.VUE_APP_SOCKET_URL,
+  baseURL: AppHelper.Env.SOCKET_URL,
 })
 
 /**
@@ -31,7 +31,7 @@ const socketInstance = socket.create({
  */
 axiosInstance.interceptors.request.use((config) => {
   const pattern = /^(?:https?:)?\/\/[\w.]+[\w-/]+[\w?&=%]*$/g
-  const isRelativeUrl = !pattern.exec(config.url || '')
+  const isRelativeUrl = !pattern.exec(config.url ?? '')
 
   if (isRelativeUrl) {
     config.headers['Accept-Language'] = AppHelper.getLanguage()
@@ -70,7 +70,7 @@ axiosInstance.interceptors.response.use(
     }
 
 <%_ } _%>
-    if (response.status && response.status >= 400) {
+    if (response.status >= 400) {
       $.snotify.error(response.data.message || response.statusText, response.status.toString())
       return Promise.reject(response.data.message || response.statusText)
     }

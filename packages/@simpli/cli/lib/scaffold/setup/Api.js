@@ -321,10 +321,8 @@ module.exports = class Api {
   buildSignIn (auth = new Auth()) {
     let result = ''
 
-    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
-
     result += `    const request = this.$clone()\n`
-    result += `    request.${auth.passwordAttrName} = Helper.encrypt(this.${auth.passwordAttrName} || '')\n\n`
+    result += `    request.${auth.passwordAttrName} = Helper.encrypt(this.${auth.passwordAttrName} ?? '')\n\n`
 
     return this.buildMethod(result, 'request', 1000)
   }
@@ -333,11 +331,7 @@ module.exports = class Api {
    * Reserved API print
    */
   buildRecoverPasswordByMail () {
-    let result = ''
-
-    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
-
-    return this.buildMethod(result)
+    return this.buildMethod('')
   }
 
   /**
@@ -346,11 +340,9 @@ module.exports = class Api {
   buildResetPassword () {
     let result = ''
 
-    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
-
     result += `    const request = this.$clone()\n`
-    result += `    request.newPassword = Helper.encrypt(this.newPassword || '')\n`
-    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword || '')\n\n`
+    result += `    request.newPassword = Helper.encrypt(this.newPassword ?? '')\n`
+    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword ?? '')\n\n`
 
     return this.buildMethod(result, 'request')
   }
@@ -361,12 +353,10 @@ module.exports = class Api {
   buildChangePassword () {
     let result = ''
 
-    result += `    new Input${this.belongsToModel}Schema().validate(this)\n\n`
-
     result += `    const request = this.$clone()\n`
-    result += `    request.currentPassword = Helper.encrypt(this.currentPassword || '')\n`
-    result += `    request.newPassword = Helper.encrypt(this.newPassword || '')\n`
-    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword || '')\n\n`
+    result += `    request.currentPassword = Helper.encrypt(this.currentPassword ?? '')\n`
+    result += `    request.newPassword = Helper.encrypt(this.newPassword ?? '')\n`
+    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword ?? '')\n\n`
 
     return this.buildMethod(result, 'request')
   }

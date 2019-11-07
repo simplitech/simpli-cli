@@ -178,7 +178,7 @@ module.exports = class Auth {
 
     const userAttr = this.model.loginResp.objectAtrrs[0]
     if (userAttr) {
-      result += `    const id = authResponse.${userAttr.name} && authResponse.${userAttr.name}.$id || 0\n`
+      result += `    const id = authResponse.${userAttr.name}?.$id ?? 0\n`
     } else {
       result += `    const id = 0\n`
     }

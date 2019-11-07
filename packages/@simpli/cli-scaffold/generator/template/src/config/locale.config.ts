@@ -57,27 +57,3 @@ export const localeVeeValidate: LocaleOptions = {
   [Lang.EN_US]: require('vee-validate/dist/locale/en'),
   [Lang.PT_BR]: require('vee-validate/dist/locale/pt_BR'),
 }
-
-/**
- * ajv-i18n locale
- */
-export const localeAjvI18n: LocaleOptions = {
-  [Lang.EN_US]: require('ajv-i18n/localize/en'),
-  [Lang.AR]: require('ajv-i18n/localize/ar'),
-  [Lang.DE]: require('ajv-i18n/localize/de'),
-  [Lang.ES]: require('ajv-i18n/localize/es'),
-  [Lang.FR]: require('ajv-i18n/localize/fr'),
-  [Lang.HU]: require('ajv-i18n/localize/hu'),
-  [Lang.IT]: require('ajv-i18n/localize/it'),
-  [Lang.JA]: require('ajv-i18n/localize/ja'),
-  [Lang.NB]: require('ajv-i18n/localize/nb'),
-  [Lang.NL]: require('ajv-i18n/localize/nl'),
-  [Lang.PL]: require('ajv-i18n/localize/pl'),
-  [Lang.PT_BR]: require('ajv-i18n/localize/pt-BR'),
-  [Lang.RU]: require('ajv-i18n/localize/ru'),
-  [Lang.SK]: require('ajv-i18n/localize/sk'),
-  [Lang.SV]: require('ajv-i18n/localize/sv'),
-  [Lang.TH]: require('ajv-i18n/localize/th'),
-  [Lang.ZH_CN]: require('ajv-i18n/localize/zh'),
-  [Lang.ZH_TW]: require('ajv-i18n/localize/zh-TW'),
-}

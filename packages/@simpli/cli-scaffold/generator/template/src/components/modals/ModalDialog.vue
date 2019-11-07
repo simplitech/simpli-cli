@@ -3,14 +3,14 @@
     <await name="processing" v-if="options">
       <div class="verti text-center">
         <div class="horiz">
-          <h4 class="weight-1 font-semibold text-lg">
+          <div class="weight-1 font-semibold text-lg">
             {{ options.title }}
-          </h4>
+          </div>
         </div>
 
-        <p v-if="options.message" class="my-4 p-4 border border-black-100 rounded-lg">
+        <div v-if="options.message" class="my-4 p-4 border border-black-100 rounded-lg">
           {{ options.message }}
-        </p>
+        </div>
 
         <div class="grid grid-columns-2 grid-gap-2">
           <button type="button"
@@ -77,7 +77,7 @@
         }
       } else {
         this.options = {
-          title: this.title || '',
+          title: this.title ?? '',
           message: this.message,
           confirmText: this.confirmText,
           cancelText: this.cancelText,
