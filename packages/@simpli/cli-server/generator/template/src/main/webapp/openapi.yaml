@@ -1,0 +1,6 @@
+<%_ var serverName = options.serverSetup.serverName _%>
+openAPI:
+  info:
+    title: '<%-serverName%>'
+  servers:
+    - url: '/api'

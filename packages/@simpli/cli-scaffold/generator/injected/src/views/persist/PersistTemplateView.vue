@@ -66,7 +66,7 @@
 
     populateResource() {
   <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-      this.schema.collection<%-dependence.children[0]%>.list()
+      this.schema.collection<%-dependence.children[0]%>.list<%-dependence.children[0]%>()
   <%_ } _%>
     }
   <%_ } _%>

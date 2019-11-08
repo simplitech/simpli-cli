@@ -6,19 +6,19 @@ package <%-packageAddress%>.<%-moduleName%>.response
 
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.<%-moduleName%>.socket.NotificationSocket
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import io.swagger.v3.oas.annotations.media.Schema
+import javax.xml.bind.annotation.XmlRootElement
 
 /**
  * Authentication Response Model
  * @author Simpli CLI generator
  */
-@ApiModel(value = "AuthResponse")
+@XmlRootElement
 class AuthResponse(var token: String, var <%-userTable.instanceName%>: <%-userTable.modelName%>) {
-    val id @ApiModelProperty(hidden = true) get() = <%-userTable.instanceName%>.id
-    val <%-accountColumn.name%> @ApiModelProperty(hidden = true) get() = <%-userTable.instanceName%>.<%-accountColumn.name%>
+    val id @Schema(hidden = true) get() = <%-userTable.instanceName%>.id
+    val <%-accountColumn.name%> @Schema(hidden = true) get() = <%-userTable.instanceName%>.<%-accountColumn.name%>
 
-    @ApiModelProperty(hidden = true)
+    @Schema(hidden = true)
     fun sendNotification(content: String) {
         NotificationSocket.socket.send(content, id)
     }

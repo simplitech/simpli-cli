@@ -4,14 +4,14 @@ package <%-packageAddress%>.<%-moduleName%>.request
 
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.tools.Validator
-import io.swagger.annotations.ApiModel
 import javax.ws.rs.BadRequestException
+import javax.xml.bind.annotation.XmlRootElement
 
 /**
  * Recover Password By Mail Request Model
  * @author Simpli CLI generator
  */
-@ApiModel(value = "RecoverPasswordByMailRequest")
+@XmlRootElement
 class RecoverPasswordByMailRequest(var email: String?) {
     fun validate(lang: LanguageHolder) {
         if (email.isNullOrEmpty()) {

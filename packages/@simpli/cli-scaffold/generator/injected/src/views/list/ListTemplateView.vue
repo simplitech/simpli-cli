@@ -21,8 +21,8 @@
           {{ $t('app.totalLines', {total: collection.total}) }}
         </span>
 
-<%_ if (collection && collection.getApiByName('listCsv')) { _%>
-        <await name="listCsv" :spinnerScale="0.8">
+<%_ if (collection && collection.getCsvApi()) { _%>
+        <await name="<%-collection.getCsvApi()%>" :spinnerScale="0.8">
           <button @click="downloadCsv" class="btn btn--solid">
             {{ $t('app.downloadCsv') }}
           </button>
@@ -127,11 +127,15 @@
         // await this.toRemove.remove()
 <%_ } _%>
         this.toRemove = null
-        await this.collection.list()
+<%_ if (collection && collection.apis && collection.apis[0].name) { _%>
+        await this.collection.<%-collection.apis[0].name%>()
+<%_ } else { _%>
+        await this.query()
+<%_ } _%>
       }
     }
 <%_ } _%>
-<%_ if (collection && collection.getApiByName('listCsv')) { _%>
+<%_ if (collection && collection.getCsvApi()) { _%>
 
     async downloadCsv() {
       const {params} = this.collection
@@ -144,7 +148,7 @@
         .clearFilters()
         .addFilter(params)
 
-      await csv.listCsv()
+      await csv.<%-collection.getCsvApi()%>()
       new Csv<%-model.name%>Schema().downloadCsv(csv.all())
     }
 <%_ } _%>

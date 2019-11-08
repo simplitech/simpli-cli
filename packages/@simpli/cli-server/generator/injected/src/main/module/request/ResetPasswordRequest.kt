@@ -3,14 +3,14 @@
 package <%-packageAddress%>.<%-moduleName%>.request
 
 import br.com.simpli.model.LanguageHolder
-import io.swagger.annotations.ApiModel
 import javax.ws.rs.BadRequestException
+import javax.xml.bind.annotation.XmlRootElement
 
 /**
  * Reset Password Request Model
  * @author Simpli CLI generator
  */
-@ApiModel(value = "ResetPasswordRequest")
+@XmlRootElement
 class ResetPasswordRequest(var newPassword: String?, var confirmPassword: String?, var hash: String?) {
     fun validate(lang: LanguageHolder) {
         if (newPassword.isNullOrEmpty()) {

@@ -54,7 +54,7 @@ async function sync (options) {
       {
         name: 'url',
         type: 'input',
-        message: 'Enter swagger.json URL'
+        message: 'Enter the openapi.json or swagger.json URL'
       }
     ])
 

@@ -19,7 +19,7 @@ module.exports = async (inspectPaths = [], options) => {
       {
         name: 'url',
         type: 'input',
-        message: 'Enter swagger.json URL'
+        message: 'Enter the openapi.json or swagger.json URL'
       }
     ])
 
@@ -35,7 +35,8 @@ module.exports = async (inspectPaths = [], options) => {
     process.exit(1)
   }
 
-  const { paths, definitions } = swaggerJSON
+  const { paths, components, definitions } = swaggerJSON
+  const schemas = (components && components.schemas) || definitions // (openapi) || swagger
 
   const scaffoldSetup = new ScaffoldSetup()
   const swagger = {
@@ -44,7 +45,7 @@ module.exports = async (inspectPaths = [], options) => {
   }
 
   if (inspectPaths.length > 0) {
-    scaffoldSetup.injectSwagger(definitions, paths)
+    scaffoldSetup.injectSwagger(schemas, paths)
     swagger.api = keyBy(scaffoldSetup.apis, 'name')
     swagger.model = keyBy(scaffoldSetup.models, 'name')
   } else {

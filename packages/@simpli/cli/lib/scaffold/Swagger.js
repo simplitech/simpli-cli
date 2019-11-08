@@ -16,7 +16,7 @@ module.exports = class Swagger {
         {
           name: 'url',
           type: 'input',
-          message: 'Enter swagger.json URL'
+          message: 'Enter the openapi.json or swagger.json URL'
         }
       ])
       swaggerUrl = url
@@ -31,14 +31,16 @@ module.exports = class Swagger {
       process.exit(1)
     }
 
-    const { swagger, paths, definitions } = swaggerJSON
+    const { openapi, swagger, paths, components, definitions } = swaggerJSON
 
-    if (!swagger) {
+    if (!openapi && !swagger) {
       error('This file is not a valid swagger')
       process.exit(1)
     }
 
-    scaffoldSetup.injectSwagger(definitions, paths)
+    const schemas = (components && components.schemas) || definitions // (openapi) || swagger
+
+    scaffoldSetup.injectSwagger(schemas, paths)
 
     const availableModels = scaffoldSetup.availableModels
     const allModels = scaffoldSetup.models

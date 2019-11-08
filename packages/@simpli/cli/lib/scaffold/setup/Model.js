@@ -271,6 +271,11 @@ module.exports = class Model {
     return this.apis.find((api) => api.name === name)
   }
 
+  getCsvApi () {
+    const name = `listCsv${this.name}`
+    return this.apis.find((api) => api.name === name)
+  }
+
   get populateApi () {
     return this.apis.find((api) => api.methodUppercase === 'GET' && api.paths.find((path) => !!path.name.match(/^id\S*$/i))) || null
   }
@@ -580,7 +585,7 @@ module.exports = class Model {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          result += `        maxlength: 255,\n`
+          result += `        maxlength: ${attr.maxLength || 255},\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
@@ -593,7 +598,7 @@ module.exports = class Model {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          result += `        maxlength: 255,\n`
+          result += `        maxlength: ${attr.maxLength || 255},\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
@@ -643,7 +648,7 @@ module.exports = class Model {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'number',\n`
-          result += `        maxlength: 255,\n`
+          result += `        maxlength: ${attr.maxLength || 255},\n`
           if (attr.isInteger) {
             result += `        step: 1,\n`
           } else if (attr.isDouble) {
@@ -744,7 +749,7 @@ module.exports = class Model {
           result += `      is: Component.InputText,\n`
           result += `      bind: {\n`
           result += `        type: 'text',\n`
-          result += `        maxlength: 255,\n`
+          result += `        maxlength: ${attr.maxLength || 255},\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
@@ -969,7 +974,7 @@ module.exports = class Model {
         } else if (attr.isDatetime) {
           result += `        format: 'datetime',\n`
         } else {
-          result += `        maxLength: 255,\n`
+          result += `        maxLength: ${attr.maxLength || 255},\n`
         }
       }
       result += `      },\n`

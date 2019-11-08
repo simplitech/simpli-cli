@@ -25,7 +25,6 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/app/EnvProduction.kt', `../kotlin/${dir}/app/EnvProduction.kt`)
     api.renderFrom('./injected', 'src/main/app/PropertyHelper.kt', `../kotlin/${dir}/app/PropertyHelper.kt`)
     api.renderFrom('./injected', 'src/main/app/RequestLogger.kt', `../kotlin/${dir}/app/RequestLogger.kt`)
-    api.renderFrom('./injected', 'src/main/app/SwaggerInit.kt', `../kotlin/${dir}/app/SwaggerInit.kt`)
 
     // main/enums
     api.renderFrom('./injected', 'src/main/enums/Lang.kt', `../kotlin/${dir}/enums/Lang.kt`)

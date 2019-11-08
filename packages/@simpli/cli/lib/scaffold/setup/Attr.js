@@ -3,6 +3,7 @@ const ptBr = require('../../lang/pt-br.json')
 const camelCase = require('lodash.camelcase')
 const mergeWith = require('lodash.mergewith')
 const uniq = require('lodash.uniq')
+const stringToParagraph = require('../../util/stringToParagraph')
 
 const reservedWords = mergeWith(
   {},
@@ -23,6 +24,7 @@ module.exports = class Attr {
     this.belongsTo = belongsTo
     this.default = prop.default !== undefined ? prop.default : null
     this.type = prop.type
+    this.maxLength = prop.maxLength || null
     this.foreign = null
     this.foreignType = null
     this.foreignIsRequired = null
@@ -272,10 +274,11 @@ module.exports = class Attr {
    */
   build () {
     let result = ''
+    const description = stringToParagraph(this.description, 15, '   * ')
 
-    if (this.description) {
+    if (description) {
       result += `  /**\n`
-      result += `   * ${this.description}\n`
+      result += `   * ${description}\n`
       result += `   */\n`
     }
 
