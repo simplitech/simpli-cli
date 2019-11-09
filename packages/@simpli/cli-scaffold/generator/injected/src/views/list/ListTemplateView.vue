@@ -9,8 +9,8 @@
       <div class="header__items">
         <adap-searchfield :collection="collection" :placeholder="$t('app.search')" class="input h-8"/>
 
-<%_ if (collection && collection.apis && collection.apis[0].name) { _%>
-        <await name="<%-collection.apis[0].name%>" :spinnerScale="0.8"/>
+<%_ if (model.listApi) { _%>
+        <await name="<%-model.listApi.name%>" :spinnerScale="0.8"/>
 <%_ } else { _%>
         <await name="list" :spinnerScale="0.8"/>
 <%_ } _%>
@@ -21,8 +21,8 @@
           {{ $t('app.totalLines', {total: collection.total}) }}
         </span>
 
-<%_ if (collection && collection.getCsvApi()) { _%>
-        <await name="<%-collection.getCsvApi()%>" :spinnerScale="0.8">
+<%_ if (model.listCsvApi) { _%>
+        <await name="<%-model.listCsvApi.name%>" :spinnerScale="0.8">
           <button @click="downloadCsv" class="btn btn--solid">
             {{ $t('app.downloadCsv') }}
           </button>
@@ -92,7 +92,7 @@
 
 <script lang="ts">
   import {Component, Prop, Watch, Mixins} from 'vue-property-decorator'
-  import {$, Helper, MixinQueryRouter} from '@/simpli'
+  import {$, Helper, MixinQueryRouter} from 'simpli-web-sdk'
   <%-model.injectIntoDependence().build()%>
   <%-model.injectCollectionIntoDependence().build()%>
   <%-model.injectSchemaIntoDependence('List').build()%>
@@ -127,15 +127,15 @@
         // await this.toRemove.remove()
 <%_ } _%>
         this.toRemove = null
-<%_ if (collection && collection.apis && collection.apis[0].name) { _%>
-        await this.collection.<%-collection.apis[0].name%>()
+<%_ if (model.listApi) { _%>
+        await this.collection.<%-model.listApi.name%>()
 <%_ } else { _%>
         await this.query()
 <%_ } _%>
       }
     }
 <%_ } _%>
-<%_ if (collection && collection.getCsvApi()) { _%>
+<%_ if (model.listCsvApi) { _%>
 
     async downloadCsv() {
       const {params} = this.collection
@@ -148,7 +148,7 @@
         .clearFilters()
         .addFilter(params)
 
-      await csv.<%-collection.getCsvApi()%>()
+      await csv.<%-model.listCsvApi.name%>()
       new Csv<%-model.name%>Schema().downloadCsv(csv.all())
     }
 <%_ } _%>

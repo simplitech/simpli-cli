@@ -93,11 +93,11 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `  ${attr.name}: null,\n`
+        result += `    ${attr.name}: null,\n`
       } else if (attr.isObjectOrigin) {
-        result += `  ${attr.name}: null,\n`
+        result += `    ${attr.name}: null,\n`
       } else if (attr.isArrayOrigin) {
-        result += `  ${attr.name}: [],\n`
+        result += `    ${attr.name}: [],\n`
       }
     })
 
@@ -109,11 +109,11 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     if (!this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `  token: ({token}) => '',\n`
+      result += `    token: ({token}) => '',\n`
     }
 
     this.model.loginResp.attrs.forEach((attr) => {
-      result += `  ${attr.name}: ({${attr.name}}) => ${attr.name},\n`
+      result += `    ${attr.name}: ({${attr.name}}) => ${attr.name},\n`
     })
 
     return result
@@ -137,10 +137,10 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     if (this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `    if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
+      result += `      if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
     } else {
-      result += `    // TODO: define the token attribute\n`
-      result += `    // if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
+      result += `      // TODO: define the token attribute\n`
+      result += `      // if (authResponse.token) localStorage.setItem('token', authResponse.token)\n`
     }
 
     return result
@@ -178,16 +178,16 @@ module.exports = class Auth {
 
     const userAttr = this.model.loginResp.objectAtrrs[0]
     if (userAttr) {
-      result += `    const id = authResponse.${userAttr.name}?.$id ?? 0\n`
+      result += `      const id = authResponse.${userAttr.name}?.$id ?? 0\n`
     } else {
-      result += `    const id = 0\n`
+      result += `      const id = 0\n`
     }
 
     if (this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `    const token = authResponse.token || ''\n`
+      result += `      const token = authResponse.token || ''\n`
     } else {
-      result += `    // TODO: define the token attribute\n`
-      result += `    const token = ''\n`
+      result += `      // TODO: define the token attribute\n`
+      result += `      const token = ''\n`
     }
 
     return result
@@ -199,7 +199,7 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.name !== 'token') {
-        result += `    state.${attr.name} = response.${attr.name}\n`
+        result += `      state.${attr.name} = response.${attr.name}\n`
       }
     })
 
@@ -212,9 +212,9 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `    state.${attr.name} = null\n`
+        result += `      state.${attr.name} = null\n`
       } else if (attr.isObjectOrigin) {
-        result += `    state.${attr.name} = null\n`
+        result += `      state.${attr.name} = null\n`
       }
     })
 

@@ -3,7 +3,7 @@
  *
  * @author Simpli CLI generator
  */
-import {PageCollection, HttpExclude, Request} from '@/simpli'
+import {PageCollection, HttpExclude, Request} from 'simpli-web-sdk'
 <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
 <%-dependence.build()%>
 <%_ } _%>

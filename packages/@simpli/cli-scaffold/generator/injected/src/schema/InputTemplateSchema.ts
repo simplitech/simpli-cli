@@ -2,7 +2,7 @@
  * Input Schema of <%-model.name%>
  * @author Simpli CLI generator
  */
-import {Schema, FieldSet, FieldComponent, Component} from '@/simpli'
+import {Schema, FieldSet, FieldComponent, Component} from 'simpli-web-sdk'
 <%-model.injectIntoDependence().build()%>
 <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
 <%-dependence.buildAsCollection()%>

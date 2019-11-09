@@ -2,7 +2,7 @@
  * Csv Schema of <%-model.name%>
  * @author Simpli CLI generator
  */
-import {Helper, Schema, FieldSet} from '@/simpli'
+import {Helper, Schema, FieldSet} from 'simpli-web-sdk'
 <%-model.injectIntoDependence().build()%>
 
 /* TODO: review generated schema */

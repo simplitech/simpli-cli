@@ -18,6 +18,7 @@
     "no-consecutive-blank-lines": true,
     "no-null-keyword": false,
     "member-access": [true, "no-public"],
+    "member-ordering": false,
     "no-console": false,
     "no-shadowed-variable": false,
     "curly": [true, "ignore-same-line"],

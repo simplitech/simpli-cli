@@ -9,7 +9,7 @@
  */
 
 import axios, {AxiosError} from 'axios'
-import {$, Helper, Enum, socket} from '@/simpli'
+import {$, Helper, Enum, socket} from 'simpli-web-sdk'
 import {AppHelper} from '@/helpers'
 
 /**

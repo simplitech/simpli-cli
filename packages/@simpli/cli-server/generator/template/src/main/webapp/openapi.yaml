@@ -2,5 +2,7 @@
 openAPI:
   info:
     title: '<%-serverName%>'
+    description: 'Welcome to <%-serverName%> API documentation.'
+    version: 0.1.0
   servers:
     - url: '/api'

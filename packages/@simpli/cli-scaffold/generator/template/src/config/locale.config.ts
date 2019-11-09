@@ -8,7 +8,7 @@
  * This configuration will be set in @/bootstrap/app.ts
  */
 
-import {Lang, Currency, LocaleOptions} from '@/simpli'
+import {Lang, Currency, LocaleOptions} from 'simpli-web-sdk'
 <%_ var availableLanguages = rootOptions.scaffoldSetup.availableLanguages _%>
 <%_ var camelCase = rootOptions.scaffoldSetup.camelCase _%>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>

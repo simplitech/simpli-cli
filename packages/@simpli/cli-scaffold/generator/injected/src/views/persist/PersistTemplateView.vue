@@ -41,7 +41,7 @@
 
 <script lang="ts">
   import {Component, Prop, Watch, Provide, Vue} from 'vue-property-decorator'
-  import {$, Helper} from '@/simpli'
+  import {$, Helper} from 'simpli-web-sdk'
   <%-model.injectIntoDependence().build()%>
   <%-model.injectSchemaIntoDependence('Input').build()%>
 

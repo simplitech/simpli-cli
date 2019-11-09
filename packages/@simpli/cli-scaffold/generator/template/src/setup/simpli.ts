@@ -5,7 +5,7 @@
  * This file contains the set responsible for app initialization
  */
 
-import {Simpli} from '@/simpli'
+import Simpli from 'simpli-web-sdk'
 
 import {axiosInstance, socketInstance} from '@/config/http.config'
 import {defaultCurrency, defaultLang, localeVueI18n, localeVeeValidate} from '@/config/locale.config'

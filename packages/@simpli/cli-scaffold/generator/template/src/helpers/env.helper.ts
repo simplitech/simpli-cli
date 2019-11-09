@@ -1,7 +1,7 @@
 /**
  * Environment variables defined in .env[.*]
  */
-import {Lang, Currency} from '@/simpli'
+import {Lang, Currency} from 'simpli-web-sdk'
 
 export abstract class Env {
   static readonly APP_ENV = process.env.VUE_APP_ENV!

@@ -6,7 +6,7 @@
 
     <modal-dialog name="dialog"/>
 
-    <vue-snotify :class="ToastConfig.ToastDefaultStyle"/>
+    <vue-snotify :class="toastStyle"/>
   </div>
 </template>
 
@@ -18,7 +18,7 @@
 import {MetaInfo} from 'vue-meta'
 import {Component, Vue} from 'vue-property-decorator'
 import {Mutation} from 'vuex-class'
-import {$, ToastConfig} from '@/simpli'
+import {$, ToastConfig} from 'simpli-web-sdk'
 import ModalDialog from '@/components/modals/ModalDialog.vue'
 
 const metaInfo = (): MetaInfo => ({
@@ -35,7 +35,9 @@ export default class App extends Vue {
   @Mutation('auth/POPULATE_TOKEN') populateToken!: Function
 
 <%_ } _%>
-  ToastConfig = ToastConfig
+  get toastStyle() {
+    return ToastConfig.ToastDefaultStyle
+  }
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
   created() {

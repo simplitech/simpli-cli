@@ -1,4 +1,4 @@
-import {Currency, Lang} from '@/simpli'
+import {Currency, Lang} from 'simpli-web-sdk'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ for (var i in auth.resolvedDependencies) { var dependence = auth.resolvedDependencies[i] _%>

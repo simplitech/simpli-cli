@@ -27,7 +27,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import {State, Action, Getter} from 'vuex-class'
-  import {Helper} from '@/simpli'
+  import {Helper} from 'simpli-web-sdk'
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.auth.model.loginHolder _%>
   <%-loginHolderModel.injectIntoDependence().build()%>
 <%-loginHolderModel.injectSchemaIntoDependence('Input', false).build(1)%>

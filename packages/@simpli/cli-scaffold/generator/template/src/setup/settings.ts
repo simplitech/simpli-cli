@@ -6,7 +6,7 @@
  */
 
 import Vue from 'vue'
-import {$, Schema, PageCollection, ToastConfig} from '@/simpli'
+import {$, Schema, PageCollection, ToastConfig} from 'simpli-web-sdk'
 import {AppHelper} from '@/helpers'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'

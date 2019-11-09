@@ -33,7 +33,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import {$} from '@/simpli'
+  import {$} from 'simpli-web-sdk'
 
   export interface PayloadObject {
     title: string,

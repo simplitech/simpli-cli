@@ -8,7 +8,7 @@
  * This configuration will be set in @/bootstrap/app.ts
  */
 
-import {FilterOptions} from '@/simpli'
+import {FilterOptions} from 'simpli-web-sdk'
 
 /**
  * VUE Filters

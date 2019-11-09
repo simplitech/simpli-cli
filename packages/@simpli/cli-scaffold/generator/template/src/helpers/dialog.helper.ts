@@ -1,4 +1,4 @@
-import {$} from '@/simpli'
+import {$} from 'simpli-web-sdk'
 
 export class Dialog {
   title: string = ''

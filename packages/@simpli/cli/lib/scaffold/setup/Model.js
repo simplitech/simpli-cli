@@ -271,9 +271,12 @@ module.exports = class Model {
     return this.apis.find((api) => api.name === name)
   }
 
-  getCsvApi () {
-    const name = `listCsv${this.name}`
-    return this.apis.find((api) => api.name === name)
+  get listApi () {
+    return this.apis.find((api) => api.methodUppercase === 'GET' && api.name === `list${this.name}`) || null
+  }
+
+  get listCsvApi () {
+    return this.apis.find((api) => api.methodUppercase === 'GET' && api.name === `listCsv${this.name}`) || null
   }
 
   get populateApi () {
@@ -336,14 +339,7 @@ module.exports = class Model {
    */
   setDependencies () {
     const dependencies = []
-    const simpliModule = '@/simpli'
-
-    // Add moment
-    if (this.attrs.find((attr) => attr.isDate || attr.isDatetime)) {
-      const momentDep = new Dependence(`moment`, true, false)
-      momentDep.addChild('moment')
-      dependencies.push(momentDep)
-    }
+    const simpliModule = 'simpli-web-sdk'
 
     const simpliCommons = new Dependence(simpliModule)
     const simpliDecorator = new Dependence(simpliModule)
@@ -427,7 +423,7 @@ module.exports = class Model {
 
     // Add from APIs
     this.bodyApis.forEach((api) => {
-      const modelResource = new Dependence(api.body.modele)
+      const modelResource = new Dependence(api.body.model)
       modelResource.resolved = false
       modelResource.addChild(api.body.model)
       if (api.body.model !== this.name) list.push(modelResource)

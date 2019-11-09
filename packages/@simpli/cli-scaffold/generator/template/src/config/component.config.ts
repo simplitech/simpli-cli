@@ -7,7 +7,7 @@
  * This configuration will be set in @/bootstrap/app.ts
  */
 
-import {ComponentOptions} from '@/simpli'
+import {ComponentOptions} from 'simpli-web-sdk'
 
 import ModalRemove from '@/components/modals/ModalRemove.vue'
 
