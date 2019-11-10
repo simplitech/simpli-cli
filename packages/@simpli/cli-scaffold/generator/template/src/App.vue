@@ -17,7 +17,6 @@
 <script lang="ts">
 import {MetaInfo} from 'vue-meta'
 import {Component, Vue} from 'vue-property-decorator'
-import {Mutation} from 'vuex-class'
 import {$, ToastConfig} from 'simpli-web-sdk'
 import ModalDialog from '@/components/modals/ModalDialog.vue'
 
@@ -31,17 +30,13 @@ const metaInfo = (): MetaInfo => ({
   components: {ModalDialog},
 })
 export default class App extends Vue {
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-  @Mutation('auth/POPULATE_TOKEN') populateToken!: Function
-
-<%_ } _%>
   get toastStyle() {
     return ToastConfig.ToastDefaultStyle
   }
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
   created() {
-    this.populateToken()
+    this.$auth.populateToken()
   }
 <%_ } _%>
 }

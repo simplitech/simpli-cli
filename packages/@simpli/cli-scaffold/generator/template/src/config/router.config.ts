@@ -14,9 +14,9 @@ import DefaultLayout from '@/views/layouts/DefaultLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
-import SignInView from '@/views/SignInView.vue'
-import RecoverPasswordByMailView from '@/views/RecoverPasswordByMailView.vue'
-import ResetPasswordView from '@/views/ResetPasswordView.vue'
+import SignInView from '@/views/auth/SignInView.vue'
+import RecoverPasswordByMailView from '@/views/auth/RecoverPasswordByMailView.vue'
+import ResetPasswordView from '@/views/auth/ResetPasswordView.vue'
 <%_ } _%>
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
 <%_ var resourceModels = rootOptions.scaffoldSetup.resourceModels _%>

@@ -10,20 +10,24 @@
 
 import axios, {AxiosError} from 'axios'
 import {$, Helper, Enum, socket} from 'simpli-web-sdk'
-import {AppHelper} from '@/helpers'
+import {Env} from '@/helpers/Env'
+import {App} from '@/helpers/vuex/App'
+<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
+import {Auth} from '@/helpers/vuex/Auth'
+<%_ } _%>
 
 /**
  * Web Server request & response config
  */
 const axiosInstance = axios.create({
-  baseURL: AppHelper.Env.API_URL,
+  baseURL: Env.API_URL,
 })
 
 /**
  * Socket Server config
  */
 const socketInstance = socket.create({
-  baseURL: AppHelper.Env.SOCKET_URL,
+  baseURL: Env.SOCKET_URL,
 })
 
 /**
@@ -34,12 +38,12 @@ axiosInstance.interceptors.request.use((config) => {
   const isRelativeUrl = !pattern.exec(config.url ?? '')
 
   if (isRelativeUrl) {
-    config.headers['Accept-Language'] = AppHelper.getLanguage()
-    config.headers['X-Client-Version'] = `w${AppHelper.getVersion()}` // w = web
+    config.headers['Accept-Language'] = App.language
+    config.headers['X-Client-Version'] = `w${App.version}` // w = web
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
-    if (AppHelper.isLogged()) {
-      config.headers.Authorization = `Bearer ${AppHelper.getToken()}`
+    if (Auth.isLogged) {
+      config.headers.Authorization = `Bearer ${Auth.token}`
     }
 <%_ } _%>
   }
@@ -66,7 +70,7 @@ axiosInstance.interceptors.response.use(
 
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
     if (response.status === Enum.HttpStatus.UNAUTHORIZED) {
-      AppHelper.signOut()
+      Auth.signOut()
     }
 
 <%_ } _%>

@@ -91,7 +91,8 @@ module.exports = (api, options) => {
       'vue-property-decorator': '^8.1.0',
       'vue-spinner': '^1.0.3',
       'vuex': '^3.0.1',
-      'vuex-class': '^0.3.1'
+      'vuex-class': '^0.3.1',
+      'vuex-typescript': '^3.0.2'
     },
     devDependencies: {
       '@babel/plugin-proposal-nullish-coalescing-operator': '^7.4.4',

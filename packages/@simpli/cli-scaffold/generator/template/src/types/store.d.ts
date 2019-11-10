@@ -22,10 +22,5 @@ export interface RootState {
 export interface AuthState {
 <%-rootOptions.scaffoldSetup.auth.buildType()-%>
   cachePath: string | null,
-  eventListener: AuthEventListener,
-}
-
-export interface AuthEventListener {
-  [key: string]: Array<(...param: any[]) => void>
 }
 <%_ } _%>

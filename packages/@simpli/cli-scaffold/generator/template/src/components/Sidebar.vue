@@ -35,7 +35,7 @@
         <div class="weight-1"></div>
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
-        <a @click="signOut()" class="pill horiz h-8 items-center px-3 mb-1">
+        <a @click="$auth.signOut()" class="pill horiz h-8 items-center px-3 mb-1">
           <i class="icon icon-logout mr-1"/>
           {{$t('app.logout')}}
         </a>
@@ -44,7 +44,7 @@
         <footer class="p-2 text-white-700 hidden md:block">
           <small>
             <b>Version</b>
-            {{version}}
+            {{$app.version}}
           </small>
         </footer>
       </div>
@@ -55,15 +55,9 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator'
-  import {Action, Getter} from 'vuex-class'
 
   @Component
   export default class Sidebar extends Vue {
-    @Getter('version') version!: string
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    @Action('auth/signOut') signOut!: Function
-<%_ } _%>
-
     menu = false
     screenWidth = window.innerWidth
 

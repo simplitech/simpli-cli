@@ -7,7 +7,6 @@
 
 import Vue from 'vue'
 import {$, Schema, PageCollection, ToastConfig} from 'simpli-web-sdk'
-import {AppHelper} from '@/helpers'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import GridLoader from 'vue-spinner/src/GridLoader.vue'
@@ -26,7 +25,15 @@ import RingLoader from 'vue-spinner/src/RingLoader.vue'
 import BounceLoader from 'vue-spinner/src/BounceLoader.vue'
 import DotLoader from 'vue-spinner/src/DotLoader.vue'
 
+import {Env} from '@/helpers/Env'
+import {App} from '@/helpers/vuex/App'
+import {Auth} from '@/helpers/vuex/Auth'
+
 Vue.config.productionTip = false
+
+Vue.prototype.$env = Env
+Vue.prototype.$app = App
+Vue.prototype.$auth = Auth
 
 $.await.addLoader('PulseLoader', PulseLoader)
 $.await.addLoader('GridLoader', GridLoader)
@@ -47,7 +54,7 @@ $.await.addLoader('DotLoader', DotLoader)
 
 $.await.defaultTransition = 'fade'
 $.await.defaultSpinner = 'ScaleLoader'
-$.await.defaultSpinnerColor = AppHelper.Env.PRIMARY_COLOR
+$.await.defaultSpinnerColor = Env.PRIMARY_COLOR
 $.await.defaultSpinnerPadding = '0'
 $.await.defaultSpinnerScale = 1
 

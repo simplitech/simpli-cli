@@ -16,9 +16,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-import {Getter, Action} from 'vuex-class'
-<%_ } _%>
 import Sidebar from '@/components/Sidebar.vue'
 
 @Component({
@@ -26,12 +23,10 @@ import Sidebar from '@/components/Sidebar.vue'
 })
 export default class AuthLayout extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-  @Action('auth/auth') auth!: Function
-
   authorized = false
 
   async mounted() {
-    await this.auth()
+    await this.$auth.authenticate()
     this.authorized = true
   }
 <%_ } _%>

@@ -1,5 +1,4 @@
 const Dependence = require('./Dependence')
-const camelCase = require('lodash.camelcase')
 
 module.exports = class Auth {
   constructor () {
@@ -76,12 +75,15 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     if (!this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `export const getToken = () => store.getters['auth/token'] as string\n`
+      result += `  static get token() {\n`
+      result += `    return read(getters.token)(store)\n`
+      result += `  }\n\n`
     }
 
     this.model.loginResp.attrs.forEach((attr) => {
-      result += `export const ${camelCase('get-' + attr.name)} = () `
-      result += `=> store.getters['auth/${attr.name}'] as ${attr.type}\n`
+      result += `  static get ${attr.name}() {\n`
+      result += `    return read(getters.${attr.name})(store)\n`
+      result += `  }\n\n`
     })
 
     return result
@@ -109,11 +111,11 @@ module.exports = class Auth {
     if (!this.model.loginResp) return result
 
     if (!this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
-      result += `    token: ({token}) => '',\n`
+      result += `    token: (state: AuthState) => state.token,\n`
     }
 
     this.model.loginResp.attrs.forEach((attr) => {
-      result += `    ${attr.name}: ({${attr.name}}) => ${attr.name},\n`
+      result += `    ${attr.name}: (state: AuthState) => state.${attr.name},\n`
     })
 
     return result

@@ -1,9 +1,10 @@
 // keep this file as minimal as possible, prefer creating a component style instead of styling an element
 
 body {
-  @apply font-display text-xs; // defined in tailwind.config
+  @apply font-display text-xs text-black-700; // defined in tailwind.config
 }
 
 a {
+  @apply transition;
   cursor: pointer;
 }

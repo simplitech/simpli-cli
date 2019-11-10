@@ -1,20 +1,18 @@
-import {ActionTree, GetterTree, ModuleTree, MutationTree, StoreOptions} from 'vuex'
+import {ActionContext, ModuleTree, StoreOptions} from 'vuex'
+import {getStoreAccessors} from 'vuex-typescript'
 import Simpli, {Enum} from 'simpli-web-sdk'
 import {RootState} from '@/types/store'
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-import {AuthModule} from '@/store/modules/AuthModule'
-<%_ } _%>
 import {defaultCurrency, defaultLang} from '@/config/locale.config'
 const app = require('../../package.json')
 
+export type RootContext = ActionContext<RootState, RootState>
+
 export class RootStore implements StoreOptions<RootState> {
+  readonly accessors = getStoreAccessors<RootState, RootState>('')
+
   strict = process.env.NODE_ENV !== 'production'
 
-  modules: ModuleTree<RootState> = {
-<%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
-    auth: new AuthModule(),
-<%_ } _%>
-  }
+  modules?: ModuleTree<RootState>
 
   state: RootState = {
     version: app.version,
@@ -22,37 +20,37 @@ export class RootStore implements StoreOptions<RootState> {
     currency: defaultCurrency,
   }
 
-  getters: GetterTree<RootState, RootState> = {
-    version: ({version}) => version,
-    language: ({language}) => language,
-    currency: ({currency}) => currency,
+  getters = {
+    version: (state: RootState) => state.version,
+    language: (state: RootState) => state.language,
+    currency: (state: RootState) => state.currency,
   }
 
-  actions: ActionTree<RootState, RootState> = {
+  actions = {
     /**
      * Change app language
      */
-    setLang: (context, val: Enum.Lang) => {
-      Simpli.changeLocale(val)
-      context.commit('SET_LANG', val)
+    setLang(context: RootContext, lang: Enum.Lang) {
+      Simpli.changeLocale(lang)
+      context.commit('SET_LANG', lang)
     },
 
     /**
      * Change app currency
      */
-    setCurrency: (context, val: Enum.Currency) => {
-      Simpli.changeCurrency(val)
-      context.commit('SET_CURRENCY', val)
+    setCurrency(context: RootContext, currency: Enum.Currency) {
+      Simpli.changeCurrency(currency)
+      context.commit('SET_CURRENCY', currency)
     },
   }
 
-  mutations: MutationTree<RootState> = {
-    SET_LANG(state, val) {
-      state.language = val
+  mutations = {
+    SET_LANG(state: RootState, lang: Enum.Lang) {
+      state.language = lang
     },
 
-    SET_CURRENCY(state, val) {
-      state.currency = val
+    SET_CURRENCY(state: RootState, currency: Enum.Currency) {
+      state.currency = currency
     },
   }
 }
