@@ -85,6 +85,10 @@ module.exports = class Column {
     return null
   }
 
+  get hasMaxlength () {
+    return Boolean(this.size && (this.isString || this.isLong))
+  }
+
   get isString () {
     return this.kotlinType === 'String'
   }
@@ -169,4 +173,82 @@ module.exports = class Column {
   get isCreatedAt () { return this.is('createdAt') }
   get isDeletedAt () { return this.is('deletedAt') }
   get isSoftDelete () { return this.is('softDelete') }
+
+  get hasSchemaParams () {
+    return !!this.schemaParams.length
+  }
+
+  get schemaParams () {
+    const params = []
+    if (this.isRequired) {
+      params.push('required = true')
+    }
+    if (this.hasMaxlength) {
+      params.push(`maxLength = ${this.size}`)
+    }
+    if (this.commentary) {
+      params.push(`description = "${this.commentary.replace(/(\r\n|\n|\r)/gm, '')}"`)
+    }
+    return params
+  }
+
+  buildSchema (indent = 1, forceNewLine = false) {
+    let indentSpace = ''
+    for (let i = 0; i < indent; i++) indentSpace += '    '
+
+    const newLine = this.commentary ? `\n` : ''
+
+    if (this.hasSchemaParams) {
+      return `${indentSpace}@Schema(${this.schemaParams.join(', ')})${forceNewLine ? '\n' : newLine}`
+    }
+
+    return ''
+  }
+
+  build () {
+    let result = this.buildSchema()
+
+    if (result && !this.commentary) {
+      result += ' '
+    } else {
+      result += '    '
+    }
+
+    result += `var ${this.name}: ${this.kotlinType}${this.qMark} = ${this.defaultValue}\n`
+
+    if (this.commentary) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildForeign () {
+    let result = ''
+    if (this.isRequired) {
+      result = `    var ${this.name}: ${this.kotlinType}\n`
+    } else {
+      result = `    var ${this.name}: ${this.kotlinType}?\n`
+    }
+    result += this.buildSchema(2, true)
+    if (this.isRequired) {
+      result += `        get() = ${this.foreign.name}?.${this.foreign.referencedColumnName} ?: ${this.isString ? '\"\"' : '0'}\n`
+    } else {
+      result += `        get() = ${this.foreign.name}?.${this.foreign.referencedColumnName}\n`
+    }
+    result += `        set(value) {\n`
+    if (!this.isRequired) {
+      result += `            if (value == null) {\n`
+      result += `                ${this.foreign.name} = null\n`
+      result += `                return\n`
+      result += `            }\n`
+    }
+    result += `            if (${this.foreign.name} == null) {\n`
+    result += `                ${this.foreign.name} = ${this.foreign.referencedTableModelName}()\n`
+    result += `            }\n`
+    result += `            ${this.foreign.name}?.${this.foreign.referencedColumnName} = value\n`
+    result += `        }\n\n`
+
+    return result
+  }
 }

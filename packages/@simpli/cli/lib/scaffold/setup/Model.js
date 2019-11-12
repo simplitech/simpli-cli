@@ -71,6 +71,13 @@ module.exports = class Model {
   }
 
   /**
+   * Filter attrs by ID
+   */
+  get idAtrrs () {
+    return this.attrs.filter((attr) => attr.isID)
+  }
+
+  /**
    * Filter attrs by foreign
    */
   get foreignAtrrs () {
@@ -82,6 +89,26 @@ module.exports = class Model {
    */
   get nonForeignAtrrs () {
     return this.attrs.filter((attr) => !attr.isForeign)
+  }
+
+  get modelAttrs () {
+    return this.attrs.filter((attr) => attr.isModel)
+  }
+
+  get descriptionAttrs () {
+    return this.attrs.filter((attr) => attr.description)
+  }
+
+  get requiredAndNotDescriptionAttrs () {
+    return this.attrs.filter((attr) => attr.isRequired && !attr.description)
+  }
+
+  get simpleAttrs () {
+    return this.attrs.filter((attr) => !attr.isRequired && !attr.description)
+  }
+
+  get passwordAttrs () {
+    return this.attrs.filter((attr) => attr.isPassword)
   }
 
   /**
@@ -1016,6 +1043,123 @@ module.exports = class Model {
     })
 
     result = result.slice(0, -1) // remove last line
+
+    return result
+  }
+
+  buildApis (auth) {
+    let result = ''
+
+    this.apis.forEach((api) => {
+      result += api.build(auth)
+      result += '\n'
+    })
+
+    result = result.slice(0, -2) // remove last line
+
+    return result
+  }
+
+  buildIdsAttr () {
+    let result = ''
+
+    this.idAtrrs.forEach((attr, i) => {
+      result += attr.build()
+
+      if (attr.description || attr.responses.length || i === this.idAtrrs.length - 1) {
+        result += '\n'
+      }
+    })
+
+    return result
+  }
+
+  buildModelAttrs () {
+    let result = ''
+
+    this.modelAttrs.forEach((attr, i) => {
+      result += attr.build()
+
+      if (attr.description || attr.responses.length || i === this.modelAttrs.length - 1) {
+        result += '\n'
+      }
+    })
+
+    return result
+  }
+
+  buildDescriptionsAttrs () {
+    let result = ''
+
+    this.descriptionAttrs.forEach((attr, i) => {
+      if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
+        result += attr.build()
+
+        if (attr.description || attr.responses.length || i === this.descriptionAttrs.length - 1) {
+          result += '\n'
+        }
+      }
+    })
+
+    return result
+  }
+
+  buildRequiredAndNotDescriptionAttrs () {
+    let result = ''
+
+    this.requiredAndNotDescriptionAttrs.forEach((attr, i) => {
+      if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
+        result += attr.build()
+
+        if (attr.description || attr.responses.length || i === this.requiredAndNotDescriptionAttrs.length - 1) {
+          result += '\n'
+        }
+      }
+    })
+
+    return result
+  }
+
+  buildSimpleAttrs () {
+    let result = ''
+
+    this.simpleAttrs.forEach((attr, i) => {
+      if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
+        result += attr.build()
+
+        if (attr.description || attr.responses.length || i === this.simpleAttrs.length - 1) {
+          result += '\n'
+        }
+      }
+    })
+
+    return result
+  }
+
+  buildPasswordAttrs () {
+    let result = ''
+
+    this.passwordAttrs.forEach((attr, i) => {
+      if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType)) {
+        result += attr.build()
+
+        if (attr.description || attr.responses.length || i === this.passwordAttrs.length - 1) {
+          result += '\n'
+        }
+      }
+    })
+
+    return result
+  }
+
+  buildForeignAttrs () {
+    let result = ''
+
+    this.foreignAtrrs.forEach((attr) => {
+      if (!attr.isID && !attr.isModel && attr.foreign && attr.foreignType) {
+        result += attr.buildForeign()
+      }
+    })
 
     return result
   }

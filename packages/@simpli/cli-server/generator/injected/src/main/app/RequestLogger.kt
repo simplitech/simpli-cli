@@ -29,7 +29,6 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
     @Context
     var sr: HttpServletRequest? = null
 
-    @Throws(IOException::class)
     override fun filter(request: ContainerRequestContext, response: ContainerResponseContext) {
         if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
@@ -42,9 +41,7 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
         }
     }
 
-    @Throws(IOException::class, WebApplicationException::class)
     override fun aroundReadFrom(context: ReaderInterceptorContext): Any {
-
         val ist = context.inputStream
         val body = BufferedReader(InputStreamReader(ist)).lines()
                 .collect(Collectors.joining("\n")) // getting the body

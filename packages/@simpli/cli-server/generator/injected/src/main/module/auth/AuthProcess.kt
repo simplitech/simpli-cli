@@ -35,7 +35,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Get the authentication information by the token
      */
-    @Throws(UnauthorizedException::class)
     fun authenticate(param: DefaultParam.Auth): AuthResponse {
         val token = extractToken(param.authorization ?: "") ?: throw UnauthorizedException(context.lang["invalid_token"])
         try {
@@ -54,7 +53,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Get the authentication information according to a login attempt
      */
-    @Throws(UnauthorizedException::class)
     fun signIn(request: AuthRequest): AuthResponse {
         try {
             val token = requestToToken(request)
@@ -72,7 +70,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Send an e-mail in order to reset the password
      */
-    @Throws(BadRequestException::class)
     fun recoverPasswordByMail(request: RecoverPasswordByMailRequest): Long {
         request.validate(context.lang)
 
@@ -90,7 +87,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Reset the password
      */
-    @Throws(BadRequestException::class)
     fun resetPassword(request: ResetPasswordRequest): String {
         request.validate(context.lang)
 
@@ -116,7 +112,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Change the password
      */
-    @Throws(BadRequestException::class)
     fun changePassword(request: ChangePasswordRequest, auth: AuthResponse): Long {
         val id = auth.id
         val <%-userTable.instanceName%> = auth.<%-userTable.instanceName%>
@@ -139,7 +134,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Get the ID by auth request
      */
-    @Throws(BadRequestException::class, NotFoundException::class)
     fun getId(request: AuthRequest): Long {
         request.validate(context.lang)
 
@@ -149,7 +143,6 @@ class AuthProcess(val context: RequestContext) {
     /**
      * Get the user by ID
      */
-    @Throws(NotFoundException::class)
     fun get<%-userTable.modelName%>(<%-userTable.idColumn.name%>: <%-userTable.idColumn.kotlinType%>): <%-userTable.modelName%> {
         return dao.get<%-userTable.modelName%>(<%-userTable.idColumn.name%>) ?: throw NotFoundException(context.lang["user_not_found"])
     }

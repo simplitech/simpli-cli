@@ -53,7 +53,6 @@ object Cast {
     internal class DateTimeTypeAdapter : JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
         private val simpleDateFormat = SimpleDateFormat(Env.props.dateFormat)
 
-        @Throws(JsonParseException::class)
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): DateTime {
             try {
                 val date = simpleDateFormat.parse(json.asString)

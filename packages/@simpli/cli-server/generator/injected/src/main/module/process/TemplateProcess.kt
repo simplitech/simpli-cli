@@ -24,7 +24,6 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 
     val dao = <%-table.modelName%>Dao(context.con)
 
-    @Throws(BadRequestException::class, NotFoundException::class)
     fun get(<%-table.primariesByParam(true, true)%>): <%-table.modelName%> {
         // TODO: review generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
@@ -102,7 +101,6 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 <%_ } _%>
     }
 
-    @Throws(BadRequestException::class)
     fun create(model: <%-table.modelName%>): Long {
         // TODO: review generated method
 <%-table.buildCreateApplyModel()%>
@@ -123,7 +121,6 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 <%_ } _%>
     }
 
-    @Throws(BadRequestException::class)
     fun update(model: <%-table.modelName%>): Int {
         // TODO: review generated method
 <%-table.buildUpdateApplyModel()%>
@@ -135,7 +132,6 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
-    @Throws(BadRequestException::class, NotFoundException::class)
     fun remove(<%-table.primariesByParam(true, true)%>): Long {
         // TODO: review generated method
 <%_ if (table.idsColumn.length <= 1) { _%>

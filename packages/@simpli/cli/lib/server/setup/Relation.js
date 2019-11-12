@@ -32,4 +32,14 @@ module.exports = class Relation {
   get isRequired () {
     return this.columnNullable === 'NO'
   }
+
+  build () {
+    let result = ''
+    if (this.isManyToMany) {
+      result += `    var ${this.name}: MutableList<${this.referencedTableModelName}>? = null\n`
+    } else {
+      result += `    var ${this.name}: ${this.referencedTableModelName}? = null\n`
+    }
+    return result
+  }
 }

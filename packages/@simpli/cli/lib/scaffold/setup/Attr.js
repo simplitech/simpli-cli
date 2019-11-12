@@ -83,6 +83,9 @@ module.exports = class Attr {
 
     return this.isPrimaryOrigin && idMatch
   }
+  get isModel () {
+    return this.isObjectOrigin || (this.isArrayOrigin && !this.isArrayPrimitive)
+  }
   get isString () { return this.isPrimaryOrigin && this.type === 'string' }
   get isInteger () { return this.isPrimaryOrigin && this.type === 'integer' }
   get isDouble () { return this.isPrimaryOrigin && this.type === 'double' }
@@ -154,7 +157,7 @@ module.exports = class Attr {
     // Decorator in type 'ID' is not allowed
     if (this.isID || this.isForeign) return result
 
-    if (this.isObjectOrigin || (this.isArrayOrigin && !this.isArrayPrimitive)) {
+    if (this.isModel) {
       result.push({
         title: 'ResponseSerialize',
         attr: `${this.type}`
@@ -269,10 +272,7 @@ module.exports = class Attr {
     return 'null'
   }
 
-  /**
-   * Print this attribute into the template generator
-   */
-  build () {
+  buildCommentary () {
     let result = ''
     const description = stringToParagraph(this.description, 15, '   * ')
 
@@ -282,26 +282,46 @@ module.exports = class Attr {
       result += `   */\n`
     }
 
+    return result
+  }
+
+  /**
+   * Print this attribute into the template generator
+   */
+  build () {
+    let result = this.buildCommentary()
+
     this.responses.forEach((resp) => {
       result += `  @${resp.title}(${resp.attr})\n`
     })
 
-    if (!this.foreign || !this.foreignType) {
-      result += `  ${this.name}: ${this.typeBuild} = ${this.valueBuild}\n`
-    } else {
-      result += `  get ${this.name}() {\n`
-      if (!this.foreignIsRequired) {
-        result += `    if (!this.${this.foreign}) return 0\n`
-      }
-      result += `    return this.${this.foreign}.$id\n`
-      result += `  }\n`
-      result += `  set ${this.name}(val) {\n`
-      if (!this.foreignIsRequired) {
-        result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
-      }
-      result += `    this.${this.foreign}.$id = val\n`
-      result += `  }\n`
+    result += `  ${this.name}: ${this.typeBuild} = ${this.valueBuild}\n`
+
+    return result
+  }
+
+  /**
+   * Print this attribute foreign into the template generator
+   */
+  buildForeign () {
+    let result = this.buildCommentary()
+
+    this.responses.forEach((resp) => {
+      result += `  @${resp.title}(${resp.attr})\n`
+    })
+
+    result += `  get ${this.name}() {\n`
+    if (!this.foreignIsRequired) {
+      result += `    if (!this.${this.foreign}) return 0\n`
     }
+    result += `    return this.${this.foreign}.$id\n`
+    result += `  }\n`
+    result += `  set ${this.name}(val) {\n`
+    if (!this.foreignIsRequired) {
+      result += `    if (!this.${this.foreign}) this.${this.foreign} = new ${this.foreignType}()\n`
+    }
+    result += `    this.${this.foreign}.$id = val\n`
+    result += `  }\n\n`
 
     return result
   }
@@ -310,6 +330,7 @@ module.exports = class Attr {
    * Print this attribute into the template generator
    * @param origin Name of class (e.g. User)
    * @param originAttr Name of property (e.g. user)
+   * @deprecated
    */
   buildPersist (origin, originAttr) {
     let result = ''

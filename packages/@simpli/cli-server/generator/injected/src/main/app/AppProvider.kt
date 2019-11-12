@@ -36,7 +36,6 @@ class AppProvider : ParamConverterProvider, ContextResolver<Gson>, ContainerResp
         return builder
     }
 
-    @Throws(IOException::class)
     override fun filter(request: ContainerRequestContext, response: ContainerResponseContext) {
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")

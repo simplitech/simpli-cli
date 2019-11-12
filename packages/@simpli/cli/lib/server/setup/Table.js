@@ -78,6 +78,26 @@ module.exports = class Table {
     return column
   }
 
+  get descriptionColumns () {
+    return this.columns.filter((column) => column.description)
+  }
+
+  get requiredAndNotDescriptionColumns () {
+    return this.columns.filter((column) => column.isRequired && !column.description)
+  }
+
+  get maxlengthAndNotRequiredAndNotDescriptionColumns () {
+    return this.columns.filter((column) => column.hasMaxlength && !column.isRequired && !column.description)
+  }
+
+  get simpleColumns () {
+    return this.columns.filter((column) => !column.hasMaxlength && !column.isRequired && !column.description)
+  }
+
+  get passwordColumns () {
+    return this.columns.filter((column) => column.isPassword)
+  }
+
   get hasUniqueDefaultId () {
     const columns = this.idsColumn
     if (columns.length === 1) {
@@ -262,7 +282,7 @@ module.exports = class Table {
   }
 
   buildValidate () {
-    let result = ''
+    let result = '        // TODO: review generated method\n'
 
     if (!this.hasID) {
       this.foreignColumns.forEach((column) => {
@@ -310,10 +330,36 @@ module.exports = class Table {
     return result
   }
 
+  buildRequiredPathId () {
+    let result = ''
+
+    if (!this.hasUniqueDefaultId) {
+      result += `    open class RequiredPathId : DefaultParam.Auth() {\n`
+      if (!this.idsColumn.length) {
+        result += `        @PathParam("id")\n`
+        result += `        @Schema(required = true)\n`
+        result += `        var id: Long? = null\n`
+      } else if (!this.idsColumn.length === 1) {
+        result += `        @PathParam("id")\n`
+        result += `        @Schema(required = true)\n`
+        result += `        var id: ${this.idColumn.kotlinType}? = null\n`
+      } else {
+        this.idsColumn.forEach((column, i) => {
+          result += `        @PathParam("id${i + 1}")\n`
+          result += `        @Schema(required = true)\n`
+          result += `        var id${i + 1}: ${column.kotlinType}? = null\n\n`
+        })
+        result = result.slice(0, -1) // remove last line
+      }
+      result += `    }\n\n`
+    }
+
+    return result
+  }
+
   buildConstructor () {
     let result = ''
 
-    result += `    @Throws(SQLException::class)\n`
     result += `    constructor(rs: ResultSet, alias: String = "${this.name}") : this() {\n`
     this.columns.forEach((column) => {
       if (column.isLong) {
@@ -361,7 +407,7 @@ module.exports = class Table {
         result += `            "${column.field}" to ${column.name},\n`
       }
     })
-    result = result.slice(0, -2) // remove last line
+    result = result.slice(0, -2) // remove last line and comma
     result += `\n    )\n`
 
     return result
@@ -395,8 +441,168 @@ module.exports = class Table {
         result += `            "${column.field}" to ${column.name},\n`
       }
     })
-    result = result.slice(0, -2) // remove last line
+    result = result.slice(0, -2) // remove last line and comma
     result += `\n    )\n`
+
+    return result
+  }
+
+  buildOrderMap () {
+    let result = ''
+
+    result += `        val orderMap = mapOf(\n`
+    this.exceptPasswordColumns.forEach((column) => {
+      result += `                "${column.name}" to "${this.name}.${column.field}",\n`
+    })
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n        )\n`
+
+    return result
+  }
+
+  buildIdsColumns () {
+    let result = ''
+
+    this.idsColumn.forEach((column) => {
+      result += column.build()
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildRelations () {
+    let result = ''
+
+    this.validRelations.forEach((relation) => {
+      result += relation.build()
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildDescriptionsColumns () {
+    let result = ''
+
+    this.descriptionColumns.forEach((column) => {
+      if (!column.isPrimary && !column.isForeign && !column.isPassword) {
+        result += column.build()
+      }
+    })
+
+    return result
+  }
+
+  buildRequiredAndNotDescriptionColumns () {
+    let result = ''
+
+    this.requiredAndNotDescriptionColumns.forEach((column) => {
+      if (!column.isPrimary && !column.isForeign && !column.isPassword) {
+        result += column.build()
+      }
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildMaxlengthAndNotRequiredAndNotDescriptionColumns () {
+    let result = ''
+
+    this.maxlengthAndNotRequiredAndNotDescriptionColumns.forEach((column) => {
+      if (!column.isPrimary && !column.isForeign && !column.isPassword) {
+        result += column.build()
+      }
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildSimpleColumns () {
+    let result = ''
+
+    this.simpleColumns.forEach((column) => {
+      if (!column.isPrimary && !column.isForeign && !column.isPassword) {
+        result += column.build()
+      }
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildPasswordColumns () {
+    let result = ''
+
+    this.passwordColumns.forEach((column) => {
+      if (!column.isPrimary && !column.isForeign) {
+        result += column.build()
+      }
+    })
+
+    if (result) {
+      result += '\n'
+    }
+
+    return result
+  }
+
+  buildGettersAndSetters () {
+    let result = ''
+
+    if (!this.idsColumn.length && !this.hasIDColumnAsFieldName()) {
+      result += `    var id\n`
+      result += `        @Schema(hidden = true)\n`
+      result += `        get() = 0\n`
+      result += `        set(value) {\n`
+      result += `            // TODO: identify the id property\n`
+      result += `        }\n\n`
+    }
+
+    this.idsColumn.forEach((column, i) => {
+      if (this.idsColumn.length === 1) {
+        if (!this.hasIDColumnAsFieldName()) {
+          result += `    var id\n`
+          result += `        @Schema(hidden = true)\n`
+          result += `        get() = ${column.name}\n`
+          result += `        set(value) {\n`
+          result += `            ${column.name} = value\n`
+          result += `        }\n\n`
+        }
+      } else {
+        if (!this.hasIDColumnAsFieldName(i + 1)) {
+          result += `    var id${i + 1}\n`
+          result += `        @Schema(hidden = true)\n`
+          result += `        get() = ${column.name}\n`
+          result += `        set(value) {\n`
+          result += `            ${column.name} = value\n`
+          result += `        }\n\n`
+        }
+      }
+    })
+
+    this.foreignColumns.forEach((column) => {
+      if (!column.isPrimary) {
+        result += column.buildForeign()
+      }
+    })
 
     return result
   }
