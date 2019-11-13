@@ -12,14 +12,15 @@
 <%_ } _%>
 
 /* TODO: review generated class */
-export class <%-model.name%> extends <%-model.isResource ? 'Resource' : 'Model'%> {
+export class <%-model.name%> extends <%-model.extendedClass%> {
+
 <%-model.buildIdsAttr()-%>
 <%-model.buildModelAttrs()-%>
 <%-model.buildDescriptionsAttrs()-%>
 <%-model.buildRequiredAndNotDescriptionAttrs()-%>
 <%-model.buildSimpleAttrs()-%>
 <%-model.buildPasswordAttrs()-%>
-<%-model.buildResource()%>
+<%-model.buildResource()-%>
 <%-model.buildForeignAttrs()-%>
-<%-model.buildApis(auth)%>
+<%-model.buildApis(auth)-%>
 }

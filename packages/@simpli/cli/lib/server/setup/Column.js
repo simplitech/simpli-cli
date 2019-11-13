@@ -174,6 +174,10 @@ module.exports = class Column {
   get isDeletedAt () { return this.is('deletedAt') }
   get isSoftDelete () { return this.is('softDelete') }
 
+  get isMultiline () {
+    return Boolean(this.commentary || (this.isRequired && this.hasMaxlength))
+  }
+
   get hasSchemaParams () {
     return !!this.schemaParams.length
   }
@@ -196,7 +200,7 @@ module.exports = class Column {
     let indentSpace = ''
     for (let i = 0; i < indent; i++) indentSpace += '    '
 
-    const newLine = this.commentary ? `\n` : ''
+    const newLine = this.isMultiline ? `\n` : ''
 
     if (this.hasSchemaParams) {
       return `${indentSpace}@Schema(${this.schemaParams.join(', ')})${forceNewLine ? '\n' : newLine}`
@@ -208,7 +212,7 @@ module.exports = class Column {
   build () {
     let result = this.buildSchema()
 
-    if (result && !this.commentary) {
+    if (result && !this.isMultiline) {
       result += ' '
     } else {
       result += '    '
@@ -216,7 +220,7 @@ module.exports = class Column {
 
     result += `var ${this.name}: ${this.kotlinType}${this.qMark} = ${this.defaultValue}\n`
 
-    if (this.commentary) {
+    if (this.isMultiline) {
       result += '\n'
     }
 

@@ -78,20 +78,24 @@ module.exports = class Table {
     return column
   }
 
-  get descriptionColumns () {
-    return this.columns.filter((column) => column.description)
+  get commentaryColumns () {
+    return this.columns.filter((column) => column.commentary)
   }
 
-  get requiredAndNotDescriptionColumns () {
-    return this.columns.filter((column) => column.isRequired && !column.description)
+  get requiredAndMaxlengthAndNotDescriptionColumns () {
+    return this.columns.filter((column) => column.isRequired && column.hasMaxlength && !column.commentary)
+  }
+
+  get requiredAndNotMaxlengthAndNotDescriptionColumns () {
+    return this.columns.filter((column) => column.isRequired && !column.hasMaxlength && !column.commentary)
   }
 
   get maxlengthAndNotRequiredAndNotDescriptionColumns () {
-    return this.columns.filter((column) => column.hasMaxlength && !column.isRequired && !column.description)
+    return this.columns.filter((column) => column.hasMaxlength && !column.isRequired && !column.commentary)
   }
 
   get simpleColumns () {
-    return this.columns.filter((column) => !column.hasMaxlength && !column.isRequired && !column.description)
+    return this.columns.filter((column) => !column.hasMaxlength && !column.isRequired && !column.commentary)
   }
 
   get passwordColumns () {
@@ -463,13 +467,13 @@ module.exports = class Table {
   buildIdsColumns () {
     let result = ''
 
-    this.idsColumn.forEach((column) => {
+    this.idsColumn.forEach((column, i) => {
       result += column.build()
-    })
 
-    if (result) {
-      result += '\n'
-    }
+      if ((i === this.idsColumn.length - 1) && !column.isMultiline) {
+        result += '\n'
+      }
+    })
 
     return result
   }
@@ -488,30 +492,50 @@ module.exports = class Table {
     return result
   }
 
-  buildDescriptionsColumns () {
+  buildCommentaryColumns () {
     let result = ''
 
-    this.descriptionColumns.forEach((column) => {
+    this.commentaryColumns.forEach((column, i) => {
       if (!column.isPrimary && !column.isForeign && !column.isPassword) {
         result += column.build()
+
+        if ((i === this.commentaryColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
       }
     })
 
     return result
   }
 
-  buildRequiredAndNotDescriptionColumns () {
+  buildRequiredAndMaxlengthAndNotDescriptionColumns () {
     let result = ''
 
-    this.requiredAndNotDescriptionColumns.forEach((column) => {
+    this.requiredAndMaxlengthAndNotDescriptionColumns.forEach((column, i) => {
       if (!column.isPrimary && !column.isForeign && !column.isPassword) {
         result += column.build()
+
+        if ((i === this.requiredAndMaxlengthAndNotDescriptionColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
       }
     })
 
-    if (result) {
-      result += '\n'
-    }
+    return result
+  }
+
+  buildRequiredAndNotMaxlengthAndNotDescriptionColumns () {
+    let result = ''
+
+    this.requiredAndNotMaxlengthAndNotDescriptionColumns.forEach((column, i) => {
+      if (!column.isPrimary && !column.isForeign && !column.isPassword) {
+        result += column.build()
+
+        if ((i === this.requiredAndNotMaxlengthAndNotDescriptionColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
+      }
+    })
 
     return result
   }
@@ -519,15 +543,15 @@ module.exports = class Table {
   buildMaxlengthAndNotRequiredAndNotDescriptionColumns () {
     let result = ''
 
-    this.maxlengthAndNotRequiredAndNotDescriptionColumns.forEach((column) => {
+    this.maxlengthAndNotRequiredAndNotDescriptionColumns.forEach((column, i) => {
       if (!column.isPrimary && !column.isForeign && !column.isPassword) {
         result += column.build()
+
+        if ((i === this.maxlengthAndNotRequiredAndNotDescriptionColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
       }
     })
-
-    if (result) {
-      result += '\n'
-    }
 
     return result
   }
@@ -535,15 +559,15 @@ module.exports = class Table {
   buildSimpleColumns () {
     let result = ''
 
-    this.simpleColumns.forEach((column) => {
+    this.simpleColumns.forEach((column, i) => {
       if (!column.isPrimary && !column.isForeign && !column.isPassword) {
         result += column.build()
+
+        if ((i === this.simpleColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
       }
     })
-
-    if (result) {
-      result += '\n'
-    }
 
     return result
   }
@@ -551,15 +575,15 @@ module.exports = class Table {
   buildPasswordColumns () {
     let result = ''
 
-    this.passwordColumns.forEach((column) => {
+    this.passwordColumns.forEach((column, i) => {
       if (!column.isPrimary && !column.isForeign) {
         result += column.build()
+
+        if ((i === this.passwordColumns.length - 1) && !column.isMultiline) {
+          result += '\n'
+        }
       }
     })
-
-    if (result) {
-      result += '\n'
-    }
 
     return result
   }

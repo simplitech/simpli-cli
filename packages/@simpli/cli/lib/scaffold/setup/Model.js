@@ -148,6 +148,10 @@ module.exports = class Model {
     return [...notResolvedDependencies, ...notResolvedPersistDependencies]
   }
 
+  get extendedClass () {
+    return this.isResource ? 'Resource' : 'Model'
+  }
+
   /**
    * Get the schema module of this model
    */
@@ -567,7 +571,7 @@ module.exports = class Model {
       }
     }
 
-    return result
+    return result + '\n'
   }
 
   /**
@@ -1047,29 +1051,16 @@ module.exports = class Model {
     return result
   }
 
-  buildApis (auth) {
-    let result = ''
-
-    this.apis.forEach((api) => {
-      result += api.build(auth)
-      result += '\n'
-    })
-
-    result = result.slice(0, -2) // remove last line
-
-    return result
-  }
-
   buildIdsAttr () {
     let result = ''
 
-    this.idAtrrs.forEach((attr, i) => {
+    this.idAtrrs.forEach((attr) => {
       result += attr.build()
-
-      if (attr.description || attr.responses.length || i === this.idAtrrs.length - 1) {
-        result += '\n'
-      }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1077,13 +1068,13 @@ module.exports = class Model {
   buildModelAttrs () {
     let result = ''
 
-    this.modelAttrs.forEach((attr, i) => {
+    this.modelAttrs.forEach((attr) => {
       result += attr.build()
-
-      if (attr.description || attr.responses.length || i === this.modelAttrs.length - 1) {
-        result += '\n'
-      }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1091,15 +1082,15 @@ module.exports = class Model {
   buildDescriptionsAttrs () {
     let result = ''
 
-    this.descriptionAttrs.forEach((attr, i) => {
+    this.descriptionAttrs.forEach((attr) => {
       if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
         result += attr.build()
-
-        if (attr.description || attr.responses.length || i === this.descriptionAttrs.length - 1) {
-          result += '\n'
-        }
       }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1107,15 +1098,15 @@ module.exports = class Model {
   buildRequiredAndNotDescriptionAttrs () {
     let result = ''
 
-    this.requiredAndNotDescriptionAttrs.forEach((attr, i) => {
+    this.requiredAndNotDescriptionAttrs.forEach((attr) => {
       if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
         result += attr.build()
-
-        if (attr.description || attr.responses.length || i === this.requiredAndNotDescriptionAttrs.length - 1) {
-          result += '\n'
-        }
       }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1123,15 +1114,15 @@ module.exports = class Model {
   buildSimpleAttrs () {
     let result = ''
 
-    this.simpleAttrs.forEach((attr, i) => {
+    this.simpleAttrs.forEach((attr) => {
       if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType) && !attr.isPassword) {
         result += attr.build()
-
-        if (attr.description || attr.responses.length || i === this.simpleAttrs.length - 1) {
-          result += '\n'
-        }
       }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1139,15 +1130,15 @@ module.exports = class Model {
   buildPasswordAttrs () {
     let result = ''
 
-    this.passwordAttrs.forEach((attr, i) => {
+    this.passwordAttrs.forEach((attr) => {
       if (!attr.isID && !attr.isModel && !(attr.foreign && attr.foreignType)) {
         result += attr.build()
-
-        if (attr.description || attr.responses.length || i === this.passwordAttrs.length - 1) {
-          result += '\n'
-        }
       }
     })
+
+    if (result && result.substr(-2) !== '\n\n') {
+      result += '\n'
+    }
 
     return result
   }
@@ -1159,6 +1150,17 @@ module.exports = class Model {
       if (!attr.isID && !attr.isModel && attr.foreign && attr.foreignType) {
         result += attr.buildForeign()
       }
+    })
+
+    return result
+  }
+
+  buildApis (auth) {
+    let result = ''
+
+    this.apis.forEach((api) => {
+      result += api.build(auth)
+      result += '\n'
     })
 
     return result

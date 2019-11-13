@@ -38,8 +38,9 @@ import javax.xml.bind.annotation.XmlRootElement
 class <%-table.modelName%>() {
 <%-table.buildIdsColumns()-%>
 <%-table.buildRelations()-%>
-<%-table.buildDescriptionsColumns()-%>
-<%-table.buildRequiredAndNotDescriptionColumns()-%>
+<%-table.buildCommentaryColumns()-%>
+<%-table.buildRequiredAndMaxlengthAndNotDescriptionColumns()-%>
+<%-table.buildRequiredAndNotMaxlengthAndNotDescriptionColumns()-%>
 <%-table.buildMaxlengthAndNotRequiredAndNotDescriptionColumns()-%>
 <%-table.buildSimpleColumns()-%>
 <%-table.buildPasswordColumns()-%>

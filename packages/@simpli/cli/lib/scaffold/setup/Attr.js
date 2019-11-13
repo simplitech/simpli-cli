@@ -151,6 +151,10 @@ module.exports = class Attr {
     return 'error'
   }
 
+  get isMultiline () {
+    return Boolean(this.description || this.responses.length)
+  }
+
   get responses () {
     const result = []
 
@@ -296,6 +300,10 @@ module.exports = class Attr {
     })
 
     result += `  ${this.name}: ${this.typeBuild} = ${this.valueBuild}\n`
+
+    if (this.isMultiline) {
+      result += '\n'
+    }
 
     return result
   }
