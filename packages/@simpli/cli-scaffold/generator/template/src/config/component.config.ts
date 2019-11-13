@@ -9,11 +9,8 @@
 
 import {ComponentOptions} from 'simpli-web-sdk'
 
-import ModalRemove from '@/components/modals/ModalRemove.vue'
-
 /**
  * Global VUE Components
  */
 export const components: ComponentOptions = {
-  ModalRemove,
 }

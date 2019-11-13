@@ -60,9 +60,9 @@
               <tr v-for="(item, i) in collection.all()" :key="i">
                 <td>
                   <div class="grid grid-columns-2 grid-gap-1">
-                    <a @click="Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)" class="btn btn--flat btn--icon icon icon-pencil mr-4"></a>
+                    <a @click="goToPersistView(item)" class="btn btn--flat btn--icon icon icon-pencil"/>
 <%_ if (model.resource.deletable) { _%>
-                    <a @click="openRemoveModal(item)" class="btn btn--flat btn--icon icon icon-trash"></a>
+                    <a @click="removeItem(item)" class="btn btn--flat btn--icon icon icon-trash"/>
 <%_ } _%>
                   </div>
                 </td>
@@ -83,16 +83,15 @@
         <await name="adapQuery" class="z-20 await__spinner--screen-light"/>
       </await>
     </section>
-<%_ if (model.resource.deletable) { _%>
-
-    <modal-remove v-model="toRemove" @confirm="removeItem"/>
-<%_ } _%>
   </div>
 </template>
 
 <script lang="ts">
   import {Component, Prop, Watch, Mixins} from 'vue-property-decorator'
   import {$, Helper, MixinQueryRouter} from 'simpli-web-sdk'
+<%_ if (model.resource.deletable) { _%>
+  import {DialogRemove} from '@/helpers/dialog/DialogRemove'
+<%_ } _%>
   <%-model.injectIntoDependence().build()%>
   <%-model.injectCollectionIntoDependence().build()%>
   <%-model.injectSchemaIntoDependence('List').build()%>
@@ -100,39 +99,30 @@
 
   @Component
   export default class List<%-model.name%>View extends Mixins(MixinQueryRouter) {
-    Helper = Helper
-
     schema = new List<%-model.name%>Schema()
     collection = new <%-model.name%>Collection()
 
-<%_ if (model.resource.deletable) { _%>
-    toRemove: <%-model.name%> | null = null
-
-<%_ } _%>
     async created() {
       await this.query()
     }
 <%_ if (model.resource.deletable) { _%>
 
-    openRemoveModal(item: <%-model.name%>) {
-      this.toRemove = item
+    goToPersistView(item: <%-model.name%>) {
+      Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)
     }
 
-    async removeItem() {
-      if (this.toRemove) {
+    async removeItem(item: <%-model.name%>) {
 <%_ if (model.removeApi) { _%>
-        await this.toRemove.<%-model.removeApi.name%>()
+      await new DialogRemove(item).confirm(() => item.<%-model.removeApi.name%>())
 <%_ } else { _%>
-        // TODO: define the remove method
-        // await this.toRemove.remove()
+      // TODO: define the remove method
+      // await new DialogRemove(item).confirm(() => item.remove<%-model.name%>())
 <%_ } _%>
-        this.toRemove = null
 <%_ if (model.listApi) { _%>
-        await this.collection.<%-model.listApi.name%>()
+      await this.collection.<%-model.listApi.name%>()
 <%_ } else { _%>
-        await this.query()
+      await this.query()
 <%_ } _%>
-      }
     }
 <%_ } _%>
 <%_ if (model.listCsvApi) { _%>
