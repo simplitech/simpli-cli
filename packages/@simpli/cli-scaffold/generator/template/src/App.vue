@@ -4,7 +4,7 @@
       <router-view/>
     </transition>
 
-    <modal-dialog name="dialog"/>
+    <modal-dialog/>
 
     <vue-snotify :class="toastStyle"/>
   </div>

@@ -105,11 +105,11 @@
     async created() {
       await this.query()
     }
-<%_ if (model.resource.deletable) { _%>
 
     goToPersistView(item: <%-model.name%>) {
       Helper.pushByName('edit<%-model.name%>', <%-model.implodeResourceIds('item')%>)
     }
+<%_ if (model.resource.deletable) { _%>
 
     async removeItem(item: <%-model.name%>) {
 <%_ if (model.removeApi) { _%>
