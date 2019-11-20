@@ -1,20 +1,25 @@
 <template>
   <aside class="sidebar">
-
     <div class="horiz items-center-center">
-      <img src="@/assets/img/logo.png" alt="Logo" class="w-8">
-      <span class="weight-1 mx-2 font-bold text-xl text-white opacity-75">
+      <img src="@/assets/img/logo.png" alt="Logo" class="w-8"/>
+
+      <div class="weight-1 mx-2 font-bold text-xl text-white opacity-75">
         <%- rootOptions.scaffoldSetup.appName %>
-      </span>
-      <a class="icon icon-menu text-primary p-2 lg:hidden" @click="toggleMenu"></a>
+      </div>
+
+      <a class="icon icon-menu text-primary p-2 lg:hidden" @click="toggleMenu"/>
     </div>
 
     <transition-expand>
       <div class="verti lg:weight-1" v-if="menu || isDesktop">
         <ul class="my-4 grid grid-columns-1 grid-gap-1">
           <li>
-            <router-link to="/dashboard" @click.native="menuOff" class="pill horiz h-8 items-center px-3">
-              <i class="icon icon-home mr-1"></i>
+            <router-link
+              to="/dashboard"
+              @click.native="menuOff"
+              class="pill horiz h-8 items-center px-3"
+            >
+              <i class="fas fa-tachometer-alt mr-1" />
               {{ $t('view.dashboard.title') }}
             </router-link>
           </li>
@@ -24,7 +29,12 @@
 <%_ for (var i in resources) { var resource = resources[i] _%>
 <%_ if (resource.collectionName) { _%>
           <li>
-            <router-link to="/<%-kebabCase(resource.name)%>/list" @click.native="menuOff" class="pill horiz h-8 items-center px-3">
+            <router-link
+              to="/<%-kebabCase(resource.name)%>/list"
+              @click.native="menuOff"
+              class="pill horiz h-8 items-center px-3"
+            >
+              <i class="fas fa-table mr-1"/>
               {{ $t('resource.<%-resource.name%>') }}
             </router-link>
           </li>
@@ -35,21 +45,23 @@
         <div class="weight-1"></div>
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
-        <a @click="$auth.signOut()" class="pill horiz h-8 items-center px-3 mb-1">
-          <i class="icon icon-logout mr-1"/>
-          {{$t('app.logout')}}
+        <a
+          @click="$auth.signOut()"
+          class="pill horiz h-8 items-center px-3 mb-1"
+        >
+          <i class="fas fa-sign-out-alt mr-1"/>
+          {{ $t('app.logout') }}
         </a>
 <%_ } _%>
 
         <footer class="p-2 text-white-700 hidden md:block">
           <small>
             <b>Version</b>
-            {{$app.version}}
+            {{ $app.version }}
           </small>
         </footer>
       </div>
     </transition-expand>
-
   </aside>
 </template>
 

@@ -11,17 +11,12 @@ module.exports = {
   // where to output built files
   outputDir: process.env.OUTPUT_DIR || 'dist',
 
-  // whether to use eslint-loader for lint on save.
-  // valid values: true | false | 'error'
-  // when set to 'error', lint errors will cause compilation to fail.
-  lintOnSave: true,
-
+  // vue runtime mode
   runtimeCompiler: true,
 
   // tweak internal webpack configuration.
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
-  chainWebpack: config => {
-  },
+  chainWebpack: config => {},
 
   // configure webpack-dev-server behavior
   devServer: {
@@ -32,6 +27,6 @@ module.exports = {
     hotOnly: false,
     // See https://github.com/vuejs/vue-cli/blob/dev/docs/cli-service.md#configuring-proxy
     proxy: null, // string | Object
-    before: app => {}
+    before: app => {},
   },
 }

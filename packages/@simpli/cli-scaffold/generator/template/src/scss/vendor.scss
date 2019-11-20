@@ -3,3 +3,5 @@
 @import '~pretty-checkbox/src/pretty-checkbox';
 @import "~simpli-web-sdk/scss/main";
 @import "~simpli-web-sdk/scss/effect";
+
+@include normalize();

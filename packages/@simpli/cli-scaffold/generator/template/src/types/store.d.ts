@@ -21,6 +21,6 @@ export interface RootState {
  */
 export interface AuthState {
 <%-rootOptions.scaffoldSetup.auth.buildType()-%>
-  cachePath: string | null,
+  cachePath: string | null
 }
 <%_ } _%>

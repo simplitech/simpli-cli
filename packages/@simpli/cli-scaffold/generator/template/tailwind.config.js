@@ -41,14 +41,14 @@ module.exports = {
     ({addUtilities, variants}) => {
       const newUtilities = {
         '.horiz': {
-          'display': 'flex',
+          display: 'flex',
           'flex-direction': 'row',
           '& > *': {
             'flex-shrink': 0,
           },
         },
         '.verti': {
-          'display': 'flex',
+          display: 'flex',
           'flex-direction': 'column',
           '& > *': {
             'flex-shrink': 0,
@@ -63,7 +63,7 @@ module.exports = {
     ({addUtilities, variants}) => {
       const newUtilities = {
         '.items-center-center': {
-          'display': 'flex',
+          display: 'flex',
           'justify-content': 'center',
           'align-items': 'center',
         },
@@ -106,18 +106,19 @@ module.exports = {
       padding: '1rem',
     },
     screens: {
-      'sm': `${process.env.VUE_APP_SMALL_SCREEN}px`,
-      'md': `${process.env.VUE_APP_MEDIUM_SCREEN}px`,
-      'lg': `${process.env.VUE_APP_LARGE_SCREEN}px`,
-      'xl': `${process.env.VUE_APP_EXTRA_LARGE_SCREEN}px`,
+      sm: `${process.env.VUE_APP_SMALL_SCREEN}px`,
+      md: `${process.env.VUE_APP_MEDIUM_SCREEN}px`,
+      lg: `${process.env.VUE_APP_LARGE_SCREEN}px`,
+      xl: `${process.env.VUE_APP_EXTRA_LARGE_SCREEN}px`,
     },
     extend: {
-      colors: { // colors defined on .env file
-        'primary': process.env.VUE_APP_PRIMARY_COLOR,
-        'secondary': process.env.VUE_APP_SECONDARY_COLOR,
-        'tertiary': process.env.VUE_APP_TERTIARY_COLOR,
-        'success': process.env.VUE_APP_SUCCESS_COLOR,
-        'danger': process.env.VUE_APP_DANGER_COLOR,
+      colors: {
+        // colors defined on .env file
+        primary: process.env.VUE_APP_PRIMARY_COLOR,
+        secondary: process.env.VUE_APP_SECONDARY_COLOR,
+        tertiary: process.env.VUE_APP_TERTIARY_COLOR,
+        success: process.env.VUE_APP_SUCCESS_COLOR,
+        danger: process.env.VUE_APP_DANGER_COLOR,
         'white-100': 'rgba(255, 255, 255, 0.1)',
         'white-200': 'rgba(255, 255, 255, 0.2)',
         'white-300': 'rgba(255, 255, 255, 0.3)',
@@ -143,7 +144,7 @@ module.exports = {
         '110': '28rem',
       },
       boxShadow: {
-        'btn': '0 5px 10px 0 rgba(0, 0, 0, 0.2)',
+        btn: '0 5px 10px 0 rgba(0, 0, 0, 0.2)',
         'box-sm': '0 0 5px rgba(0, 0, 0, 0.5)',
         'box-md': '0 0 10px rgba(0, 0, 0, 0.5)',
         'box-lg': '0 0 15px rgba(0, 0, 0, 0.5)',

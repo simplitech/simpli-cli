@@ -8,7 +8,10 @@
 import Vue from 'vue'
 
 import './registerServiceWorker'
-import 'font-awesome/css/font-awesome.css'
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
+import '@fortawesome/fontawesome-free/css/solid.min.css'
+import '@fortawesome/fontawesome-free/css/regular.min.css'
+import '@fortawesome/fontawesome-free/css/brands.min.css'
 
 import VueMeta from 'vue-meta'
 import VueMoment from 'vue-moment'

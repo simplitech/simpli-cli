@@ -59,11 +59,11 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `  ${attr.name}: ${attr.typeBuild} | null,\n`
+        result += `  ${attr.name}: ${attr.typeBuild} | null\n`
       } else if (attr.isObjectOrigin) {
-        result += `  ${attr.name}: ${attr.typeBuild},\n`
+        result += `  ${attr.name}: ${attr.typeBuild}\n`
       } else if (attr.isArrayOrigin) {
-        result += `  ${attr.name}: ${attr.typeBuild},\n`
+        result += `  ${attr.name}: ${attr.typeBuild}\n`
       }
     })
 

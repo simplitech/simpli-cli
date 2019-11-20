@@ -17,7 +17,7 @@
 
         <div class="weight-1"></div>
 
-        <span v-if="collection.size()">
+        <span v-if="collection.isNotEmpty()">
           {{ $t('app.totalLines', {total: collection.total}) }}
         </span>
 
@@ -37,7 +37,7 @@
 
     <section class="weight-1 h-full bg-black-100">
       <await init name="query" class="relative h-full verti items-center" effect="fade-up" spinner="MoonLoader" spinnerPadding="20px">
-        <template v-if="!collection.size()">
+        <template v-if="collection.isEmpty()">
           <div class="mt-10 uppercase text-center text-black-600 text-lg font-light">
             {{ $t('app.noDataToShow') }}
           </div>
@@ -57,17 +57,21 @@
               </thead>
 
               <tbody>
-              <tr v-for="(item, i) in collection.all()" :key="i">
+              <tr v-for="(item, i) in collection.all()" :key="item.$id">
                 <td>
                   <div class="grid grid-columns-2 grid-gap-1">
-                    <a @click="goToPersistView(item)" class="btn btn--flat btn--icon icon icon-pencil"/>
+                    <a @click="goToPersistView(item)" class="btn btn--flat btn--icon">
+                      <i class="far fa-edit"/>
+                    </a>
 <%_ if (model.resource.deletable) { _%>
-                    <a @click="removeItem(item)" class="btn btn--flat btn--icon icon icon-trash"/>
+                    <a @click="removeItem(item)" class="btn btn--flat btn--icon">
+                      <i class="far fa-trash-alt"/>
+                    </a>
 <%_ } _%>
                   </div>
                 </td>
 
-                <td v-for="(field, j) in schema.allFields" :key="j">
+                <td v-for="field in schema.allFields" :key="field">
                   <render-schema v-model="collection.get(i)" :schema="schema" :field="field"/>
                 </td>
               </tr>

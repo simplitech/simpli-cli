@@ -19,7 +19,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator'
 import Sidebar from '@/components/Sidebar.vue'
 
 @Component({
-  components: { Sidebar },
+  components: {Sidebar},
 })
 export default class AuthLayout extends Vue {
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>

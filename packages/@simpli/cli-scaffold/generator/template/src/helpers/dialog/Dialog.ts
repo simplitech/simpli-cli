@@ -8,8 +8,8 @@ export class Dialog {
   confirmClass: string | null = null
   cancelClass: string | null = null
 
-  onConfirm: Function = () => {/**/}
-  onCancel: Function = () => {/**/}
+  onConfirm: Function = () => {}
+  onCancel: Function = () => {}
 
   constructor() {
     this.confirmText = $.t('app.confirm') as string

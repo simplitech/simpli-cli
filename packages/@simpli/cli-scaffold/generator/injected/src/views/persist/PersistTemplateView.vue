@@ -2,7 +2,7 @@
 <%_ var kebabCase = rootOptions.scaffoldSetup.kebabCase _%>
   <div class="view">
     <header class="header">
-      <h1 class="header__title mb-1">
+      <h1 class="header__title">
         {{ $t('resource.<%-model.name%>') }}
       </h1>
     </header>
