@@ -42,6 +42,7 @@ or
 	- Data Access Object (DAO)
 	- Persist Validation
 	- Locale support (en-US and pt-BR included)
+	- Preconfigured AWS Mail sender
 	- Swagger Documentation
 	- Unit Test
 
@@ -53,8 +54,14 @@ project-root/
         main/
             kotlin/
                 [module_name]/
+                    auth/
+                    context/
+                    mail/
                     process/
+                    request/
                     response/
+                    router/
+                    socket
                 app/
                 dao/
                 enums/
@@ -69,8 +76,10 @@ project-root/
         test/
             kotlin/
                 [module_name]/
+                    auth/
                     process/
                 model/
+                    resource/
             resource/
                 database/
                     create.sql
@@ -89,45 +98,55 @@ project-root/
 ```
 
 #### Features included
-	- Typescript Language
+	- 100% Typescript
 	- Login System
-	- Simpli Web Sdk
+	- Simpli Web SDK
 	- Serialized API responses into Models
 	- Locale support (en-US and pt-BR included)
 	- Persist Validation
 	- Webpack with hot-reload
-	- VUE with SPA (VueRouter)
-	- VUEX
+	- VUE CLI
+	- VUE with Typescript
+	- VUEX with Typescriptk
+	- SPA (with VueRouter)
 	- SCSS
-	- TSLint
+	- ESLint
 
 #### Structure
 ```
 project-root/
     public/
         img/
+        preloader/
     src/
         assets/
+            font/
             img/
-        bootstrap/
         components/
             modals/
         config/
         helpers/
+            dialog/
             vuex/
         locale/
         model/
             collection/
             resource/
+            request/
             response/
+        schema/
         scss/
+            components/
+        setup/
         store/
             modules/
         types/
         views/
+            auth/
             layouts/
             list/
             persist/
+    /tests/
 ```
 
 ---

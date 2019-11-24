@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256" height="256">
+  <img alt="Simpli CLI" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" width="256" height="256">
   <br>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/v/@simpli/cli.svg"></a>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/dt/@simpli/cli.svg"></a>
@@ -8,26 +8,24 @@
 
 ### Simpli CLI Server Project
 
+Make sure the port 8080 is not in use.
+
 Go to your project directory root and seed your database:
 
 ```sh
 $ simpli server:seed
 ```
 
-Then, generate the War file:
+Then, run this shell:
 
 ```sh
-$ mvn package
+$ sh build.sh
 ```
 
-Then, initialize the Tomcat and move the WAR file to tomcat folder to deploy it:
+This command will use the `mvn` CLI and the `docker` CLI.
+Therefore, it should have those installed.
 
-```sh
-$ tomcat start
-$ mv <warfile> <tomcat-webapps-location>
-```
-
-Once you have run your generated server, you may access `localhost:8080/[WAR-file-name]` (it can vary depending on your Tomcat configuration):
+Go to `localhost:8080`
 
 ![Server Running](https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/server-img3.png)
 

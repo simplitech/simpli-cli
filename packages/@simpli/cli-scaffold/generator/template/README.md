@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Simpli Logo" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/docs/img/logo.png" width="256" height="256">
+  <img alt="Simpli CLI" src="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" width="256" height="256">
   <br>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/v/@simpli/cli.svg"></a>
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/dt/@simpli/cli.svg"></a>
@@ -9,15 +9,19 @@
 # Simpli CLI Client Project
 
 Go to your project directory root and run:
+```sh
+$ npm i
+```
 
+To enter on `development mode`, run:
 ```sh
 $ npm run serve
 ```
-to enter on `development mode`. Or run:
+
+To build for `production mode`, run:
 ```sh
 $ npm run build
 ```
-to build for `production mode`.
 
 When you enter on `dev`, you may see this screen at `localhost:8181`:
 
