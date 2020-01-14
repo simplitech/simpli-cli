@@ -417,3 +417,10 @@ $ simpli server:seed
 ```
 
 ---
+
+## Contributing
+
+To run simpli-cli with your changes simply run this command:
+```
+node <simpli-cli-folder>/packages/@simpli/cli/bin/simpli.js <any-command> --debug
+```
