@@ -1,6 +1,6 @@
 {
   "name": "simpli-cli-version-marker",
-  "version": "2.3.2",
+  "version": "2.3.3-0",
   "description": "version marker for @simpli/cli",
   "author": "Felipe Gibran Eleuterio Toledo",
   "license": "MIT"

@@ -42,9 +42,7 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
     }
 
     override fun aroundReadFrom(context: ReaderInterceptorContext): Any {
-        val ist = context.inputStream
-        val body = BufferedReader(InputStreamReader(ist)).lines()
-                .collect(Collectors.joining("\n")) // getting the body
+        val body = context.inputStream.reader(Charsets.UTF_8).readLines().joinToString("\n")
 
         if (Env.props.detailedLog) {
             Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
@@ -52,7 +50,7 @@ class RequestLogger : ContainerResponseFilter, ReaderInterceptor {
             """)
         }
 
-        context.inputStream = ByteArrayInputStream(body.toByteArray()) // putting the body back in, idk
+        context.inputStream = ByteArrayInputStream(body.toByteArray(Charsets.UTF_8))
 
         return context.proceed()
     }
