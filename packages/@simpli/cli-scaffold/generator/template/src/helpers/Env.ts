@@ -22,5 +22,7 @@ export abstract class Env {
   static readonly SMALL_SCREEN = Number(process.env.VUE_APP_PRIMARY_COLOR!)
   static readonly MEDIUM_SCREEN = Number(process.env.VUE_APP_SECONDARY_COLOR!)
   static readonly LARGE_SCREEN = Number(process.env.VUE_APP_TERTIARY_COLOR!)
-  static readonly EXTRA_LARGE_SCREEN = Number(process.env.VUE_APP_SUCCESS_COLOR!)
+  static readonly EXTRA_LARGE_SCREEN = Number(
+    process.env.VUE_APP_SUCCESS_COLOR!
+  )
 }

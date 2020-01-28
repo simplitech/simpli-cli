@@ -33,7 +33,7 @@ const socketInstance = socket.create({
 /**
  * Interceptor for every HTTP request of this app
  */
-axiosInstance.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use(config => {
   const pattern = /^(?:https?:)?\/\/[\w.]+[\w-/]+[\w?&=%]*$/g
   const isRelativeUrl = !pattern.exec(config.url ?? '')
 
@@ -55,7 +55,7 @@ axiosInstance.interceptors.request.use((config) => {
  * Interceptor for every HTTP response of this app
  */
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  response => response,
   (error: AxiosError) => {
     const response = error.response
 
@@ -75,12 +75,15 @@ axiosInstance.interceptors.response.use(
 
 <%_ } _%>
     if (response.status >= 400) {
-      $.snotify.error(response.data.message || response.statusText, response.status.toString())
+      $.snotify.error(
+        response.data.message || response.statusText,
+        response.status.toString()
+      )
       return Promise.reject(response.data.message || response.statusText)
     }
 
     return Promise.reject(error)
-  },
+  }
 )
 
 export {axiosInstance, socketInstance}

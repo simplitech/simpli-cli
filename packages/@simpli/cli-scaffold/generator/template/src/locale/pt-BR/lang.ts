@@ -20,7 +20,8 @@ export default {
     submit: 'Enviar',
     totalLines: '{total} entradas no total',
     version: 'Versão',
-    onlyIfWantChangePassword: 'Preencha este campo somente se quiser alterar a senha',
+    onlyIfWantChangePassword:
+      'Preencha este campo somente se quiser alterar a senha',
   },
 
   system: {

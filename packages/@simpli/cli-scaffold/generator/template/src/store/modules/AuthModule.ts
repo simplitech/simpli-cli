@@ -40,7 +40,10 @@ export class AuthModule implements Module<AuthState, RootState> {
 
       context.commit('POPULATE_TOKEN')
 
-      const uri = context.getters.cachePath && $.route.name !== 'signIn' ? context.getters.cachePath : '/dashboard'
+      const uri =
+        context.getters.cachePath && $.route.name !== 'signIn'
+          ? context.getters.cachePath
+          : '/dashboard'
       await Helper.infoAndPush('system.info.welcome', uri)
 
       context.commit('SET_CACHE_PATH', null)
@@ -66,12 +69,21 @@ export class AuthModule implements Module<AuthState, RootState> {
 <%-rootOptions.scaffoldSetup.auth.buildPopulateIdAndToken()-%>
 
       // TODO: verify the need of a socket connection
-      const connection = $.socket.connect<string>('notification', `/<%-signInApi.moduleName%>/notification/${token}`)
+      const connection = $.socket.connect<string>(
+        'notification',
+        `/<%-signInApi.moduleName%>/notification/${token}`
+      )
 
-      connection.onOpen(() => console.info(`Socket connection with client id=${id} established`))
-      connection.onClose(() => console.info(`Socket connection with client id=${id} lost`))
-      connection.onError(() => console.error(`Error with socket connection(client id=${id})`))
-      connection.onData((resp) => $.snotify.info(resp as string))
+      connection.onOpen(() =>
+        console.info(`Socket connection with client id=${id} established`)
+      )
+      connection.onClose(() =>
+        console.info(`Socket connection with client id=${id} lost`)
+      )
+      connection.onError(() =>
+        console.error(`Error with socket connection(client id=${id})`)
+      )
+      connection.onData(resp => $.snotify.info(resp as string))
 
       context.commit('POPULATE', authResponse)
 
@@ -101,7 +113,7 @@ export class AuthModule implements Module<AuthState, RootState> {
     },
 
     FORGET(state: AuthState) {
-      <%-rootOptions.scaffoldSetup.auth.buildForget()-%>
+<%-rootOptions.scaffoldSetup.auth.buildForget()-%>
 
       localStorage.removeItem('token')
     },

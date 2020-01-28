@@ -13,5 +13,4 @@ import {FilterOptions} from 'simpli-web-sdk'
 /**
  * VUE Filters
  */
-export const filters: FilterOptions = {
-}
+export const filters: FilterOptions = {}

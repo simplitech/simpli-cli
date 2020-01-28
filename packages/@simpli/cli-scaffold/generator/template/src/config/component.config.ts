@@ -12,5 +12,4 @@ import {ComponentOptions} from 'simpli-web-sdk'
 /**
  * Global VUE Components
  */
-export const components: ComponentOptions = {
-}
+export const components: ComponentOptions = {}

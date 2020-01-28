@@ -19,7 +19,10 @@ export class Dialog {
     this.cancelClass = 'btn btn--flat'
   }
 
-  async confirm<R>(onConfirm?: (dialog: this) => Promise<R>, onCancel?: () => void) {
+  async confirm<R>(
+    onConfirm?: (dialog: this) => Promise<R>,
+    onCancel?: () => void
+  ) {
     $.modal.open('dialog', this)
 
     return new Promise<R>((resolve, reject) => {

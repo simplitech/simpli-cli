@@ -20,7 +20,8 @@ export default {
     submit: 'Submit',
     totalLines: '{total} total lines',
     version: 'Version',
-    onlyIfWantChangePassword: 'Fill this field only if you want to change the password',
+    onlyIfWantChangePassword:
+      'Fill this field only if you want to change the password',
   },
 
   system: {

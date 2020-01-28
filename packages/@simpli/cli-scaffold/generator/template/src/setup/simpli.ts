@@ -8,7 +8,12 @@
 import Simpli from 'simpli-web-sdk'
 
 import {axiosInstance, socketInstance} from '@/config/http.config'
-import {defaultCurrency, defaultLang, localeVueI18n, localeVeeValidate} from '@/config/locale.config'
+import {
+  defaultCurrency,
+  defaultLang,
+  localeVueI18n,
+  localeVeeValidate,
+} from '@/config/locale.config'
 import {components} from '@/config/component.config'
 import {filters} from '@/config/filter.config'
 import {router} from '@/config/router.config'

@@ -71,8 +71,14 @@ export const router: RouterOptions = {
 <%_ for (var i in resourceModels) { var resource = resourceModels[i] _%>
 <%_ if (resource.collectionName) { _%>
 
-        {path: '/<%-kebabCase(resource.name)%>/list', component: List<%-resource.name%>View},
-        {path: '/<%-kebabCase(resource.name)%>/new', component: Persist<%-resource.name%>View},
+        {
+          path: '/<%-kebabCase(resource.name)%>/list',
+          component: List<%-resource.name%>View,
+        },
+        {
+          path: '/<%-kebabCase(resource.name)%>/new',
+          component: Persist<%-resource.name%>View,
+        },
         {
           path: '/<%-kebabCase(resource.name)%>/edit<%-resource.resource.endpointParamsImploded%>',
           name: 'edit<%-resource.name%>',
