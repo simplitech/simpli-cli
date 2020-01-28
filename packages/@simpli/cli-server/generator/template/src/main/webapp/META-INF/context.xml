@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Context path="/<%-options.serverSetup.serverName%>">
+<!--docker-->
     <Resource
         name="jdbc/<%-options.serverSetup.connection.database%>DS"
         url="jdbc:mysql://db:3306/<%-options.serverSetup.connection.database%>"
@@ -12,4 +13,18 @@
         removeAbandonedTimeout="5" timeBetweenEvictionRunsMillis="30000"
         type="javax.sql.DataSource"
     />
+
+<!--localhost-->
+<!--    <Resource-->
+<!--            name="jdbc/<%-options.serverSetup.connection.database%>DS"-->
+<!--            url="jdbc:mysql://<%-options.serverSetup.connection.host%>:<%-options.serverSetup.connection.port%>/<%-options.serverSetup.connection.database%>"-->
+<!--            username="<%-options.serverSetup.connection.user%>"-->
+<!--            password="<%-options.serverSetup.connection.password%>"-->
+<!--            auth="Container" driverClassName="com.mysql.jdbc.Driver"-->
+<!--            factory="org.apache.commons.dbcp.BasicDataSourceFactory"-->
+<!--            initialSize="1" maxActive="3" maxIdle="1"-->
+<!--            maxWait="20000" minEvictableIdleTimeMillis="3000" minIdle="1"-->
+<!--            removeAbandonedTimeout="5" timeBetweenEvictionRunsMillis="30000"-->
+<!--            type="javax.sql.DataSource"-->
+<!--    />-->
 </Context>

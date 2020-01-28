@@ -75,7 +75,7 @@
     <dependency>
       <groupId>br.com.simpli</groupId>
       <artifactId>simpli-sql</artifactId>
-      <version>3.1.2</version>
+      <version>3.1.3</version>
     </dependency>
     <dependency>
       <groupId>com.google.api.client</groupId>
