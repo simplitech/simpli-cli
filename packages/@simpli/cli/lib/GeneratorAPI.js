@@ -204,7 +204,8 @@ function extractCallDir () {
   const obj = {}
   Error.captureStackTrace(obj)
   const callSite = obj.stack.split('\n')[3]
-  const fileName = callSite.match(/\s\((.*):\d+:\d+\)$/)[1]
+  const match = callSite.match(/at (?:\S+ \()?(.*):\d+:\d+\)?$/)
+  const fileName = match[1]
   return path.dirname(fileName)
 }
 
