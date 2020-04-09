@@ -9,11 +9,17 @@
 # Simpli CLI
 
 * [About](#about)
+* [Examples](#examples)
 * [Getting Started](#getting-started)
 * [Commands](#commands)
 
 ## About
 Simpli CLI provides tools to generate either web-server or web-client projects based on a MySQL database scheme.
+
+## Examples
+[API usecase](https://github.com/simplitech/simplicli-apiusecase)
+
+[Web usecase](https://github.com/simplitech/simplicli-webusecase)
 
 ---
 
