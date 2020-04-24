@@ -2,11 +2,11 @@
 <%_ var moduleName = options.serverSetup.moduleName _%>
 package <%-packageAddress%>.<%-moduleName%>.context
 
-import <%-packageAddress%>.app.Env
+import <%-packageAddress%>.app.Facade.Env
 import <%-packageAddress%>.enums.Lang
 import <%-packageAddress%>.locale.EnUs
-import <%-packageAddress%>.model.collection.ListFilter
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.model.filter.ListFilter
+import <%-packageAddress%>.model.param.DefaultParam
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.sql.AbstractConnector
 
@@ -16,7 +16,7 @@ import br.com.simpli.sql.AbstractConnector
  * @author Simpli CLI generator
  */
  open class RequestContext(val con: AbstractConnector, param: DefaultParam) {
-     val lang: LanguageHolder = Env.props.availableLanguages[Lang.from(param.lang)] ?: EnUs()
+     val lang: LanguageHolder = Env.AVAILABLE_LANGUAGES[Lang.from(param.lang)] ?: EnUs()
      val clientVersion: String = param.clientVersion
 
      init {

@@ -6,7 +6,7 @@
   <a href="https://www.npmjs.com/package/@simpli/cli"><img src="https://img.shields.io/npm/l/@simpli/cli.svg"></a>
 </p>
 
-### Simpli CLI Server Project
+### Simpli CLI - API <%-options.serverSetup.serverName%>
 
 Make sure the port 8080 is not in use.
 
@@ -43,3 +43,11 @@ If you could not find it, go to the root of project and generate the `data.sql` 
 Make sure your database is used for testing because the command `simpli server:seed` will TRUNCATE your tables.
 
 ---
+
+## Contribute
+To generate an exact copy of this:
+- Run test/resources/database/create.sql
+- `npm install -g @simpli/cli`
+- `simpli new:project <project_name>`
+- Choose `Web Server project (backend)`
+- Choose `<%-options.serverSetup.connection.database%>` for database

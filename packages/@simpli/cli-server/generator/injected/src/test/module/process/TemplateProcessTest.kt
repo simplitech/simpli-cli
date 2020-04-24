@@ -7,7 +7,7 @@ import <%-packageAddress%>.<%-moduleName%>.ProcessTest
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.model.param.Auth<%-table.modelName%>ListParam
 <%_ for (var i in table.manyToMany) { var m2m = table.manyToMany[i] _%>
 <%_ if (m2m.crossRelationModelName !== table.modelName) { _%>
 import <%-packageAddress%>.model.resource.<%-m2m.crossRelationModelName%>
@@ -36,7 +36,7 @@ class <%-table.modelName%>ProcessTest : ProcessTest() {
 <%_ } _%>
     private val model = <%-table.modelName%>()
 
-    private val listFilter = DefaultParam.AuthPaged()
+    private val listFilter = Auth<%-table.modelName%>ListParam()
 
     private val subject = <%-table.modelName%>Process(context)
 

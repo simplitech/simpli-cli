@@ -9,7 +9,7 @@ import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 import <%-packageAddress%>.dao.<%-m2m.pivotModelName%>Dao
 <%_ } _%>
 <%_ } _%>
-import <%-packageAddress%>.model.collection.ListFilter
+import <%-packageAddress%>.model.filter.<%-table.modelName%>ListFilter
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
@@ -50,7 +50,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 <%_ } _%>
     }
 
-    fun list(filter: ListFilter): PageCollection<<%-table.modelName%>> {
+    fun list(filter: <%-table.modelName%>ListFilter): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         val items = dao.getList(filter)
         val total = dao.count(filter)

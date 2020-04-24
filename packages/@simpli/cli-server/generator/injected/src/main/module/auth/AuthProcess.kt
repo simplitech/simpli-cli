@@ -6,11 +6,11 @@
 package <%-packageAddress%>.<%-moduleName%>.auth
 
 import <%-packageAddress%>.app.Cast
-import <%-packageAddress%>.app.Env
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.app.Facade.Env
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.exception.response.UnauthorizedException
+import <%-packageAddress%>.model.param.DefaultParam
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.<%-moduleName%>.context.RequestContext
 import <%-packageAddress%>.<%-moduleName%>.mail.RecoverPasswordMail
@@ -29,7 +29,6 @@ import java.util.Calendar
  * @author Simpli CLI generator
  */
 class AuthProcess(val context: RequestContext) {
-
     val dao = AuthDao(context.con)
 
     /**
@@ -76,7 +75,7 @@ class AuthProcess(val context: RequestContext) {
         val <%-userTable.instanceName%> = dao.get<%-userTable.modelName%>ByEmail("${request.<%-accountColumn.name%>}") ?: throw BadRequestException(context.lang.emailNotFound())
 
         val json = Cast.classToJson(TokenForgottenPassword("${<%-userTable.instanceName%>.<%-accountColumn.name%>}"))
-        val encrypted = SecurityUtils.encrypt(json, Env.props.encryptHash)
+        val encrypted = SecurityUtils.encrypt(json, Env.ENCRYPT_HASH)
         val hash = encrypted?.replace("/", "%2F") ?: "invalid_hash"
 
         RecoverPasswordMail(context.lang, <%-userTable.instanceName%>, hash).send()
@@ -91,13 +90,13 @@ class AuthProcess(val context: RequestContext) {
         request.validate(context.lang)
 
         val hashResolved = request.hash?.replace(" ", "+") ?: ""
-        val token = SecurityUtils.decrypt(hashResolved, Env.props.encryptHash) ?: throw BadRequestException(context.lang.invalidToken())
+        val token = SecurityUtils.decrypt(hashResolved, Env.ENCRYPT_HASH) ?: throw BadRequestException(context.lang.invalidToken())
 
         val tokenForgottenPassword = Cast.jsonToClass(token, TokenForgottenPassword::class.java)
 
         val calendar = Calendar.getInstance()
         calendar.time = tokenForgottenPassword.date
-        calendar.add(Calendar.DAY_OF_MONTH, Env.props.forgottenPasswordTokenLife)
+        calendar.add(Calendar.DAY_OF_MONTH, Env.FORGOTTEN_PASSWORD_TOKEN_LIFE)
 
         // token expires after x days
         if (calendar.time.before(Date())) throw BadRequestException(context.lang.expiredToken())
@@ -155,7 +154,7 @@ class AuthProcess(val context: RequestContext) {
             val empty = "invalid_token"
             return try {
                 val json = Cast.classToJson(request)
-                val encrypted = SecurityUtils.encrypt(json, Env.props.encryptHash) ?: empty
+                val encrypted = SecurityUtils.encrypt(json, Env.ENCRYPT_HASH) ?: empty
                 val token = SecurityUtils.encode(encrypted, "UTF-8") ?: empty
 
                 token
@@ -171,7 +170,7 @@ class AuthProcess(val context: RequestContext) {
             val empty = AuthRequest(null, null)
             return try {
                 val encrypted = SecurityUtils.decode(token, "UTF-8")
-                val json = SecurityUtils.decrypt(encrypted ?: return empty, Env.props.encryptHash)
+                val json = SecurityUtils.decrypt(encrypted ?: return empty, Env.ENCRYPT_HASH)
                 val request = Cast.jsonToClass(json ?: return empty, AuthRequest::class.java)
 
                 request

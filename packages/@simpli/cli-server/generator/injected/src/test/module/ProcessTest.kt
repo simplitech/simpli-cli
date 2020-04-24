@@ -10,7 +10,7 @@ import <%-packageAddress%>.AppTest
 import <%-packageAddress%>.<%-moduleName%>.context.RequestContext
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
-import <%-packageAddress%>.app.Env
+import <%-packageAddress%>.app.Facade.Env
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import br.com.simpli.tools.SecurityUtils.sha256
 
@@ -22,9 +22,9 @@ open class ProcessTest: AppTest() {
     protected val context = RequestContext(transacConnector, param)
 
     protected val <%-userTable.instanceName%> = <%-userTable.modelName%>().apply {
-        <%-userTable.idColumn.name%> = Env.props.testerId
-        <%-accountColumn.name%> = Env.props.testerLogin
-        <%-passwordColumn.name%> = sha256(Env.props.testerPassword)
+        <%-userTable.idColumn.name%> = Env.TESTER_ID
+        <%-accountColumn.name%> = Env.TESTER_LOGIN
+        <%-passwordColumn.name%> = sha256(Env.TESTER_PASSWORD)
     }
 
     protected val authRequest: AuthRequest

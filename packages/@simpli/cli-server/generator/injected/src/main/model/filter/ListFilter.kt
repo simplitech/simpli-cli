@@ -1,5 +1,5 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
-package <%-packageAddress%>.model.collection
+package <%-packageAddress%>.model.filter
 
 /**
  * ListFilter

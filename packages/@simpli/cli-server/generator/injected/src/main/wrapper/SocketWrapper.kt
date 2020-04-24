@@ -10,7 +10,6 @@ import javax.websocket.Session
  * @author Simpli CLI generator
  */
 open class SocketWrapper<C : Any> {
-
     private var uniqueSession: Session? = null
     private val mappedSession = mutableMapOf<String, Session>()
 
@@ -50,5 +49,4 @@ open class SocketWrapper<C : Any> {
             else -> session.basicRemote.sendText(classToJson(content))
         }
     }
-
 }

@@ -1,23 +1,21 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
-<%_ var moduleName = options.serverSetup.moduleName _%>
-package <%-packageAddress%>.<%-moduleName%>.context
+package <%-packageAddress%>.app.healthcheck
 
-import <%-packageAddress%>.model.param.DefaultParam
 import br.com.simpli.sql.AbstractConPipe
+import br.com.simpli.sql.AbstractConnector
 
 /**
  * Public Pipe
  * Responsible to control the data which is entering into the server
  * @author Simpli CLI generator
  */
-object PublicPipe {
+object HealthCheckPipe {
     fun <T> handle(
             conPipe: AbstractConPipe,
-            param: DefaultParam,
-            callback: (context: RequestContext) -> T
+            callback: (con: AbstractConnector) -> T
     ): T {
         return conPipe.handle {
-            callback(RequestContext(it, param))
+            callback(it)
         }
     }
 }

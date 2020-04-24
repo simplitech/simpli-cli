@@ -6,6 +6,7 @@
 package <%-packageAddress%>.<%-moduleName%>.auth
 
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
+import <%-packageAddress%>.model.rm.<%-userTable.modelName%>RM
 import br.com.simpli.sql.AbstractConnector
 import br.com.simpli.sql.Query
 
@@ -14,7 +15,6 @@ import br.com.simpli.sql.Query
  * @author Simpli CLI generator
  */
 class AuthDao(val con: AbstractConnector) {
-
     fun getIdOf<%-userTable.modelName%>(<%-accountColumn.name%>: <%-accountColumn.kotlinType%>, <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>): Long? {
         val query = Query()
                 .select("<%-userTable.idColumn.name%>")
@@ -32,7 +32,7 @@ class AuthDao(val con: AbstractConnector) {
                 .whereEq("<%-userTable.idColumn.field%>", <%-userTable.idColumn.name%>)
 
         return con.getOne(query) {
-            <%-userTable.modelName%>(it)
+            <%-userTable.modelName%>RM.build(it)
         }
     }
 
@@ -43,7 +43,7 @@ class AuthDao(val con: AbstractConnector) {
                 .whereEq("<%-accountColumn.field%>", <%-accountColumn.name%>)
 
         return con.getOne(query) {
-            <%-userTable.modelName%>(it)
+            <%-userTable.modelName%>RM.build(it)
         }
     }
 
@@ -57,5 +57,4 @@ class AuthDao(val con: AbstractConnector) {
 
         return con.execute(query).affectedRows
     }
-
 }

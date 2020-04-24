@@ -7,8 +7,9 @@ package <%-packageAddress%>.<%-moduleName%>.router
 import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
 import <%-packageAddress%>.<%-moduleName%>.process.<%-table.modelName%>Process
 import <%-packageAddress%>.wrapper.RouterWrapper
+import <%-packageAddress%>.model.param.DefaultParam
+import <%-packageAddress%>.model.param.Auth<%-table.modelName%>ListParam
 import <%-packageAddress%>.model.resource.<%-table.modelName%>
-import <%-packageAddress%>.param.DefaultParam
 import br.com.simpli.model.PageCollection
 import io.swagger.v3.oas.annotations.Operation
 import javax.ws.rs.BeanParam
@@ -27,7 +28,6 @@ import javax.ws.rs.core.MediaType
 @Path("/<%-moduleNameKebabCase%>/<%-table.apiName%>")
 @Produces(MediaType.APPLICATION_JSON)
 class <%-table.modelName%>Router : RouterWrapper() {
-
     @GET
     @Path("<%-table.primariesBySlash()%>")
     @Operation(tags = ["<%-table.modelName%>"], summary = "Gets a instance of a given ID of <%-table.modelName%>")
@@ -40,7 +40,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
 
     @GET
     @Operation(tags = ["<%-table.modelName%>"], summary = "Lists the instances of <%-table.modelName%>")
-    fun list<%-table.modelName%>(@BeanParam param: DefaultParam.AuthPaged): PageCollection<<%-table.modelName%>> {
+    fun list<%-table.modelName%>(@BeanParam param: Auth<%-table.modelName%>ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).list(param)
@@ -48,16 +48,16 @@ class <%-table.modelName%>Router : RouterWrapper() {
     }
 
     @GET
-    @Path("/csv")
-    @Operation(tags = ["<%-table.modelName%>"], summary = "Lists the instances of <%-table.modelName%> to use it in a CSV file")
-    fun listCsv<%-table.modelName%>(@BeanParam param: DefaultParam.AuthPaged): PageCollection<<%-table.modelName%>> {
+    @Path("/export")
+    @Operation(tags = ["<%-table.modelName%>"], summary = "Lists the instances of <%-table.modelName%> to export as a file")
+    fun listExport<%-table.modelName%>(@BeanParam param: Auth<%-table.modelName%>ListParam): PageCollection<<%-table.modelName%>> {
         // TODO: review generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).list(param)
 		}
     }
-
 <%_ if (table.hasPersist) { _%>
+
     @POST
     @Operation(tags = ["<%-table.modelName%>"], summary = "Persists a new instance of <%-table.modelName%>. Use ID = 0 to create a new one, or ID > 0 to update a current one")
     fun persist<%-table.modelName%>(@BeanParam param: DefaultParam.Auth, model: <%-table.modelName%>): Long {
@@ -66,9 +66,9 @@ class <%-table.modelName%>Router : RouterWrapper() {
             <%-table.modelName%>Process(context).persist(model)
 		}
     }
-
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
+
     @DELETE
     @Path("<%-table.primariesBySlash()%>")
     @Operation(tags = ["<%-table.modelName%>"], summary = "Deletes a instance of a given ID of <%-table.modelName%>")
@@ -78,6 +78,5 @@ class <%-table.modelName%>Router : RouterWrapper() {
             <%-table.modelName%>Process(context).remove(<%-table.primariesByParamCall('param')%>)
 		}
     }
-
 <%_ } _%>
 }

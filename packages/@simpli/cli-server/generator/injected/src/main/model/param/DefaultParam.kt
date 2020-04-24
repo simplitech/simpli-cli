@@ -1,7 +1,7 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
-package <%-packageAddress%>.param
+package <%-packageAddress%>.model.param
 
-import <%-packageAddress%>.model.collection.ListFilter
+import <%-packageAddress%>.model.filter.ListFilter
 import <%-packageAddress%>.enums.Lang
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.ws.rs.HeaderParam

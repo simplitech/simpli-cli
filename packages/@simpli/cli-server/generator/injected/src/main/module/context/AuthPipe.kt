@@ -4,7 +4,7 @@ package <%-packageAddress%>.<%-moduleName%>.context
 
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
 import <%-packageAddress%>.<%-moduleName%>.auth.AuthProcess
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.model.param.DefaultParam
 import br.com.simpli.sql.AbstractConPipe
 
 /**

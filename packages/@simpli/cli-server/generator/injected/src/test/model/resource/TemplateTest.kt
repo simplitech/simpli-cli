@@ -2,7 +2,6 @@
 package <%-packageAddress%>.model.resource
 
 import <%-packageAddress%>.AppTest
-import <%-packageAddress%>.dao.<%-table.modelName%>Dao
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.locale.EnUs
 import java.util.Date

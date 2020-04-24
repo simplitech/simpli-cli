@@ -1,0 +1,75 @@
+<%_ var packageAddress = options.serverSetup.packageAddress _%>
+{
+  "configuration": {
+    "name": "LoggerConfig",
+    "ThresholdFilter":
+    {
+      "level": "${sys:LOG_LEVEL:-info}"
+    },
+    "appenders": {
+      "appender": [
+        {
+          "type": "Console",
+          "name": "STDOUT",
+          "PatternLayout": {
+            "pattern": "%highlight{%d [%p] %c{-0} – %m%n}{STYLE=Logback}",
+            "disableAnsi": "${sys:LOG_NO_COLOR:-true}"
+          }
+        },
+        {
+          "type": "Console",
+          "name": "AWS",
+          "PatternLayout": {
+            "pattern": "%highlight{%d [%p] %c{-0} – %m%n}{STYLE=Logback}",
+            "disableAnsi": "${sys:LOG_NO_COLOR:-true}"
+          },
+          "ThresholdFilter": {
+            "level": "${sys:LOG_LEVEL_AWS:-info}"
+          }
+        }
+      ]
+    },
+    "loggers": {
+      "logger": [
+        {
+          "name": "<%-packageAddress%>.app",
+          "level": "${sys:LOG_LEVEL:-info}",
+          "additivity": "false",
+          "AppenderRef": {
+            "ref": "STDOUT"
+          }
+        },
+        {
+          "name": "com.amazonaws",
+          "level": "${sys:LOG_LEVEL_AWS:-info}",
+          "additivity": "false",
+          "AppenderRef": {
+            "ref": "AWS"
+          }
+        },
+        {
+          "name": "com.amazonaws.xray",
+          "level": "${sys:LOG_LEVEL_AWS:-fatal}",
+          "additivity": "false",
+          "AppenderRef": {
+            "ref": "AWS"
+          }
+        },
+        {
+          "name": "com.amazonaws.auth.profile.internal.BasicProfileConfigLoader",
+          "level": "error",
+          "additivity": "false",
+          "AppenderRef": {
+            "ref": "AWS"
+          }
+        }
+      ],
+      "root": {
+        "level": "${sys:LOG_LEVEL_MASTER:-info}",
+        "AppenderRef": {
+          "ref": "STDOUT"
+        }
+      }
+    }
+  }
+}

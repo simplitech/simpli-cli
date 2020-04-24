@@ -2,8 +2,8 @@
 package <%-packageAddress%>.app
 
 import <%-packageAddress%>.app.Cast.builder
+import <%-packageAddress%>.app.Facade.Env
 import com.google.gson.Gson
-import java.io.IOException
 import java.lang.reflect.Type
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -24,7 +24,6 @@ import javax.ws.rs.ext.Provider
  */
 @Provider
 class AppProvider : ParamConverterProvider, ContextResolver<Gson>, ContainerResponseFilter {
-
     override fun <T : Any?> getConverter(rawType: Class<T>?, genericType: Type?, annotations: Array<out Annotation>?): ParamConverter<T>? {
         return when (rawType) {
             is Date, Date::class.java -> DateParameterConverter() as ParamConverter<T>
@@ -43,7 +42,7 @@ class AppProvider : ParamConverterProvider, ContextResolver<Gson>, ContainerResp
     }
 
     internal class DateParameterConverter : ParamConverter<Date> {
-        private val simpleDateFormat = SimpleDateFormat(Env.props.dateFormat)
+        private val simpleDateFormat = SimpleDateFormat(Env.DATE_FORMAT)
 
         override fun fromString(str: String): Date? {
             try {
@@ -57,5 +56,4 @@ class AppProvider : ParamConverterProvider, ContextResolver<Gson>, ContainerResp
             return simpleDateFormat.format(date)
         }
     }
-
 }

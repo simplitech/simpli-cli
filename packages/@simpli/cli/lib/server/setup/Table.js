@@ -26,6 +26,18 @@ module.exports = class Table {
     return this.columns.filter((column) => column.isForeign)
   }
 
+  get numberColumns () {
+    return this.columns.filter((column) => !column.isForeign && (column.isLong || column.isDouble))
+  }
+
+  get booleanColumns () {
+    return this.columns.filter((column) => column.isBoolean)
+  }
+
+  get dateColumns () {
+    return this.columns.filter((column) => column.isDate)
+  }
+
   get primaryColumns () {
     return this.columns.filter((column) => column.isPrimary)
   }
@@ -122,6 +134,14 @@ module.exports = class Table {
 
   get validRelations () {
     return this.relations.filter((relation) => relation.isValid)
+  }
+
+  get validNotManyToManyRelations () {
+    return this.relations.filter((relation) => relation.isValid && !relation.isManyToMany)
+  }
+
+  get validDistinctNotManyToManyRelations () {
+    return uniqBy(this.validNotManyToManyRelations, 'referencedTableName')
   }
 
   get validDistinctRelations () {
@@ -364,20 +384,24 @@ module.exports = class Table {
   buildConstructor () {
     let result = ''
 
-    result += `    constructor(rs: ResultSet, alias: String = "${this.name}") : this() {\n`
+    result += `    fun build(rs: ResultSet, alias: String = "${this.name}", allowedColumns: Array<String> = selectFields(alias)) = ${this.modelName}().apply {\n`
+    result += `        ResultBuilder(allowedColumns, rs, alias).run {\n`
+
     this.columns.forEach((column) => {
       if (column.isLong) {
-        result += `        ${column.name} = rs.getLong${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `            ${column.name} = getLong${column.isRequired ? '' : 'OrNull'}("${column.field}")\n`
       } else if (column.isDouble) {
-        result += `        ${column.name} = rs.getDouble${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `            ${column.name} = getDouble${column.isRequired ? '' : 'OrNull'}("${column.field}")\n`
       } else if (column.isString) {
-        result += `        ${column.name} = rs.getString(alias, "${column.field}")\n`
+        result += `            ${column.name} = getString("${column.field}")\n`
       } else if (column.isBoolean) {
-        result += `        ${column.name} = rs.getBoolean${column.isRequired ? '' : 'OrNull'}(alias, "${column.field}")\n`
+        result += `            ${column.name} = getBoolean${column.isRequired ? '' : 'OrNull'}("${column.field}")\n`
       } else if (column.isDate) {
-        result += `        ${column.name} = rs.getTimestamp(alias, "${column.field}")\n`
+        result += `            ${column.name} = getTimestamp("${column.field}")\n`
       }
     })
+
+    result += `        }\n`
     result += `    }\n`
 
     return result
@@ -403,12 +427,12 @@ module.exports = class Table {
   buildUpdateSet () {
     let result = ''
 
-    result += `    fun updateSet() = mapOf(\n`
+    result += `    fun updateSet(${this.instanceName}: ${this.modelName}) = mapOf(\n`
     this.exceptIDColumns.forEach((column) => {
       if (column.isPassword) {
-        result += `            "${column.field}" to Query("IF(? IS NOT NULL, SHA2(?, 256), ${column.field})", ${column.name}, ${column.name}),\n`
+        result += `            "${column.field}" to Query("IF(? IS NOT NULL, SHA2(?, 256), ${column.field})", ${this.instanceName}.${column.name}, ${this.instanceName}.${column.name}),\n`
       } else if (!column.isCreatedAt) {
-        result += `            "${column.field}" to ${column.name},\n`
+        result += `            "${column.field}" to ${this.instanceName}.${column.name},\n`
       }
     })
     result = result.slice(0, -2) // remove last line and comma
@@ -437,13 +461,39 @@ module.exports = class Table {
   buildInsertValues () {
     let result = ''
 
-    result += `    fun insertValues() = mapOf(\n`
+    result += `    fun insertValues(${this.instanceName}: ${this.modelName}) = mapOf(\n`
     this.exceptAutoIncrementColumns.forEach((column) => {
       if (column.isPassword) {
-        result += `            "${column.field}" to Query("SHA2(?, 256)", ${column.name}),\n`
+        result += `            "${column.field}" to Query("SHA2(?, 256)", ${this.instanceName}.${column.name}),\n`
       } else if (!column.isUpdatedAt) {
-        result += `            "${column.field}" to ${column.name},\n`
+        result += `            "${column.field}" to ${this.instanceName}.${column.name},\n`
       }
+    })
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n    )\n`
+
+    return result
+  }
+
+  buildSelectFields () {
+    let result = ''
+
+    result += `    fun selectFields(alias: String = "${this.name}") = arrayOf(\n`
+    this.exceptPasswordColumns.forEach((column) => {
+      result += `            "$alias.${column.field}",\n`
+    })
+    result = result.slice(0, -2) // remove last line and comma
+    result += `\n    )\n`
+
+    return result
+  }
+
+  buildFieldsToSearch () {
+    let result = ''
+
+    result += `    fun fieldsToSearch(alias: String = "${this.name}") = arrayOf(\n`
+    this.queryColumns.forEach((column) => {
+      result += `            "$alias.${column.field}",\n`
     })
     result = result.slice(0, -2) // remove last line and comma
     result += `\n    )\n`
@@ -454,12 +504,20 @@ module.exports = class Table {
   buildOrderMap () {
     let result = ''
 
-    result += `        val orderMap = mapOf(\n`
-    this.exceptPasswordColumns.forEach((column) => {
-      result += `                "${column.name}" to "${this.name}.${column.field}",\n`
+    result += `    fun orderMap(alias: String = "${this.name}") = mapOf(\n`
+
+    this.validNotManyToManyRelations.forEach((relation) => {
+      result += `            "${relation.name}" to "$alias.${relation.columnName}",\n`
     })
+
+    this.exceptPasswordColumns.forEach((column) => {
+      if (!column.isForeign) {
+        result += `            "${column.name}" to "$alias.${column.field}",\n`
+      }
+    })
+
     result = result.slice(0, -2) // remove last line and comma
-    result += `\n        )\n`
+    result += `\n    )\n`
 
     return result
   }
@@ -627,6 +685,120 @@ module.exports = class Table {
         result += column.buildForeign()
       }
     })
+
+    return result
+  }
+
+  buildFilterColumns () {
+    let result = ''
+
+    this.foreignColumns.forEach((column) => {
+      result += column.buildFilter()
+    })
+
+    this.dateColumns.forEach((column) => {
+      result += column.buildFilter()
+    })
+
+    this.numberColumns.forEach((column) => {
+      result += column.buildFilter()
+    })
+
+    this.booleanColumns.forEach((column) => {
+      if (!column.isSoftDelete) {
+        result += column.buildFilter()
+      }
+    })
+
+    result = result.slice(0, -1) // remove last line
+
+    return result
+  }
+
+  buildParamColumns () {
+    let result = ''
+
+    this.foreignColumns.forEach((column) => {
+      result += column.buildParam()
+    })
+
+    this.dateColumns.forEach((column) => {
+      result += column.buildParam()
+    })
+
+    this.numberColumns.forEach((column) => {
+      result += column.buildParam()
+    })
+
+    this.booleanColumns.forEach((column) => {
+      if (!column.isSoftDelete) {
+        result += column.buildParam()
+      }
+    })
+
+    result = result.slice(0, -1) // remove last line
+
+    return result
+  }
+
+  buildSelectDao () {
+    if (!this.validNotManyToManyRelations.length) {
+      return `                .select${this.modelName}()\n`
+    }
+
+    const selectFields = this.validNotManyToManyRelations.map((relation) => {
+      let alias = ''
+      if (relation.referencedTableName !== relation.referencedTableAlias) {
+        alias = `"${relation.referencedTableAlias}"`
+      }
+
+      return `${relation.referencedTableModelName}RM.selectFields(${alias})`
+    })
+
+    selectFields.unshift(`${this.modelName}RM.selectFields()`)
+
+    return `                .selectFields(${(selectFields || []).join(' + ')})\n`
+  }
+
+  buildJoinDao () {
+    let result = ''
+
+    this.validNotManyToManyRelations.forEach((relation) => {
+      let referencedTableName = relation.referencedTableName || ''
+
+      if (referencedTableName !== relation.referencedTableAlias) {
+        referencedTableName += ` AS ${relation.referencedTableAlias}`
+      }
+
+      if (relation.isRequired) {
+        result += `                .innerJoin("${referencedTableName}", "${relation.referencedTableAlias}.${relation.referencedColumnName}", "${relation.tableName}.${relation.columnName}")\n`
+      } else {
+        result += `                .leftJoin("${referencedTableName}", "${relation.referencedTableAlias}.${relation.referencedColumnName}", "${relation.tableName}.${relation.columnName}")\n`
+      }
+    })
+
+    return result
+  }
+
+  buildRMDao () {
+    let result = `            ${this.modelName}RM.build(it)`
+
+    if (!this.validNotManyToManyRelations.length) {
+      result += '\n'
+      return result
+    }
+
+    result += '.apply {\n'
+    this.validNotManyToManyRelations.forEach((relation) => {
+      let alias = ''
+
+      if (relation.referencedTableName !== relation.referencedTableAlias) {
+        alias += `, "${relation.referencedTableAlias}"`
+      }
+
+      result += `                ${relation.name} = ${relation.referencedTableModelName}RM.build(it${alias})\n`
+    })
+    result += '            }\n'
 
     return result
   }

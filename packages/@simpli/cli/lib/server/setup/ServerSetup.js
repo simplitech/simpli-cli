@@ -3,6 +3,7 @@ const Column = require('./Column')
 const Relation = require('./Relation')
 const ManyToMany = require('./ManyToMany')
 const lorem = require('../util/lorem')
+const snakeCase = require('lodash.snakecase')
 const startCase = require('lodash.startcase')
 const camelCase = require('lodash.camelcase')
 const kebabCase = require('lodash.kebabcase')
@@ -84,7 +85,17 @@ module.exports = class ServerSetup {
         const duplicateRelations = table.validRelations.filter((relation) => relation.name === name)
 
         duplicateRelations.forEach((relation, i) => {
-          relation.name = `${relation.name}${i + 1}`
+          const columnName = relation.columnName || ''
+          const pattern = /^id(\S+)Fk$/g
+          const match = pattern.exec(columnName)
+
+          if (match && match[1]) {
+            relation.name = camelCase(match[1])
+          } else {
+            relation.name = `${relation.name}${i + 1}`
+          }
+
+          relation.referencedTableAlias = snakeCase(relation.name)
         })
       })
     })

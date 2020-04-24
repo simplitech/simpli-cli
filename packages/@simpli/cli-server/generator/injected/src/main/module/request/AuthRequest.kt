@@ -8,7 +8,6 @@ package <%-packageAddress%>.<%-moduleName%>.request
 import br.com.simpli.model.LanguageHolder
 import br.com.simpli.tools.Validator
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.xml.bind.annotation.XmlRootElement
 import <%-packageAddress%>.<%-moduleName%>.auth.AuthProcess
 import <%-packageAddress%>.exception.response.BadRequestException
 
@@ -16,7 +15,6 @@ import <%-packageAddress%>.exception.response.BadRequestException
  * Authentication Request Model
  * @author Simpli CLI generator
  */
-@XmlRootElement
 class AuthRequest(var <%-accountColumn.name%>: <%-accountColumn.kotlinType%>?, var <%-passwordColumn.name%>: <%-passwordColumn.kotlinType%>?) {
     fun validate(lang: LanguageHolder) {
         if (<%-accountColumn.name%>.isNullOrEmpty()) {

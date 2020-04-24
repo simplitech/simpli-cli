@@ -7,13 +7,11 @@ package <%-packageAddress%>.<%-moduleName%>.response
 import <%-packageAddress%>.model.resource.<%-userTable.modelName%>
 import <%-packageAddress%>.<%-moduleName%>.socket.NotificationSocket
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.xml.bind.annotation.XmlRootElement
 
 /**
  * Authentication Response Model
  * @author Simpli CLI generator
  */
-@XmlRootElement
 class AuthResponse(var token: String, var <%-userTable.instanceName%>: <%-userTable.modelName%>) {
     val id @Schema(hidden = true) get() = <%-userTable.instanceName%>.id
     val <%-accountColumn.name%> @Schema(hidden = true) get() = <%-userTable.instanceName%>.<%-accountColumn.name%>

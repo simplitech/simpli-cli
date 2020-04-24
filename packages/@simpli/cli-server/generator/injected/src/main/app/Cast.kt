@@ -1,10 +1,10 @@
 <%_ var packageAddress = options.serverSetup.packageAddress _%>
 package <%-packageAddress%>.app
 
+import <%-packageAddress%>.app.Facade.Env
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
-import com.google.gson.JsonParseException
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
@@ -22,11 +22,12 @@ import javax.ws.rs.WebApplicationException
  * @author Simpli CLI generator
  */
 object Cast {
-
     val builder: Gson = GsonBuilder()
-            .setDateFormat(Env.props.dateFormat)
+            .setDateFormat(Env.DATE_FORMAT)
             .registerTypeAdapter(DateTime::class.java, DateTimeTypeAdapter())
             .create()
+
+    val pretty = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
 
     /**
      * Transform a class object to another class
@@ -51,7 +52,7 @@ object Cast {
     }
 
     internal class DateTimeTypeAdapter : JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
-        private val simpleDateFormat = SimpleDateFormat(Env.props.dateFormat)
+        private val simpleDateFormat = SimpleDateFormat(Env.DATE_FORMAT)
 
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): DateTime {
             try {
@@ -67,5 +68,4 @@ object Cast {
             return JsonPrimitive(stringDate)
         }
     }
-
 }

@@ -20,14 +20,25 @@ module.exports = (api, options) => {
     // main/app
     api.renderFrom('./injected', 'src/main/app/AppProvider.kt', `../kotlin/${dir}/app/AppProvider.kt`)
     api.renderFrom('./injected', 'src/main/app/Cast.kt', `../kotlin/${dir}/app/Cast.kt`)
-    api.renderFrom('./injected', 'src/main/app/Env.kt', `../kotlin/${dir}/app/Env.kt`)
-    api.renderFrom('./injected', 'src/main/app/EnvDebug.kt', `../kotlin/${dir}/app/EnvDebug.kt`)
-    api.renderFrom('./injected', 'src/main/app/EnvProduction.kt', `../kotlin/${dir}/app/EnvProduction.kt`)
-    api.renderFrom('./injected', 'src/main/app/PropertyHelper.kt', `../kotlin/${dir}/app/PropertyHelper.kt`)
+    api.renderFrom('./injected', 'src/main/app/Facade.kt', `../kotlin/${dir}/app/Facade.kt`)
     api.renderFrom('./injected', 'src/main/app/RequestLogger.kt', `../kotlin/${dir}/app/RequestLogger.kt`)
 
+    // main/app/env
+    api.renderFrom('./injected', 'src/main/app/env/Props.kt', `../../kotlin/${dir}/app/env/Props.kt`)
+    api.renderFrom('./injected', 'src/main/app/env/PropsBeta.kt', `../../kotlin/${dir}/app/env/PropsBeta.kt`)
+    api.renderFrom('./injected', 'src/main/app/env/PropsProduction.kt', `../../kotlin/${dir}/app/env/PropsProduction.kt`)
+    api.renderFrom('./injected', 'src/main/app/env/PropsStaging.kt', `../../kotlin/${dir}/app/env/PropsStaging.kt`)
+
+    // main/app/healthcheck
+    api.renderFrom('./injected', 'src/main/app/healthcheck/HealthCheckDao.kt', `../../kotlin/${dir}/app/healthcheck/HealthCheckDao.kt`)
+    api.renderFrom('./injected', 'src/main/app/healthcheck/HealthCheckPipe.kt', `../../kotlin/${dir}/app/healthcheck/HealthCheckPipe.kt`)
+    api.renderFrom('./injected', 'src/main/app/healthcheck/HealthCheckProcess.kt', `../../kotlin/${dir}/app/healthcheck/HealthCheckProcess.kt`)
+    api.renderFrom('./injected', 'src/main/app/healthcheck/HealthCheckRouter.kt', `../../kotlin/${dir}/app/healthcheck/HealthCheckRouter.kt`)
+
     // main/enums
+    api.renderFrom('./injected', 'src/main/enums/ConnectionStatus.kt', `../kotlin/${dir}/enums/ConnectionStatus.kt`)
     api.renderFrom('./injected', 'src/main/enums/Lang.kt', `../kotlin/${dir}/enums/Lang.kt`)
+    api.renderFrom('./injected', 'src/main/enums/Mode.kt', `../kotlin/${dir}/enums/Mode.kt`)
 
     // main/exception
     api.renderFrom('./injected', 'src/main/exception/HttpException.kt', `../kotlin/${dir}/exception/HttpException.kt`)
@@ -58,15 +69,19 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/exception/response/UnauthorizedException.kt', `../../kotlin/${dir}/exception/response/UnauthorizedException.kt`)
     api.renderFrom('./injected', 'src/main/exception/response/UnsupportedMediaTypeException.kt', `../../kotlin/${dir}/exception/response/UnsupportedMediaTypeException.kt`)
 
+    // main/extension
+    api.renderFrom('./injected', 'src/main/extension/HttpServletRequest.kt', `../kotlin/${dir}/extension/HttpServletRequest.kt`)
+    api.renderFrom('./injected', 'src/main/extension/Session.kt', `../kotlin/${dir}/extension/Session.kt`)
+
     // main/locale
     api.renderFrom('./injected', 'src/main/locale/EnUs.kt', `../kotlin/${dir}/locale/EnUs.kt`)
     api.renderFrom('./injected', 'src/main/locale/PtBr.kt', `../kotlin/${dir}/locale/PtBr.kt`)
 
-    // main/model/collection
-    api.renderFrom('./injected', 'src/main/model/collection/ListFilter.kt', `../../kotlin/${dir}/model/collection/ListFilter.kt`)
+    // main/model/filter
+    api.renderFrom('./injected', 'src/main/model/filter/ListFilter.kt', `../../kotlin/${dir}/model/filter/ListFilter.kt`)
 
-    // main/param
-    api.renderFrom('./injected', 'src/main/param/DefaultParam.kt', `../kotlin/${dir}/param/DefaultParam.kt`)
+    // main/model/param
+    api.renderFrom('./injected', 'src/main/model/param/DefaultParam.kt', `../../kotlin/${dir}/model/param/DefaultParam.kt`)
 
     // main/wrapper
     api.renderFrom('./injected', 'src/main/wrapper/MailWrapper.kt', `../kotlin/${dir}/wrapper/MailWrapper.kt`)
@@ -114,8 +129,17 @@ module.exports = (api, options) => {
     // main/dao
     api.renderFrom('./injected', 'src/main/dao/TemplateDao.kt', `../kotlin/${dir}/dao/${table.modelName}Dao.kt`, data)
 
+    // main/model/filter
+    api.renderFrom('./injected', 'src/main/model/filter/TemplateListFilter.kt', `../../kotlin/${dir}/model/filter/${table.modelName}ListFilter.kt`, data)
+
+    // main/model/param
+    api.renderFrom('./injected', 'src/main/model/param/AuthTemplateListParam.kt', `../../kotlin/${dir}/model/param/Auth${table.modelName}ListParam.kt`, data)
+
     // main/model/resource
     api.renderFrom('./injected', 'src/main/model/resource/Template.kt', `../../kotlin/${dir}/model/resource/${table.modelName}.kt`, data)
+
+    // main/model/rm
+    api.renderFrom('./injected', 'src/main/model/rm/TemplateRM.kt', `../../kotlin/${dir}/model/rm/${table.modelName}RM.kt`, data)
 
     // main/module/process
     api.renderFrom('./injected', 'src/main/module/process/TemplateProcess.kt', `../../kotlin/${dir}/${moduleName}/process/${table.modelName}Process.kt`, data)

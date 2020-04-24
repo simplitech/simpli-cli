@@ -9,8 +9,8 @@ import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ResetPasswordRequest
 import <%-packageAddress%>.<%-moduleName%>.request.RecoverPasswordByMailRequest
 import <%-packageAddress%>.<%-moduleName%>.response.AuthResponse
+import <%-packageAddress%>.model.param.DefaultParam
 import <%-packageAddress%>.wrapper.RouterWrapper
-import <%-packageAddress%>.param.DefaultParam
 import io.swagger.v3.oas.annotations.Operation
 import javax.ws.rs.BeanParam
 import javax.ws.rs.Path
@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType
 @Path("<%-moduleName%>/auth")
 @Produces(MediaType.APPLICATION_JSON)
 class AuthRouter : RouterWrapper() {
-
     @GET
     @Operation(tags = ["AuthRequest"], summary = "Gets the user authentication")
     fun authenticate(@BeanParam param: DefaultParam.Auth): AuthResponse {

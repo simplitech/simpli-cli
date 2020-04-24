@@ -7,11 +7,11 @@ package <%-packageAddress%>.<%-moduleName%>.auth
 import <%-packageAddress%>.<%-moduleName%>.ProcessTest
 import <%-packageAddress%>.<%-moduleName%>.request.AuthRequest
 import <%-packageAddress%>.<%-moduleName%>.request.ChangePasswordRequest
-import <%-packageAddress%>.app.Env
+import <%-packageAddress%>.app.Facade.Env
 import <%-packageAddress%>.exception.response.BadRequestException
 import <%-packageAddress%>.exception.response.NotFoundException
 import <%-packageAddress%>.exception.response.UnauthorizedException
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.model.param.DefaultParam
 import br.com.simpli.tools.SecurityUtils.sha256
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
  * @author Simpli CLI generator
  */
 class AuthProcessTest : ProcessTest() {
-    private val unauthorizedRequest = AuthRequest(Env.props.testerLogin, "wrongpassword")
+    private val unauthorizedRequest = AuthRequest(Env.TESTER_LOGIN, "wrongpassword")
     private val subject = AuthProcess(context)
 
     @Test(expected = UnauthorizedException::class)
@@ -52,9 +52,9 @@ class AuthProcessTest : ProcessTest() {
     @Test
     fun testChangePassword() {
         val request = ChangePasswordRequest(
-                sha256(Env.props.testerPassword),
-                sha256("""${Env.props.testerPassword}new"""),
-                sha256("""${Env.props.testerPassword}new""")
+                sha256(Env.TESTER_PASSWORD),
+                sha256("""${Env.TESTER_PASSWORD}new"""),
+                sha256("""${Env.TESTER_PASSWORD}new""")
         )
 
         val result = subject.changePassword(request, auth)
@@ -65,8 +65,8 @@ class AuthProcessTest : ProcessTest() {
     fun testChangePasswordWrongPassword() {
         val request = ChangePasswordRequest(
                 sha256("wrongpassword"),
-                sha256("""${Env.props.testerPassword}new"""),
-                sha256("""${Env.props.testerPassword}new""")
+                sha256("""${Env.TESTER_PASSWORD}new"""),
+                sha256("""${Env.TESTER_PASSWORD}new""")
         )
 
         subject.changePassword(request, auth)
@@ -75,9 +75,9 @@ class AuthProcessTest : ProcessTest() {
     @Test(expected = BadRequestException::class)
     fun testChangePasswordPasswordNoMatch() {
         val request = ChangePasswordRequest(
-                sha256(Env.props.testerPassword),
-                sha256("""${Env.props.testerPassword}new"""),
-                sha256("""${Env.props.testerPassword}different""")
+                sha256(Env.TESTER_PASSWORD),
+                sha256("""${Env.TESTER_PASSWORD}new"""),
+                sha256("""${Env.TESTER_PASSWORD}different""")
         )
 
         subject.changePassword(request, auth)

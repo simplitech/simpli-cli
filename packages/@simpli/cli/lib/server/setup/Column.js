@@ -227,6 +227,79 @@ module.exports = class Column {
     return result
   }
 
+  buildFilter () {
+    if (this.isPrimary) {
+      return ''
+    }
+
+    if (this.isForeign) {
+      return `    var ${this.name}: List<${this.kotlinType}>?\n\n`
+    }
+
+    if (this.isLong || this.isDouble) {
+      let result = ''
+      result += `    var min${this.capitalizedName}: ${this.kotlinType}?\n`
+      result += `    var max${this.capitalizedName}: ${this.kotlinType}?\n\n`
+      return result
+    }
+
+    if (this.isDate) {
+      let result = ''
+      result += `    var start${this.capitalizedName}: ${this.kotlinType}?\n`
+      result += `    var end${this.capitalizedName}: ${this.kotlinType}?\n\n`
+      return result
+    }
+
+    return `    var ${this.name}: ${this.kotlinType}?\n\n`
+  }
+
+  buildParam () {
+    let result = ''
+
+    if (this.isPrimary) {
+      return result
+    }
+
+    result += `    @QueryParam("${this.name}")\n`
+    result += `    @Schema\n`
+
+    if (this.isForeign) {
+      result += `    override var ${this.name}: List<${this.kotlinType}>? = null\n\n`
+      return result
+    }
+
+    if (this.isLong || this.isDouble) {
+      let result = ''
+
+      result += `    @QueryParam("min${this.capitalizedName}")\n`
+      result += `    @Schema\n`
+      result += `    override var min${this.capitalizedName}: ${this.kotlinType}? = null\n\n`
+
+      result += `    @QueryParam("max${this.capitalizedName}")\n`
+      result += `    @Schema\n`
+      result += `    override var max${this.capitalizedName}: ${this.kotlinType}? = null\n\n`
+
+      return result
+    }
+
+    if (this.isDate) {
+      let result = ''
+
+      result += `    @QueryParam("start${this.capitalizedName}")\n`
+      result += `    @Schema\n`
+      result += `    override var start${this.capitalizedName}: ${this.kotlinType}? = null\n\n`
+
+      result += `    @QueryParam("end${this.capitalizedName}")\n`
+      result += `    @Schema\n`
+      result += `    override var end${this.capitalizedName}: ${this.kotlinType}? = null\n\n`
+
+      return result
+    }
+
+    result += `    override var ${this.name}: ${this.kotlinType}? = null\n\n`
+    return result
+  }
+
   buildForeign () {
     let result = ''
     if (this.isRequired) {
@@ -241,8 +314,13 @@ module.exports = class Column {
       result += `        get() = ${this.foreign.name}?.${this.foreign.referencedColumnName}\n`
     }
     result += `        set(value) {\n`
-    if (!this.isRequired) {
-      result += `            if (value == null) {\n`
+    if (this.isRequired) {
+      result += `            if (value == 0L) {\n`
+      result += `                ${this.foreign.name} = null\n`
+      result += `                return\n`
+      result += `            }\n`
+    } else {
+      result += `            if (value == null || value == 0L) {\n`
       result += `                ${this.foreign.name} = null\n`
       result += `                return\n`
       result += `            }\n`
@@ -251,6 +329,60 @@ module.exports = class Column {
     result += `                ${this.foreign.name} = ${this.foreign.referencedTableModelName}()\n`
     result += `            }\n`
     result += `            ${this.foreign.name}?.${this.foreign.referencedColumnName} = value\n`
+    result += `        }\n\n`
+
+    return result
+  }
+
+  buildFilterDao () {
+    if (this.isPrimary) {
+      return ''
+    }
+
+    if (this.isForeign) {
+      let result = ''
+
+      result += `        filter.${this.name}?.also {\n`
+      result += `            if (it.isNotEmpty()) {\n`
+      result += `                whereIn("$alias.${this.name}", *it.toTypedArray())\n`
+      result += `            }\n`
+      result += `        }\n\n`
+
+      return result
+    }
+
+    if (this.isLong || this.isDouble) {
+      let result = ''
+
+      result += `        filter.min${this.capitalizedName}?.also {\n`
+      result += `            whereGtEq("$alias.${this.name}", it)\n`
+      result += `        }\n`
+
+      result += `        filter.max${this.capitalizedName}?.also {\n`
+      result += `            whereLtEq("$alias.${this.name}", it)\n`
+      result += `        }\n\n`
+
+      return result
+    }
+
+    if (this.isDate) {
+      let result = ''
+
+      result += `        filter.start${this.capitalizedName}?.also {\n`
+      result += `            whereGtEq("DATE($alias.${this.name})", Query("DATE(?)", it))\n`
+      result += `        }\n`
+
+      result += `        filter.end${this.capitalizedName}?.also {\n`
+      result += `            whereLtEq("DATE($alias.${this.name})", Query("DATE(?)", it))\n`
+      result += `        }\n\n`
+
+      return result
+    }
+
+    let result = ''
+
+    result += `        filter.${this.name}?.also {\n`
+    result += `            whereEq("$alias.${this.name}", it)\n`
     result += `        }\n\n`
 
     return result

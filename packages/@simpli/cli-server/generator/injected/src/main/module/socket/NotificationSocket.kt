@@ -5,19 +5,18 @@
 package <%-packageAddress%>.<%-moduleName%>.socket
 
 import <%-packageAddress%>.<%-moduleName%>.context.AuthPipe
-import <%-packageAddress%>.app.Env
-import <%-packageAddress%>.app.RequestLogger
-import <%-packageAddress%>.param.DefaultParam
+import <%-packageAddress%>.enums.ConnectionStatus
+import <%-packageAddress%>.extension.jsonProperties
+import <%-packageAddress%>.model.param.DefaultParam
 import <%-packageAddress%>.wrapper.RouterWrapper
 import <%-packageAddress%>.wrapper.SocketWrapper
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.websocket.OnClose
 import javax.websocket.OnError
 import javax.websocket.OnOpen
 import javax.websocket.Session
 import javax.websocket.server.PathParam
 import javax.websocket.server.ServerEndpoint
+import org.apache.logging.log4j.LogManager
 
 /**
  * Notification Web Socket
@@ -26,9 +25,10 @@ import javax.websocket.server.ServerEndpoint
  */
 @ServerEndpoint("/ws/<%-moduleNameKebabCase%>/notification/{token}")
 class NotificationSocket: RouterWrapper() {
-
     companion object {
         val socket = SocketWrapper<String>()
+
+        private val logger = LogManager.getLogger(NotificationSocket::class.java)
     }
 
     @OnOpen
@@ -46,33 +46,18 @@ class NotificationSocket: RouterWrapper() {
             socket.attachSession(session, auth.id)
         }
 
-        if (Env.props.detailedLog) {
-            Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
-            ===== CLIENT SOCKET CONNECTION ESTABLISHED =====
-            CLIENT ID: ${session.userProperties["id"]}
-            CLIENT LOGIN: ${session.userProperties["<%-accountColumn.name%>"]}
-            =========================================
-            """)
-        }
+        logger.debug(session.jsonProperties(ConnectionStatus.ESTABLISHED))
     }
 
     @OnClose
     fun onDisconnect(session: Session) {
         socket.detachSession(session)
 
-        if (Env.props.detailedLog) {
-            Logger.getLogger(RequestLogger::class.java.name).log(Level.INFO, """
-            ===== CLIENT SOCKET CONNECTION LOST =====
-            CLIENT ID: ${session.userProperties["id"]}
-            CLIENT LOGIN: ${session.userProperties["<%-accountColumn.name%>"]}
-            =========================================
-            """)
-        }
+        logger.debug(session.jsonProperties(ConnectionStatus.LOST))
     }
 
     @OnError
     fun onError(e: Throwable) {
         toResponse(e)
     }
-
 }
