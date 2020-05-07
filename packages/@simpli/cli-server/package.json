@@ -1,6 +1,6 @@
 {
   "name": "@simpli/cli-server",
-  "version": "2.3.6",
+  "version": "2.4.0-0",
   "description": "server for simpli-cli",
   "main": "index.js",
   "publishConfig": {
