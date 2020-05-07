@@ -34,7 +34,7 @@ module.exports = class Server {
   constructor (name, context, promptModules) {
     this.name = name
     this.context = process.env.SIMPLI_CLI_CONTEXT = context
-    this.serverSetup = new ServerSetup()
+    this.serverSetup = new ServerSetup(name)
     const { presetPrompt, featurePrompt } = this.resolveIntroPrompts()
     this.presetPrompt = presetPrompt
     this.featurePrompt = featurePrompt

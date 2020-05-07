@@ -35,7 +35,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-import {Helper} from 'simpli-web-sdk'
 <%_ var resetPasswordRequestModel = rootOptions.scaffoldSetup.auth.model.resetPasswordRequest _%>
 <%-resetPasswordRequestModel.injectIntoDependence().build()%>
 <%-resetPasswordRequestModel.injectSchemaIntoDependence('Input', false).build(1)%>
@@ -53,7 +52,8 @@ export default class ResetPasswordView extends Vue {
 
   async submit() {
     await this.request.resetPassword()
-    await Helper.successAndPush('system.success.resetPassword', '/sign-in')
+    this.$toast.success('system.success.resetPassword')
+    await this.$nav.push('/sign-in')
   }
 }
 </script>

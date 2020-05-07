@@ -1,5 +1,5 @@
 .header {
-  @apply z-10 shadow-lg bg-white;
+  @apply verti z-10 shadow-lg bg-white;
 
   .header__title {
     @apply my-2 text-center text-2xl font-light w-full;
@@ -9,7 +9,7 @@
     @apply horiz flex-wrap items-center-center;
 
     > * {
-      @apply m-2;
+      @apply m-3;
     }
   }
 }

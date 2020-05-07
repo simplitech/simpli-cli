@@ -1,18 +1,45 @@
+<%_ var appName = rootOptions.scaffoldSetup.appName || 'Webapp' _%>
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link href="<%%= BASE_URL %%>preloader/please-wait.css" rel="stylesheet">
-    <link rel="shortcut icon" href="<%%= BASE_URL %%>favicon.ico">
-    <title>Loading Application...</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <meta property="og:site_name"         content="<%-appName%>" />
+    <meta property="og:type"              content="website" />
+    <meta property="og:url"               content="https://github.com/simplitech/simpli-cli" />
+    <meta property="og:title"             content="<%-appName%>" />
+    <meta property="og:description"       content="Simpli CLI - Generated App" />
+    <meta property="og:image"             content="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" />
+    <meta property="og:image:width"       content="2368" />
+    <meta property="og:image:height"      content="2368" />
+
+    <meta name='twitter:card'             content="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" />
+    <meta name="twitter:image"            content="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" />
+    <meta name="twitter:url"              content="https://github.com/simplitech/simpli-cli" />
+
+    <title><%-appName%></title>
+
+    <meta itemprop="name" content="<%-appName%>" />
+    <meta itemprop="url" content="https://github.com/simplitech/simpli-cli" />
+    <meta itemprop="thumbnailUrl" content="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" />
+    <meta itemprop="image" content="https://raw.githubusercontent.com/simplitech/simpli-cli/master/logo.png" />
+
+    <meta name="author" content="Simpli CLI generator" />
+    <meta name="description" content="Simpli CLI - Generated App" />
+    <meta name="keywords" content="" />
+
+    <link href="<%%= BASE_URL %%>preloader/please-wait.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="<%%= BASE_URL %%>favicon.ico" />
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but vue-sandbox doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but this application doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+
     <div id="app"></div>
+
     <script type="text/javascript" src="<%%= BASE_URL %%>preloader/please-wait.min.js"></script>
     <script type="text/javascript">
       window.appLoader = window.pleaseWait({
@@ -21,6 +48,7 @@
         loadingHtml: '<div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>',
       });
     </script>
+
     <!-- built files will be auto injected -->
   </body>
 </html>

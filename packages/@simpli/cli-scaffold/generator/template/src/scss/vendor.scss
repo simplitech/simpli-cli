@@ -1,7 +1,25 @@
 @import "~normalize-scss/sass/normalize";
 @import "~simple-line-icons/scss/simple-line-icons";
 @import '~pretty-checkbox/src/pretty-checkbox';
-@import "~simpli-web-sdk/scss/main";
-@import "~simpli-web-sdk/scss/effect";
+@import '~sweetalert2/src/sweetalert2';
+@import "~@simpli/vue-adap-table/scss/adapOrderby";
+@import "~@simpli/vue-adap-table/scss/adapPagination";
+@import "~@simpli/vue-adap-table/scss/adapSearchfield";
+@import "~@simpli/vue-input/scss/input";
+@import "~@simpli/vue-await/scss/await";
+@import "~@simpli/vue-modal/scss/modal";
+
+.vue-notify--material {
+  @import "~vue-snotify/styles/material.scss";
+}
+
+.vue-notify--simple {
+  @import "~vue-snotify/styles/simple.scss";
+}
+
+.vue-notify--dark {
+  @import "~vue-snotify/styles/dark.scss";
+}
+
 
 @include normalize();

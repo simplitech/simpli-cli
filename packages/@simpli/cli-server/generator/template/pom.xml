@@ -124,7 +124,27 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-core</artifactId>
-      <version>1.11.302</version>
+      <version>1.11.723</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-xray</artifactId>
+      <version>1.11.723</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-xray-recorder-sdk-core</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-xray-recorder-sdk-aws-sdk-instrumentor</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-xray-recorder-sdk-aws-sdk</artifactId>
+      <version>2.4.0</version>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>

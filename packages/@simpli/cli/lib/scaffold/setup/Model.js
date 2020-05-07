@@ -149,7 +149,7 @@ module.exports = class Model {
   }
 
   get extendedClass () {
-    return this.isResource ? 'Resource' : 'Model'
+    return this.isResource ? ' implements IResource' : ''
   }
 
   /**
@@ -307,7 +307,7 @@ module.exports = class Model {
   }
 
   get listCsvApi () {
-    return this.apis.find((api) => api.methodUppercase === 'GET' && api.name === `listCsv${this.name}`) || null
+    return this.apis.find((api) => api.methodUppercase === 'GET' && api.name === `listExport${this.name}`) || null
   }
 
   get populateApi () {
@@ -370,16 +370,26 @@ module.exports = class Model {
    */
   setDependencies () {
     const dependencies = []
-    const simpliModule = 'simpli-web-sdk'
+    const facadeModule = '@/facade'
+    const simpliModule = '@simpli/serialized-request'
+    const resourceModule = '@simpli/resource-collection/dist/types/IResource'
+    const resourceCollectionModule = '@simpli/resource-collection'
 
+    const facade = new Dependence(facadeModule)
     const simpliCommons = new Dependence(simpliModule)
-    const simpliDecorator = new Dependence(simpliModule)
+    const simpliResource = new Dependence(resourceModule)
+    const simpliResourceCollection = new Dependence(resourceCollectionModule)
 
+    this.populateFacade(facade)
     this.populateSimpliCommons(simpliCommons)
-    this.populateSimpliDecorator(simpliDecorator)
+    this.populateSimpliResource(simpliResource)
+    this.populateSimpliResourceCollection(simpliResourceCollection)
 
+    if (facade.hasChildren) dependencies.push(facade)
     if (simpliCommons.hasChildren) dependencies.push(simpliCommons)
-    if (simpliDecorator.hasChildren) dependencies.push(simpliDecorator)
+    if (simpliResource.hasChildren) dependencies.push(simpliResource)
+    if (simpliResourceCollection.hasChildren) dependencies.push(simpliResourceCollection)
+
     dependencies.push(...this.generateModelResources())
 
     this.dependencies = dependencies
@@ -408,23 +418,35 @@ module.exports = class Model {
     this.persistDependencies = uniqBy(dependencies, 'module') || []
   }
 
-  populateSimpliCommons (dep = new Dependence()) {
+  populateFacade (dep = new Dependence()) {
     dep.addChild('$')
-    dep.addChild('Helper')
-    dep.addChild('Request')
-    if (this.isResource) {
-      dep.addChild('Resource')
-    } else {
-      dep.addChild('Model')
-    }
   }
 
-  populateSimpliDecorator (dep = new Dependence()) {
+  populateSimpliCommons (dep = new Dependence()) {
+    dep.addChild('Request')
+
+    if (this.isPaginated) {
+      dep.addChild('HttpExclude')
+      dep.addChild('RequestExpose')
+    }
+
     this.attrs.forEach((attr) => {
       attr.responses.forEach((response) => {
         dep.addChild(response.title)
       })
     })
+  }
+
+  populateSimpliResource (dep = new Dependence()) {
+    if (this.isResource) {
+      dep.addChild('IResource')
+    }
+  }
+
+  populateSimpliResourceCollection (dep = new Dependence()) {
+    if (this.isPaginated) {
+      dep.addChild('PageCollection')
+    }
   }
 
   generateModelResources () {
@@ -556,22 +578,91 @@ module.exports = class Model {
     }
     result += `  }\n`
 
+    result += `  get $tag() {\n`
     if (attrFromTAG && !attrFromTAG.isArrayOrigin) {
       if (attrFromTAG.isObjectOrigin) {
-        result += `  get $tag() {\n`
         if (!attrFromTAG.isRequired && !attrFromID.fromResp) {
           result += `    if (!this.${attrFromTAG.name}) return ''\n`
         }
         result += `    return this.${attrFromTAG.name}.$tag\n`
-        result += `  }\n`
       } else {
-        result += `  get $tag() {\n`
         result += `    return String(this.${this.resource.keyTAG})\n`
-        result += `  }\n`
       }
+    } else {
+      result += `    return String(this.$id)\n`
     }
+    result += `  }\n`
 
     return result + '\n'
+  }
+
+  /**
+   * Print the schema into the template generator
+   */
+  buildFilterSchema (collection = new Model()) {
+    let result = ''
+    const api = collection.apis[0]
+
+    if (api) {
+      api.queries.forEach((query) => {
+        const isArray = Boolean((query.type || '').match(/^\S+\[]$/g))
+        const forbiddenNames = ['query', 'page', 'limit', 'orderBy', 'ascending']
+
+        if (!forbiddenNames.includes(query.name)) {
+          if (isArray) {
+            const attr = this.foreignAtrrs.find((attr) => attr.name === query.name)
+
+            if (attr) {
+              result += `    ${attr.foreign}: (schema): FieldComponent => ({\n`
+              result += `      is: Component.InputSelect,\n`
+              result += `      bind: {\n`
+              result += `        items: this.collection${attr.foreignType}.items,\n`
+              result += `        multiple: true,\n`
+              result += `        closeOnSelect: false,\n`
+              result += `        preserveSearch: true,\n`
+              result += `        label: this.translateFrom(schema.fieldName),\n`
+              result += `        trackBy: '$id',\n`
+              result += `        preselectFirst: true,\n`
+              result += `      },\n`
+              result += `    }),\n`
+            }
+          } else if (query.type === 'number') {
+            result += `    ${query.name}: (schema): FieldComponent => ({\n`
+            result += `      is: Component.InputText,\n`
+            result += `      bind: {\n`
+            result += `        type: 'number',\n`
+            result += `        label: this.translateFrom(schema.fieldName),\n`
+            result += `      },\n`
+            result += `    }),\n`
+          } else if (query.type === 'boolean') {
+            result += `    ${query.name}: (schema): FieldComponent => ({\n`
+            result += `      is: Component.InputCheckbox,\n`
+            result += `      bind: {\n`
+            result += `        label: this.translateFrom(schema.fieldName),\n`
+            result += `        class: 'pretty p-switch p-fill justify-center mt-8',\n`
+            result += `        labelClass: 'relative state',\n`
+            result += `      },\n`
+            result += `    }),\n`
+          } else {
+            const matchDate = /^(?:start|end)(\S+)$/.exec(query.name)
+            const isDate = matchDate && matchDate[1]
+            result += `    ${query.name}: (schema): FieldComponent => ({\n`
+            result += `      is: Component.InputText,\n`
+            result += `      bind: {\n`
+            result += `        type: '${isDate ? 'mask' : 'text'}',\n`
+            if (isDate) {
+              result += `        maskPreset: 'date',\n`
+            }
+            result += `        label: this.translateFrom(schema.fieldName),\n`
+            result += `      },\n`
+            result += `    }),\n`
+          }
+        }
+      })
+    }
+
+    result = result.slice(0, -1) // remove last line
+    return result
   }
 
   /**
@@ -587,7 +678,7 @@ module.exports = class Model {
           result += `      is: Component.InputSelect,\n`
           result += `      bind: {\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
-          result += `        items: this.collection${attr.type}.all(),\n`
+          result += `        items: this.collection${attr.type}.items,\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
           }
@@ -596,7 +687,7 @@ module.exports = class Model {
           result += `      is: Component.InputSelect,\n`
           result += `      bind: {\n`
           result += `        label: this.translateFrom(schema.fieldName),\n`
-          result += `        items: this.collection${attr.type}.all(),\n`
+          result += `        items: this.collection${attr.type}.items,\n`
           if (attr.isRequired) {
             result += `        required: true,\n`
           }
@@ -806,17 +897,17 @@ module.exports = class Model {
         result += `      bind: {\n`
         if (attr.isObjectResource) {
           if (attr.isRequired) {
-            result += `        content: schema.model.${attr.name}.$id,\n`
+            result += `        content: schema.model.${attr.name}.$tag,\n`
           } else {
-            result += `        content: schema.model.${attr.name}?.$id,\n`
+            result += `        content: schema.model.${attr.name}?.$tag,\n`
           }
         } else {
           if (attr.isRequired) {
             result += `        // TODO: define the attribute\n`
-            result += `        // content: schema.model.${attr.name}.$id,\n`
+            result += `        // content: schema.model.${attr.name}.$tag,\n`
           } else {
             result += `        // TODO: define the attribute\n`
-            result += `        // content: schema.model.${attr.name}?.$id,\n`
+            result += `        // content: schema.model.${attr.name}?.$tag,\n`
           }
         }
         result += `      },\n`
@@ -826,7 +917,7 @@ module.exports = class Model {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.bool(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.bool(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isUrl) {
@@ -851,21 +942,21 @@ module.exports = class Model {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.bool(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.bool(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isDate) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.date(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.date(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isDatetime) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.datetime(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.datetime(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isPassword) {
@@ -873,28 +964,28 @@ module.exports = class Model {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.phone(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.phone(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isCpf) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.cpf(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.cpf(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isCnpj) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.cnpj(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.cnpj(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else if (attr.isRg) {
         result += `    ${attr.name}: (schema): FieldComponent => ({\n`
         result += `      is: Component.Render,\n`
         result += `      bind: {\n`
-        result += `        content: Helper.rg(schema.model.${attr.name}),\n`
+        result += `        content: $.filter.rg(schema.model.${attr.name}),\n`
         result += `      },\n`
         result += `    }),\n`
       } else {
@@ -924,32 +1015,32 @@ module.exports = class Model {
         }
 
         if (attr.isRequired) {
-          result += `schema.model.${attr.name}.$id,\n`
+          result += `schema.model.${attr.name}.$tag,\n`
         } else {
-          result += `schema.model.${attr.name}?.$id ?? null,\n`
+          result += `schema.model.${attr.name}?.$tag ?? null,\n`
         }
       } else if (attr.isArrayOrigin) {
       } else if (attr.isSoftDelete) {
-        result += `    ${attr.name}: (schema) => Helper.bool(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.bool(schema.model.${attr.name}),\n`
       } else if (attr.isUrl) {
         result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
       } else if (attr.isImageUrl) {
         result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
       } else if (attr.isBoolean) {
-        result += `    ${attr.name}: (schema) => Helper.bool(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.bool(schema.model.${attr.name}),\n`
       } else if (attr.isDate) {
-        result += `    ${attr.name}: (schema) => Helper.date(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.date(schema.model.${attr.name}),\n`
       } else if (attr.isDatetime) {
-        result += `    ${attr.name}: (schema) => Helper.datetime(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.datetime(schema.model.${attr.name}),\n`
       } else if (attr.isPassword) {
       } else if (attr.isPhone) {
-        result += `    ${attr.name}: (schema) => Helper.phone(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.phone(schema.model.${attr.name}),\n`
       } else if (attr.isCpf) {
-        result += `    ${attr.name}: (schema) => Helper.cpf(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.cpf(schema.model.${attr.name}),\n`
       } else if (attr.isCnpj) {
-        result += `    ${attr.name}: (schema) => Helper.cnpj(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.cnpj(schema.model.${attr.name}),\n`
       } else if (attr.isRg) {
-        result += `    ${attr.name}: (schema) => Helper.rg(schema.model.${attr.name}),\n`
+        result += `    ${attr.name}: (schema) => $.filter.rg(schema.model.${attr.name}),\n`
       } else {
         result += `    ${attr.name}: (schema) => schema.model.${attr.name},\n`
       }
@@ -1016,11 +1107,58 @@ module.exports = class Model {
   buildLocale (prefix = '') {
     let result = ''
 
-    result += `    ${prefix}${this.name}: {\n`
+    result += `    "${prefix}${this.name}": {\n`
+
     this.attrs.forEach((attr) => {
-      result += `      ${attr.name}: '${startCase(attr.name)}',\n`
+      result += `      "${attr.name}": "${startCase(attr.name)}",\n`
     })
+
+    if (this.attrs.length) {
+      result = result.slice(0, -2) // remove last line and comma
+      result += '\n'
+    }
+
     result += `    },\n`
+
+    return result
+  }
+
+  /**
+   * Print the locale classes into the template generator
+   */
+  buildFilterLocale (prefix = '', collection = new Model()) {
+    let result = ''
+    const api = collection.apis[0]
+
+    if (api) {
+      result += `    "${prefix}${this.name}": {\n`
+      let isEmpty = true
+
+      api.queries.forEach((query) => {
+        const isArray = Boolean((query.type || '').match(/^\S+\[]$/g))
+        const forbiddenNames = ['query', 'page', 'limit', 'orderBy', 'ascending']
+
+        if (!forbiddenNames.includes(query.name)) {
+          if (isArray) {
+            const attr = this.foreignAtrrs.find((attr) => attr.name === query.name)
+            if (attr) {
+              result += `      "${attr.foreign}": "${startCase(attr.foreign)}",\n`
+              isEmpty = false
+            }
+          } else {
+            result += `      "${query.name}": "${startCase(query.name)}",\n`
+            isEmpty = false
+          }
+        }
+      })
+
+      if (!isEmpty) {
+        result = result.slice(0, -2) // remove last line and comma
+        result += '\n'
+      }
+
+      result += `    },\n`
+    }
 
     return result
   }
@@ -1035,15 +1173,25 @@ module.exports = class Model {
     return result
   }
 
+  buildPersistResourceDeclares () {
+    let result = ''
+
+    this.persistDependencies.forEach((dep) => {
+      result += `  collection${dep.children[0]}: ${dep.children[0]}Collection\n`
+    })
+
+    return result
+  }
+
   buildPersistResource () {
     let result = ''
 
     this.objectAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.collection${attr.type}.all(),\n`
+      result += `        ${attr.name}: this.collection${attr.type}.items,\n`
     })
 
     this.arrayAtrrs.forEach((attr) => {
-      result += `        ${attr.name}: this.collection${attr.type}.all(),\n`
+      result += `        ${attr.name}: this.collection${attr.type}.items,\n`
     })
 
     result = result.slice(0, -1) // remove last line
@@ -1162,6 +1310,57 @@ module.exports = class Model {
       result += api.build(auth)
       result += '\n'
     })
+
+    return result
+  }
+
+  buildCollectionFields () {
+    let result = ''
+    const api = this.apis[0]
+
+    if (api) {
+      api.queries.forEach((query) => {
+        const isArray = Boolean((query.type || '').match(/^\S+\[]$/g))
+        const defaultValue = isArray ? '[]' : 'null'
+        const isNullable = isArray ? '' : ' | null'
+
+        const forbiddenNames = ['query', 'page', 'limit', 'orderBy', 'ascending']
+
+        if (!forbiddenNames.includes(query.name)) {
+          result += `  @RequestExpose() ${query.name}: ${query.type}${isNullable} = ${defaultValue}\n`
+        }
+      })
+
+      if (api.queries.length) {
+        result += '\n'
+      }
+    }
+
+    return result
+  }
+
+  buildCollectionForeignAttrs (itemModel = new Model()) {
+    let result = ''
+    const api = this.apis[0]
+
+    if (api) {
+      itemModel.foreignAtrrs.forEach((attr) => {
+        const hasQuery = api.queries.some((query) => query.name === attr.name)
+
+        if (hasQuery) {
+          result += `  get ${attr.foreign}() {\n`
+          result += `    return (\n`
+          result += `      this.resource?.collection${attr.foreignType}.getManyIds(\n`
+          result += `        this.${attr.name}\n`
+          result += `      ) ?? null\n`
+          result += `    )\n`
+          result += `  }\n`
+          result += `  set ${attr.foreign}(input) {`
+          result += `    this.${attr.name} = input?.map(item => item?.$id) ?? []\n`
+          result += `  }\n\n`
+        }
+      })
+    }
 
     return result
   }

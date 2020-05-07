@@ -63,11 +63,30 @@ module.exports = class Api {
   setQueries (config) {
     this.queries = (config.parameters || [])
       .filter((param) => param.in === 'query')
-      .map((param) => ({
-        name: param.name,
-        type: this.convertType((param.schema && param.schema.type) || param.type),
-        required: Boolean(param.required)
-      }))
+      .map((param) => {
+        let type = (param.schema && param.schema.type) || param.type
+        const isArray = type === 'array'
+
+        if (type === 'array') {
+          type = (
+            param.schema &&
+            param.schema.items &&
+            param.schema.items.type
+          ) || null
+        }
+
+        type = this.convertType(type)
+
+        if (isArray) {
+          type = `${type}[]`
+        }
+
+        return {
+          name: param.name,
+          type,
+          required: Boolean(param.required)
+        }
+      })
   }
 
   setBody (config) {
@@ -76,7 +95,7 @@ module.exports = class Api {
 
     if (!body) {
       // Swagger body
-      body = config.parameters.find((param) => param.in === 'body')
+      body = (config.parameters || []).find((param) => param.in === 'body')
     }
 
     if (body) {
@@ -199,7 +218,7 @@ module.exports = class Api {
   }
 
   convertType (type = '') {
-    if (type === 'integer' || type === 'double') return 'number'
+    if (type === 'integer' || type === 'double' || type === 'number') return 'number'
     if (type === 'boolean') return 'boolean'
     return 'string'
   }
@@ -367,8 +386,8 @@ module.exports = class Api {
   buildSignIn (auth = new Auth()) {
     let result = ''
 
-    result += `    const request = this.$clone()\n`
-    result += `    request.${auth.passwordAttrName} = Helper.encrypt(this.${auth.passwordAttrName} ?? '')\n\n`
+    result += `    const request = $.utils.clone(this)\n`
+    result += `    request.${auth.passwordAttrName} = $.utils.sha256(this.${auth.passwordAttrName})\n\n`
 
     return this.buildMethod(result, 'request', 1000)
   }
@@ -386,9 +405,9 @@ module.exports = class Api {
   buildResetPassword () {
     let result = ''
 
-    result += `    const request = this.$clone()\n`
-    result += `    request.newPassword = Helper.encrypt(this.newPassword ?? '')\n`
-    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword ?? '')\n\n`
+    result += `    const request = $.utils.clone(this)\n`
+    result += `    request.newPassword = $.utils.sha256(this.newPassword)\n`
+    result += `    request.confirmPassword = $.utils.sha256(this.confirmPassword)\n\n`
 
     return this.buildMethod(result, 'request')
   }
@@ -399,10 +418,10 @@ module.exports = class Api {
   buildChangePassword () {
     let result = ''
 
-    result += `    const request = this.$clone()\n`
-    result += `    request.currentPassword = Helper.encrypt(this.currentPassword ?? '')\n`
-    result += `    request.newPassword = Helper.encrypt(this.newPassword ?? '')\n`
-    result += `    request.confirmPassword = Helper.encrypt(this.confirmPassword ?? '')\n\n`
+    result += `    const request = $.utils.clone(this)\n`
+    result += `    request.currentPassword = $.utils.sha256(this.currentPassword)\n`
+    result += `    request.newPassword = $.utils.sha256(this.newPassword)\n`
+    result += `    request.confirmPassword = $.utils.sha256(this.confirmPassword)\n\n`
 
     return this.buildMethod(result, 'request')
   }

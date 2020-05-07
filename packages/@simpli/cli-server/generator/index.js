@@ -70,6 +70,7 @@ module.exports = (api, options) => {
     api.renderFrom('./injected', 'src/main/exception/response/UnsupportedMediaTypeException.kt', `../../kotlin/${dir}/exception/response/UnsupportedMediaTypeException.kt`)
 
     // main/extension
+    api.renderFrom('./injected', 'src/main/extension/ContainerResponseContext.kt', `../kotlin/${dir}/extension/ContainerResponseContext.kt`)
     api.renderFrom('./injected', 'src/main/extension/HttpServletRequest.kt', `../kotlin/${dir}/extension/HttpServletRequest.kt`)
     api.renderFrom('./injected', 'src/main/extension/Session.kt', `../kotlin/${dir}/extension/Session.kt`)
 

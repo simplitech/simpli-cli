@@ -1,0 +1,231 @@
+{
+  "app": {
+    "title": "<%- rootOptions.scaffoldSetup.appName || 'Webapp' %>",
+    "subtitle": "Painel Admin",
+    "logout": "Sair",
+    "menu": "Menu",
+    "add": "Cadastrar",
+    "export": "Exportar",
+    "select": "Selecione",
+    "remove": "Remover",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "noDataToShow": "Nenhum dado para apresentar",
+    "downloadXlsx": "Baixar XLSX",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "moreFilters": "Mais Filtros",
+    "submit": "Enviar",
+    "totalLines": "{total} entradas no total",
+    "version": "Versão",
+    "onlyIfWantChangePassword": "Preencha este campo somente se quiser alterar a senha",
+    "noResultFound": "Nenhum resultado encontrado",
+    "emptyList": "Lista vazia"
+  },
+  "system": {
+    "question": {
+      "confirmRemove": "Tem certeza que deseja remover este item?",
+      "yesRemove": "Sim, remover!"
+    },
+    "info": {
+      "welcome": "Bem-vindo"
+    },
+    "success": {
+      "recoverPasswordByMail": "Um e-mail foi enviado à sua conta",
+      "resetPassword": "Senha alterada com sucesso",
+      "changePassword": "Senha alterada com sucesso",
+      "persist": "Salvo com Sucesso!"
+    },
+    "error": {
+      "unauthorized": "Acesso Restrito",
+      "noServer": "Não foi possível conectar ao servidor",
+      "validation": "Existem campos com erros de validação"
+    }
+  },
+  "lang": {
+    "code": "pt-BR",
+    "name": "Português",
+    "decimal": ",",
+    "thousands": "."
+  },
+  "currency": {
+    "USD": {
+      "prefix": "USD$",
+      "precision": "2"
+    },
+    "BRL": {
+      "prefix": "R$",
+      "precision": "2"
+    }
+  },
+  "country": {
+    "BRA": {
+      "name": "Brasil",
+      "alpha2": "BR",
+      "alpha3": "BRA",
+      "lang": {
+        "code": "pt-BR",
+        "name": "Português"
+      }
+    },
+    "USA": {
+      "name": "Estados Unidos",
+      "alpha2": "US",
+      "alpha3": "USA",
+      "lang": {
+        "code": "en-US",
+        "name": "Inglês"
+      }
+    }
+  },
+  "boolean": {
+    "true": "Sim",
+    "false": "Não"
+  },
+  "dateFormat": {
+    "date": "DD/MM/YYYY",
+    "datetime": "DD/MM/YYYY HH:mm",
+    "time": "hh:mm"
+  },
+  "mask": {
+    "date": "##/##/####",
+    "datetime": "##/##/#### ##:##",
+    "zipcode": "#####-###",
+    "zipcodeAlt": "#####-###",
+    "phone": "(##) ####-####",
+    "phoneAlt": "(##) #####-####",
+    "cpf": "###.###.###-##",
+    "cnpj": "##.###.###/####-##",
+    "rg": "##.###.###-#"
+  },
+  "httpResponse": {
+    "100": "Continue",
+    "101": "Switching Protocol",
+    "200": "Ok",
+    "201": "Created",
+    "202": "Accepted",
+    "203": "Non Authoritative Information",
+    "204": "No Content",
+    "205": "Reset Content",
+    "206": "Partial Content",
+    "300": "Multiple Choices",
+    "301": "Moved Permanently",
+    "302": "Found",
+    "303": "See Other",
+    "304": "Not Modified",
+    "305": "Use Proxy",
+    "307": "Temporary Redirect",
+    "400": "Bad Request",
+    "401": "Unauthorized",
+    "402": "Payment Required",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "405": "Method not Allowed",
+    "406": "Not Acceptable",
+    "407": "Proxy Authentication Required",
+    "408": "Request Timeout",
+    "409": "Conflict",
+    "410": "Gone",
+    "411": "Length Required",
+    "412": "Precondition Failed",
+    "413": "Request Entity Too Large",
+    "414": "Request URI Too Long",
+    "415": "Unsupported Media Type",
+    "416": "Requested Range Not Satisfiable",
+    "417": "Expectation Failed",
+    "422": "Unprocessable Entity",
+    "429": "Too Many Requests",
+    "500": "Internal Server Error",
+    "501": "Not Implemented",
+    "502": "Bad Gateway",
+    "503": "Service Unavailable",
+    "504": "Gateway Timeout",
+    "505": "Http Version Not Supported"
+  },
+  "filter": {
+    "phone": {
+      "regex": "(\\d{2})(\\d{4,5})(\\d{4})$",
+      "format": "($1) $2-$3"
+    },
+    "zipcode": {
+      "regex": "(\\d{5})(\\d{3})$",
+      "format": "$1-$2"
+    }
+  },
+  "messages": {
+    "cpf": "O campo {0} deve ser um CPF válido",
+    "cnpj": "O campo {0} deve ser um CNPJ válido",
+    "phone": "O campo {0} deve ser um telefone válido",
+    "cep": "O campo {0} deve ser um CEP válido",
+    "boleto": "O campo {0} deve ser um Boleto válido"
+  },
+  "validation": {
+    "messages": {
+      "_default": "O valor do campo {0} não é válido",
+      "after": "O campo {0} deve estar depois do campo {1}",
+      "alpha": "O campo {0} deve conter somente letras",
+      "alpha_dash": "O campo {0} deve conter letras, números e traços",
+      "alpha_num": "O campo {0} deve conter somente letras e números",
+      "alpha_spaces": "O campo {0} só pode conter caracteres alfabéticos e espaços",
+      "before": "O campo {0} deve estar antes do campo {1}",
+      "between": "O campo {0} deve estar entre {1} e {2}",
+      "confirmed": "Os campos {0} e {1} devem ser iguais",
+      "credit_card": "O campo {0} é inválido",
+      "date_between": "O campo {0} deve estar entre {1} e {2}",
+      "date_format": "O campo {0} deve estar no formato {1}",
+      "decimal": "O campo {0} deve ser numérico e deve conter {1} casas decimais",
+      "digits": "O campo {0} deve ser numérico e ter exatamente {1} dígitos",
+      "dimensions": "O campo {0} deve ter {1} pixels de largura por {2} pixels de altura",
+      "email": "O campo {0} deve ser um email válido",
+      "excluded": "O campo {0} deve ser um valor válido",
+      "ext": "O campo {0} deve ser um arquivo válido",
+      "image": "O campo {0} deve ser uma imagem",
+      "included": "O campo {0} deve ter um valor válido",
+      "integer": "O campo {0} deve ser um número inteiro",
+      "ip": "O campo {0} deve ser um endereço IP válido",
+      "is": "O valor inserido no campo {0} não é válido",
+      "length": "O tamanho do campo {0} está entre {1} e {2}",
+      "max": "O campo {0} não deve ter mais que {1} caracteres",
+      "max_value": "O campo {0} precisa ser {1} ou menor",
+      "mimes": "O campo {0} deve ser um tipo de arquivo válido",
+      "min": "O campo {0} deve conter pelo menos {1} caracteres",
+      "min_value": "O campo {0} precisa ser {1} ou maior",
+      "numeric": "O campo {0} deve conter apenas números",
+      "regex": "O campo {0} possui um formato inválido",
+      "required": "O campo {0} é obrigatório",
+      "size": "O campo {0} deve ser menor que NaN undefined",
+      "url": "O campo {0} não é uma URL válida"
+    },
+    "attributes": {},
+    "dateFormat": {
+      "date": "DD/MM/YYYY",
+      "datetime": "DD/MM/YYYY HH:mm",
+      "time": "hh:mm"
+    }
+  },
+  "view": {
+    "signIn": {
+      "title": "Fazer Login",
+      "signin": "Entrar",
+      "forgotPassword": "Esqueci senha"
+    },
+    "recoverPasswordByMail": {
+      "title": "Esqueci senha",
+      "submit": "Enviar",
+      "signIn": "Fazer login"
+    },
+    "resetPassword": {
+      "title": "Resetar senha",
+      "submit": "Enviar"
+    },
+    "dashboard": {
+      "title": "Dashboard"
+    }
+  },
+  "resource": {
+<%- rootOptions.scaffoldSetup.buildLocaleResource() -%>
+  },
+  "schema": {
+<%- rootOptions.scaffoldSetup.buildLocaleSchema() -%>
+  }
+}

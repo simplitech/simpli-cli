@@ -1,0 +1,232 @@
+{
+  "app": {
+    "title": "<%- rootOptions.scaffoldSetup.appName || 'Webapp' %>",
+    "subtitle": "Admin Panel",
+    "logout": "Logout",
+    "menu": "Menu",
+    "add": "Add",
+    "export": "Export",
+    "select": "Select",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "noDataToShow": "No data to show",
+    "downloadXlsx": "Download XLSX",
+    "search": "Search",
+    "filter": "Filter",
+    "moreFilters": "More Filters",
+    "submit": "Submit",
+    "totalLines": "{total} total lines",
+    "version": "Version",
+    "onlyIfWantChangePassword": "Fill this field only if you want to change the password",
+    "noResultFound": "No result found",
+    "emptyList": "List is empty"
+  },
+  "system": {
+    "question": {
+      "confirmRemove": "Are you sure you want to remove this item?",
+      "yesRemove": "Yes, remove!"
+    },
+    "info": {
+      "welcome": "Welcome"
+    },
+    "success": {
+      "recoverPasswordByMail": "An E-Mail has been sent to your account",
+      "resetPassword": "The password has successfully changed",
+      "changePassword": "The password has successfully changed",
+      "persist": "Persisted Successfully!"
+    },
+    "error": {
+      "unauthorized": "Restricted Access",
+      "noServer": "Could not connect to server",
+      "validation": "There are fields with validation errors"
+    }
+  },
+  "lang": {
+    "code": "en-US",
+    "name": "English",
+    "decimal": ".",
+    "thousands": ","
+  },
+  "currency": {
+    "USD": {
+      "prefix": "$",
+      "precision": "2"
+    },
+    "BRL": {
+      "prefix": "BRL$",
+      "precision": "2"
+    }
+  },
+  "country": {
+    "BRA": {
+      "name": "Brazil",
+      "alpha2": "BR",
+      "alpha3": "BRA",
+      "lang": {
+        "code": "pt-BR",
+        "name": "Portuguese"
+      }
+    },
+    "USA": {
+      "name": "United States",
+      "alpha2": "US",
+      "alpha3": "USA",
+      "lang": {
+        "code": "en-US",
+        "name": "English"
+      }
+    }
+  },
+  "boolean": {
+    "true": "Yes",
+    "false": "No"
+  },
+  "dateFormat": {
+    "date": "MM/DD/YYYY",
+    "datetime": "MM/DD/YYYY HH:mm",
+    "time": "HH:mm"
+  },
+  "mask": {
+    "date": "##/##/####",
+    "datetime": "##/##/#### ##:##",
+    "zipcode": "#####",
+    "zipcodeAlt": "#####-####",
+    "phone": "(###) ###-####",
+    "phoneAlt": "(###) ###-####",
+    "cpf": "###.###.###-##",
+    "cnpj": "##.###.###/####-##",
+    "rg": "##.###.###-#"
+  },
+  "httpResponse": {
+    "100": "Continue",
+    "101": "Switching Protocol",
+    "200": "Ok",
+    "201": "Created",
+    "202": "Accepted",
+    "203": "Non Authoritative Information",
+    "204": "No Content",
+    "205": "Reset Content",
+    "206": "Partial Content",
+    "300": "Multiple Choices",
+    "301": "Moved Permanently",
+    "302": "Found",
+    "303": "See Other",
+    "304": "Not Modified",
+    "305": "Use Proxy",
+    "307": "Temporary Redirect",
+    "400": "Bad Request",
+    "401": "Unauthorized",
+    "402": "Payment Required",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "405": "Method not Allowed",
+    "406": "Not Acceptable",
+    "407": "Proxy Authentication Required",
+    "408": "Request Timeout",
+    "409": "Conflict",
+    "410": "Gone",
+    "411": "Length Required",
+    "412": "Precondition Failed",
+    "413": "Request Entity Too Large",
+    "414": "Request URI Too Long",
+    "415": "Unsupported Media Type",
+    "416": "Requested Range Not Satisfiable",
+    "417": "Expectation Failed",
+    "422": "Unprocessable Entity",
+    "429": "Too Many Requests",
+    "500": "Internal Server Error",
+    "501": "Not Implemented",
+    "502": "Bad Gateway",
+    "503": "Service Unavailable",
+    "504": "Gateway Timeout",
+    "505": "Http Version Not Supported"
+  },
+  "filter": {
+    "phone": {
+      "regex": "(\\d{3})(\\d{3})(\\d{4})$",
+      "format": "($1) $2-$3"
+    },
+    "zipcode": {
+      "regex": "(\\d{5})$",
+      "format": "$1"
+    }
+  },
+  "messages": {
+    "cpf": "The field {0} must be a valid CPF",
+    "cnpj": "The field {0} must be a valid CNPJ",
+    "phone": "The field {0} must be a valid phone number",
+    "cep": "The field {0} must be a valid CEP",
+    "boleto": "The field {0} must be a valid Boleto"
+  },
+  "validation": {
+    "messages": {
+      "_default": "The {0} value is not valid",
+      "after": "The {0} must be after or equal to {1}",
+      "alpha": "The {0} field may only contain alphabetic characters",
+      "alpha_dash": "The {0} field may contain alpha-numeric characters as well as dashes and underscores",
+      "alpha_num": "The {0} field may only contain alpha-numeric characters",
+      "alpha_spaces": "The {0} field may only contain alphabetic characters as well as spaces",
+      "before": "The {0} must be before or equal to {1}",
+      "between": "The {0} field must be between {1} and {2}",
+      "confirmed": "The {0} confirmation does not match",
+      "credit_card": "The {0} field is invalid",
+      "date_between": "The {0} must be between {1} and {2}",
+      "date_format": "The {0} must be in the format {1}",
+      "decimal": "The {0} field must be numeric and may contain {1} decimal points",
+      "digits": "The {0} field must be numeric and contains exactly {1} digits",
+      "dimensions": "The {0} field must be {1} pixels by {2} pixels",
+      "email": "The {0} field must be a valid email",
+      "excluded": "The {0} field must be a valid value",
+      "ext": "The {0} field must be a valid file",
+      "image": "The {0} field must be an image",
+      "included": "The {0} field must be a valid value",
+      "integer": "The {0} field must be an integer",
+      "ip": "The {0} field must be a valid ip address",
+      "ip_or_fqdn": "The {0} field must be a valid ip address or FQDN",
+      "length": "The {0} length must be between {1} and {2}",
+      "max": "The {0} field may not be greater than {1} characters",
+      "max_value": "The {0} field must be {1} or less",
+      "mimes": "The {0} field must have a valid file type",
+      "min": "The {0} field must be at least {1} characters",
+      "min_value": "The {0} field must be {1} or more",
+      "numeric": "The {0} field may only contain numeric characters",
+      "regex": "The {0} field format is invalid",
+      "required": "The {0} field is required",
+      "required_if": "The {0} field is required when the {1} field has this value",
+      "size": "The {0} size must be less than NaN undefined",
+      "url": "The {0} field is not a valid URL"
+    },
+    "attributes": {},
+    "dateFormat": {
+      "date": "MM/DD/YYYY",
+      "datetime": "MM/DD/YYYY HH:mm",
+      "time": "HH:mm"
+    }
+  },
+  "view": {
+    "signIn": {
+      "title": "Sign-in",
+      "signin": "Sign in",
+      "forgotPassword": "Forgot password"
+    },
+    "recoverPasswordByMail": {
+      "title": "Forgot Password",
+      "submit": "Enviar",
+      "signIn": "Sign-in"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "submit": "Submit"
+    },
+    "dashboard": {
+      "title": "Dashboard"
+    }
+  },
+  "resource": {
+    <%- rootOptions.scaffoldSetup.buildLocaleResource() -%>
+  },
+  "schema": {
+    <%- rootOptions.scaffoldSetup.buildLocaleSchema() -%>
+  }
+}

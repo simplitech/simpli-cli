@@ -3,18 +3,25 @@
  *
  * @author Simpli CLI generator
  */
-import {PageCollection, HttpExclude, Request} from 'simpli-web-sdk'
-<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
+<%_ for (var i in model.resolvedDependencies) { var dependence = model.resolvedDependencies[i] _%>
 <%-dependence.build()%>
+<%_ } _%>
+<%_ for (var i in itemModel.resolvedPersistDependencies) { var dependence = itemModel.resolvedPersistDependencies[i] _%>
+<%-dependence.buildAsCollection()%>
 <%_ } _%>
 
 /* TODO: review generated class */
 @HttpExclude()
-export class <%-model.name%> extends PageCollection<<%-model.itemModelName%>> {
+export class <%-model.name%> extends PageCollection<<%-itemModel.name%>> {
   constructor() {
-    super(<%-model.itemModelName%>)
+    super(<%-itemModel.name%>)
   }
 
+  resource?: I<%-model.name%>ResourcesHolder
+
+<%-model.buildCollectionFields()-%>
+
+<%-model.buildCollectionForeignAttrs(itemModel)-%>
 <%_ if (model.apis.length >= 1) { _%>
   queryAsPage() {
     return this.<%-model.apis[0].name%>()
@@ -27,4 +34,8 @@ export class <%-model.name%> extends PageCollection<<%-model.itemModelName%>> {
 
 <%_ } _%>
 <%_ } _%>
+}
+
+export interface I<%-model.name%>ResourcesHolder {
+  <%-itemModel.buildPersistResourceDeclares()-%>
 }

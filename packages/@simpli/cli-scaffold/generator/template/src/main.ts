@@ -1,19 +1,11 @@
-import Vue from 'vue'
-import App from './App.vue'
+import '@/registerServiceWorker'
 
-import '@/setup/simpli'
-import '@/setup/settings'
-import '@/setup/vendor'
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
+import '@fortawesome/fontawesome-free/css/solid.min.css'
+import '@fortawesome/fontawesome-free/css/regular.min.css'
+import '@fortawesome/fontawesome-free/css/brands.min.css'
+import 'vue-transition-expand/dist/vue-transition-expand.css'
 
-import {$} from 'simpli-web-sdk'
-import {store} from '@/store'
+import {Setup} from '@/app/Setup'
 
-new Vue({
-  router: $.router,
-  i18n: $.i18n,
-  store,
-  render: h => h(App),
-}).$mount('#app')
-
-// @ts-ignore
-window.appLoader.finish()
+Setup.init()

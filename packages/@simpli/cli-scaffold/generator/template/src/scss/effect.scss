@@ -1,0 +1,168 @@
+$effect-fade-duration: 400ms !default;
+
+$effect-fade-up-duration: 400ms !default;
+$effect-fade-up-length: 20px !default;
+
+$effect-fade-down-duration: 400ms !default;
+$effect-fade-down-length: 20px !default;
+
+$effect-fade-left-duration: 400ms !default;
+$effect-fade-left-length: 20px !default;
+
+$effect-fade-right-duration: 400ms !default;
+$effect-fade-right-length: 20px !default;
+
+$effect-fade-up-big-duration: 400ms !default;
+$effect-fade-down-big-duration: 400ms !default;
+$effect-fade-left-big-duration: 400ms !default;
+$effect-fade-right-big-duration: 400ms !default;
+
+$effect-zoom-duration: 400ms !default;
+
+$effect-zoom-up-duration: 400ms !default;
+$effect-zoom-down-duration: 400ms !default;
+$effect-zoom-left-duration: 400ms !default;
+$effect-zoom-right-duration: 400ms !default;
+
+$effect-blur-duration: 400ms !default;
+$effect-blur-length: 20px !default;
+
+
+/* Fade Effect */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity ease-in-out $effect-fade-duration;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Fade-Up Effect */
+.fade-up-enter-active, .fade-up-leave-active {
+  transition: opacity ease-in-out $effect-fade-up-duration, transform ease-in-out $effect-fade-up-duration;
+}
+.fade-up-enter, .fade-up-leave-to {
+  opacity: 0;
+  transform: translateY($effect-fade-up-length);
+}
+
+/* Fade-Down Effect */
+.fade-down-enter-active, .fade-down-leave-active {
+  transition: opacity ease-in-out $effect-fade-down-duration, transform ease-in-out $effect-fade-down-duration;
+}
+.fade-down-enter, .fade-down-leave-to {
+  opacity: 0;
+  transform: translateY(-$effect-fade-down-length);
+}
+
+/* Fade-Left Effect */
+.fade-left-enter-active, .fade-left-leave-active {
+  transition: opacity ease-in-out $effect-fade-left-duration, transform ease-in-out $effect-fade-left-duration;
+}
+.fade-left-enter, .fade-left-leave-to {
+  opacity: 0;
+  transform: translateX($effect-fade-left-length);
+}
+
+/* Fade-Right Effect */
+.fade-right-enter-active, .fade-right-leave-active {
+  transition: opacity ease-in-out $effect-fade-right-duration, transform ease-in-out $effect-fade-right-duration;
+}
+.fade-right-enter, .fade-right-leave-to {
+  opacity: 0;
+  transform: translateX(-$effect-fade-right-length);
+}
+
+/* Fade-Up-Big Effect */
+.fade-up-big-enter-active, .fade-up-big-leave-active {
+  transition: opacity ease-in-out $effect-fade-up-big-duration, transform ease-in-out $effect-fade-up-big-duration;
+}
+.fade-up-big-enter, .fade-up-big-leave-to {
+  transform: translateY(100vh);
+}
+
+/* Fade-Down-Big Effect */
+.fade-down-big-enter-active, .fade-down-big-leave-active {
+  transition: opacity ease-in-out $effect-fade-down-big-duration, transform ease-in-out $effect-fade-down-big-duration;
+}
+.fade-down-big-enter, .fade-down-big-leave-to {
+  transform: translateY(-100vh);
+}
+
+/* Fade-Left-Big Effect */
+.fade-left-big-enter-active, .fade-left-big-leave-active {
+  transition: opacity ease-in-out $effect-fade-left-big-duration, transform ease-in-out $effect-fade-left-big-duration;
+}
+.fade-left-big-enter, .fade-left-big-leave-to {
+  transform: translateX(100vw);
+}
+
+/* Fade-Right-Big Effect */
+.fade-right-big-enter-active, .fade-right-big-leave-active {
+  transition: opacity ease-in-out $effect-fade-right-big-duration, transform ease-in-out $effect-fade-right-big-duration;
+}
+.fade-right-big-enter, .fade-right-big-leave-to {
+  transform: translateX(-100vw);
+}
+
+/* Zoom Effect */
+.zoom-enter-active, .zoom-leave-active {
+  transition: opacity ease-in-out $effect-zoom-duration, transform ease-in-out $effect-zoom-duration;
+}
+.zoom-enter, .zoom-leave-to {
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Zoom-Up Effect */
+.zoom-up-enter-active, .zoom-up-leave-active {
+  transition: opacity ease-in-out $effect-zoom-up-duration, transform ease-in-out $effect-zoom-up-duration;
+}
+.zoom-up-enter, .zoom-up-leave-to {
+  opacity: 0;
+  transform: translateY(50vh) scale(0);
+}
+
+/* Zoom-Down Effect */
+.zoom-down-enter-active, .zoom-down-leave-active {
+  transition: opacity ease-in-out $effect-zoom-down-duration, transform ease-in-out $effect-zoom-down-duration;
+}
+.zoom-down-enter, .zoom-down-leave-to {
+  opacity: 0;
+  transform: translateY(-50vh) scale(0);
+}
+
+/* Zoom-Left Effect */
+.zoom-left-enter-active, .zoom-left-leave-active {
+  transition: opacity ease-in-out $effect-zoom-left-duration, transform ease-in-out $effect-zoom-left-duration;
+}
+.zoom-left-enter, .zoom-left-leave-to {
+  opacity: 0;
+  transform: translateX(50vw) scale(0);
+}
+
+/* Zoom-Right Effect */
+.zoom-right-enter-active, .zoom-right-leave-active {
+  transition: opacity ease-in-out $effect-zoom-right-duration, transform ease-in-out $effect-zoom-right-duration;
+}
+.zoom-right-enter, .zoom-right-leave-to {
+  opacity: 0;
+  transform: translateX(-50vw) scale(0);
+}
+
+/* Blur Effect */
+.blur-enter-active, .blur-leave-active {
+  transition: opacity ease-in-out $effect-blur-duration, filter ease-in-out $effect-blur-duration;
+}
+.blur-enter, .blur-leave-to {
+  opacity: 0;
+  filter: blur($effect-blur-length);
+}
+
+/* Expand Effect (only for <transition-expand>) */
+.expand-enter-active, .expand-leave-active {
+  transition: height 400ms ease-in-out;
+  overflow: hidden;
+}
+.expand-enter, .expand-leave-to {
+  height: 0;
+}

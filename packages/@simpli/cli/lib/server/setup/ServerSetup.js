@@ -12,7 +12,8 @@ const uuid = require('uuid')
 const faker = require('faker')
 
 module.exports = class ServerSetup {
-  constructor () {
+  constructor (projectName) {
+    this.projectName = projectName
     this.serverName = null // Name of the project
     this.moduleName = null // Module name of a section (e.g. admin, user, etc.)
     this.packageAddress = null // Main address of the project classes (e.g. com.example)

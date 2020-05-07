@@ -72,6 +72,10 @@ module.exports = class ScaffoldSetup {
     return this.models.filter((model) => model.type === type)
   }
 
+  modelByCollectionName (name) {
+    return this.models.find((model) => model.collectionName === name)
+  }
+
   startCase (prop) {
     return startCase(prop)
   }
@@ -130,5 +134,51 @@ module.exports = class ScaffoldSetup {
         if (model) attr.isObjectResource = model.isResource
       })
     })
+  }
+
+  buildLocaleResource () {
+    let result = ''
+
+    this.resourceModels.forEach((model) => {
+      result += `    "${model.name}": "${startCase(model.name)}",\n`
+    })
+
+    result = result.slice(0, -2) // remove last line and comma
+    result += '\n'
+
+    return result
+  }
+
+  buildLocaleSchema () {
+    let result = ''
+
+    this.standardModels.forEach((model) => {
+      result += model.buildLocale('Input')
+      result += model.buildLocale('List')
+      result += model.buildLocale('Export')
+    })
+
+    this.requestModels.forEach((model) => {
+      result += model.buildLocale('Input')
+    })
+
+    this.responseModels.forEach((model) => {
+      result += model.buildLocale('Input')
+      result += model.buildLocale('Export')
+    })
+
+    this.resourceModels.forEach((model) => {
+      const collection = this.paginatedModels.find((paginatedModel) => model.collectionName === paginatedModel.name)
+
+      result += model.buildFilterLocale('Filter', collection)
+      result += model.buildLocale('Input')
+      result += model.buildLocale('List')
+      result += model.buildLocale('Export')
+    })
+
+    result = result.slice(0, -2) // remove last line and comma
+    result += '\n'
+
+    return result
   }
 }

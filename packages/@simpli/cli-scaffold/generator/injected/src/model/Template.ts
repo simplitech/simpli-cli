@@ -12,7 +12,7 @@
 <%_ } _%>
 
 /* TODO: review generated class */
-export class <%-model.name%> extends <%-model.extendedClass%> {
+export class <%-model.name%><%-model.extendedClass%> {
 
 <%-model.buildIdsAttr()-%>
 <%-model.buildModelAttrs()-%>

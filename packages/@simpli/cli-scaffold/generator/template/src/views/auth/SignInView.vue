@@ -41,7 +41,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-import {Helper} from 'simpli-web-sdk'
 <%_ var loginHolderModel = rootOptions.scaffoldSetup.auth.model.loginHolder _%>
   <%-loginHolderModel.injectIntoDependence().build()%>
 <%-loginHolderModel.injectSchemaIntoDependence('Input', false).build(1)%>
@@ -53,7 +52,7 @@ export default class SignInView extends Vue {
 
   created() {
     if (this.$auth.isLogged) {
-      Helper.push('/dashboard')
+      this.$nav.replace('/dashboard')
     }
   }
 }

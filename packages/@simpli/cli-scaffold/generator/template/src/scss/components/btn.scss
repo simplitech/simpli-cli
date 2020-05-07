@@ -1,6 +1,7 @@
 .btn {
   @apply items-center-center bg-black-300 py-0 px-8 transition border-none;
   @apply text-xs text-black-700 font-semibold cursor-pointer no-underline uppercase;
+
   min-height: 2rem;
   border-radius: 20px;
 
@@ -22,6 +23,14 @@
     &:not(:disabled):hover {
       transform: scale(1.07)
     }
+
+    &.btn--success {
+      @apply bg-success;
+    }
+
+    &.btn--danger {
+      @apply bg-danger;
+    }
   }
 
   &.btn--border {
@@ -42,7 +51,26 @@
   }
 
   &.btn--flat {
-    @extend .btn--border;
-    @apply border-0;
+    @apply bg-transparent text-secondary border-transparent border-2 border-solid;
+
+    &:not(:disabled):hover {
+      @apply border-secondary;
+    }
+  }
+
+  &.btn--square {
+    @apply rounded-none;
+  }
+
+  &.btn--caret {
+    &:before {
+      @apply transition;
+    }
+
+    &.btn--caret--active {
+      &:before {
+        transform: rotate(-90deg);
+      }
+    }
   }
 }

@@ -1,20 +1,48 @@
 @import "../variables";
 
 .input {
-  @apply text-black rounded-lg outline-none p-2 align-middle text-base transition;
+  @apply text-sm text-black-700 bg-gray-100 border-b-2 border-tertiary shadow-inner rounded outline-none p-2 align-middle transition;
+  min-height: 35px;
   caret-color: $secondary-color;
-  box-shadow: 0 0 0 2px $tertiary-color;
+
+  -webkit-appearance: none; // iPhone fix
+  -moz-appearance: none; // iPhone fix
+  appearance: none; // iPhone fix
 
   &:disabled {
-    @apply bg-transparent text-black-200 cursor-not-allowed;
+    @apply text-black-200 cursor-not-allowed;
   }
 
   &:focus {
-    box-shadow: 0 0 0 2px $primary-color;
+    @apply border-primary;
+  }
+
+  &.invalid {
+    @apply border-b-2 border-danger;
+  }
+
+  &.pending {
+    @apply border-b-2 border-secondary;
+  }
+
+  &.valid {
+    @apply border-b-2 border-success;
   }
 
   &.multiselect {
-    @apply p-0 bg-transparent rounded-lg;
+    @apply p-0 rounded;
+
+    &.multiselect--left {
+      .multiselect__content-wrapper {
+        @apply w-auto left-0;
+      }
+    }
+
+    &.multiselect--right {
+      .multiselect__content-wrapper {
+        @apply w-auto right-0;
+      }
+    }
 
     .multiselect__select {
       @apply h-full;
@@ -30,14 +58,18 @@
     }
 
     .multiselect__tags {
-      @apply h-full;
+      @apply horiz flex-wrap;
 
       .multiselect__input {
-        @apply h-full;
+        @apply text-sm weight-1;
       }
 
       .multiselect__single {
-        @apply bg-transparent h-full top-0 text-sm text-black-700 uppercase horiz items-center font-semibold;
+        @apply bg-transparent top-0 text-sm text-black-700 truncate horiz items-center font-semibold;
+        height: calc(100% - 10px);
+        width: calc(100% - 50px);
+        min-width: 50px;
+        margin-top: 5px;
       }
 
       .multiselect__tag {
@@ -57,7 +89,7 @@
       ul.multiselect__content {
         li.multiselect__element {
           .multiselect__option {
-            @apply uppercase text-sm;
+            @apply text-sm;
 
             &.multiselect__option--highlight {
               @apply bg-secondary text-white opacity-75;
@@ -87,15 +119,17 @@
   @apply verti;
 
   .input-group__label {
-    @apply mb-1 text-sm text-black-700;
+    @apply text-xs text-black-700;
   }
 
   .input-group__input {
     @extend .input;
   }
 
-  &.input-group--invalid .input-group__input{
-    box-shadow: 0 0 0 2px $danger-color;
+  &.input-group--dark {
+    .input-group__input {
+      @apply bg-white-500;
+    }
   }
 
   &.input-group--text {
@@ -106,11 +140,12 @@
 
   &.input-group--select {
     .input-group__input {
-      min-height: 2.5rem !important;
+      min-height: 2rem !important;
     }
 
     .input-group__label {
       min-height: 1.5rem !important;
+      line-height: 1.5rem !important;
     }
   }
 

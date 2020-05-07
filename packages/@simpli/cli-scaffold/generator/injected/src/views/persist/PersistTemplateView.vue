@@ -7,14 +7,14 @@
       </h1>
     </header>
 
-    <section class="relative weight-1 bg-black-100">
+    <section class="relative">
 <%_ if (model.populateApi) { _%>
-      <await name="<%-model.populateApi.name%>" class="absolute inset-0 px-4 py-8 overflow-y-auto">
+      <await name="<%-model.populateApi.name%>" class="px-4 py-8">
 <%_ } else { _%>
-      <await name="populate" class="absolute inset-0 px-4 py-8 overflow-y-auto">
+      <await name="populate" class="px-4 py-8">
 <%_ } _%>
-        <form class="container card" @submit.prevent="persist">
-          <div class="mb-8 grid grid-columns lg:grid-columns-2 grid-gap-4">
+        <form class="container card w-full lg:w-160" @submit.prevent="persist">
+          <div class="mb-8 grid md:grid-cols-2 gap-4">
             <render-schema
                     v-for="field in schema.allFields"
                     v-model="<%-model.attrName%>"
@@ -41,7 +41,6 @@
 
 <script lang="ts">
   import {Component, Prop, Watch, Provide, Vue} from 'vue-property-decorator'
-  import {$, Helper} from 'simpli-web-sdk'
   <%-model.injectIntoDependence().build()%>
   <%-model.injectSchemaIntoDependence('Input').build()%>
 
@@ -65,11 +64,11 @@
 <%_ if (model.resolvedPersistDependencies.length) { _%>
 
     populateResource() {
-  <%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
-      this.schema.collection<%-dependence.children[0]%>.list<%-dependence.children[0]%>()
-  <%_ } _%>
+<%_ for (var i in model.resolvedPersistDependencies) { var dependence = model.resolvedPersistDependencies[i] _%>
+      this.schema.collection<%-dependence.children[0]%>.queryAsPage()
+<%_ } _%>
     }
-  <%_ } _%>
+<%_ } _%>
 
     async populate() {
 <%_ for (var i in model.resource.endpointParams) { var param = model.resource.endpointParams[i] _%>
@@ -86,9 +85,9 @@
       }
 
 <%_ if (model.populateApi) { _%>
-      $.await.done('<%-model.populateApi.name%>')
+      this.$await.done('<%-model.populateApi.name%>')
 <%_ } else { _%>
-      $.await.done('populate')
+      this.$await.done('populate')
 <%_ } _%>
     }
 
@@ -96,7 +95,7 @@
       const isValid = await this.validator.validateAll()
 
       if (!isValid) {
-        Helper.abort('system.error.validation')
+        this.$toast.abort('system.error.validation')
       }
 
 <%_ if (model.persistApi) { _%>
@@ -105,7 +104,8 @@
       // TODO: define the persist method
       // await this.<%-model.attrName%>.persist()
 <%_ } _%>
-      await Helper.successAndPush('system.success.persist', '/<%-kebabCase(model.name)%>/list')
+      this.$toast.success('system.success.persist')
+      await this.$nav.push('/<%-kebabCase(model.name)%>/list')
     }
   }
 </script>

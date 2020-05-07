@@ -4,7 +4,9 @@
       "tag",
       "label",
       "title",
-      "name"
+      "name",
+      "email",
+      "e_mail"
     ],
     "nickname": [
       "nickname"

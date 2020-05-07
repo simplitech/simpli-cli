@@ -1,8 +1,8 @@
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 import {ActionContext, Module} from 'vuex'
-import {getStoreAccessors} from 'vuex-typescript'
+import {AccessorHandler} from '@simpli/vuex-typescript'
+import {$} from '@/facade'
 import {AuthState, RootState} from '@/types/store'
-import {$, Helper} from 'simpli-web-sdk'
 <%_ var auth = rootOptions.scaffoldSetup.auth _%>
 <%_ var signInApi = auth.api.signIn _%>
 <%_ var authApi = auth.api.auth _%>
@@ -13,9 +13,8 @@ import {$, Helper} from 'simpli-web-sdk'
 
 export type AuthContext = ActionContext<AuthState, RootState>
 
+@AccessorHandler
 export class AuthModule implements Module<AuthState, RootState> {
-  readonly accessors = getStoreAccessors<AuthState, RootState>('auth')
-
   namespaced = true
 
   state: AuthState = {
@@ -39,12 +38,15 @@ export class AuthModule implements Module<AuthState, RootState> {
 <%-rootOptions.scaffoldSetup.auth.buildSetItem('loginResp')-%>
 
       context.commit('POPULATE_TOKEN')
+      context.commit('POPULATE', authResponse)
 
       const uri =
         context.getters.cachePath && $.route.name !== 'signIn'
           ? context.getters.cachePath
           : '/dashboard'
-      await Helper.infoAndPush('system.info.welcome', uri)
+
+      $.toast.info('system.info.welcome')
+      await $.nav.push(uri)
 
       context.commit('SET_CACHE_PATH', null)
 
@@ -61,7 +63,7 @@ export class AuthModule implements Module<AuthState, RootState> {
         context.commit('SET_CACHE_PATH', $.route.path)
 
         await context.dispatch('signOut')
-        Helper.abort('system.error.unauthorized')
+        $.toast.abort('system.error.unauthorized')
       }
 
       const authResponse = await <%-loginHolderModel.name%>.<%-authApi.name%>()
@@ -94,7 +96,7 @@ export class AuthModule implements Module<AuthState, RootState> {
      * Sign out account
      */
     async signOut(context: AuthContext) {
-      await Helper.push('/sign-in')
+      await $.nav.push('/sign-in')
 
       // TODO: verify the need of a socket connection
       $.socket.disconnect('notification')

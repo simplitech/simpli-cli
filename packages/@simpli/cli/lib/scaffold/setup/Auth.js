@@ -59,7 +59,7 @@ module.exports = class Auth {
 
     this.model.loginResp.attrs.forEach((attr) => {
       if (attr.isPrimaryOrigin) {
-        result += `  ${attr.name}: ${attr.typeBuild} | null\n`
+        result += `  ${attr.name}: ${attr.typeBuild}\n`
       } else if (attr.isObjectOrigin) {
         result += `  ${attr.name}: ${attr.typeBuild}\n`
       } else if (attr.isArrayOrigin) {
@@ -76,13 +76,13 @@ module.exports = class Auth {
 
     if (!this.model.loginResp.attrs.find((attr) => attr.name === 'token')) {
       result += `  static get token() {\n`
-      result += `    return read(getters.token)(store)\n`
+      result += `    return Auth.$accessors.read(auth.getters.token)(store)\n`
       result += `  }\n\n`
     }
 
     this.model.loginResp.attrs.forEach((attr) => {
       result += `  static get ${attr.name}() {\n`
-      result += `    return read(getters.${attr.name})(store)\n`
+      result += `    return Auth.$accessors.read(auth.getters.${attr.name})(store)\n`
       result += `  }\n\n`
     })
 

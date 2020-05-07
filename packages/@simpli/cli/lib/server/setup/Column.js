@@ -369,11 +369,11 @@ module.exports = class Column {
       let result = ''
 
       result += `        filter.start${this.capitalizedName}?.also {\n`
-      result += `            whereGtEq("DATE($alias.${this.name})", Query("DATE(?)", it))\n`
+      result += `            where("DATE($alias.${this.name}) >= DATE(?)", it)\n`
       result += `        }\n`
 
       result += `        filter.end${this.capitalizedName}?.also {\n`
-      result += `            whereLtEq("DATE($alias.${this.name})", Query("DATE(?)", it))\n`
+      result += `            where("DATE($alias.${this.name}) <= DATE(?)", it)\n`
       result += `        }\n\n`
 
       return result

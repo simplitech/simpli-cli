@@ -2,6 +2,7 @@
 package <%-packageAddress%>.wrapper
 
 import <%-packageAddress%>.app.Facade.Env
+import <%-packageAddress%>.app.RequestLogger
 import <%-packageAddress%>.exception.HttpException
 import br.com.simpli.sql.ReadConPipe
 import br.com.simpli.sql.TransacConPipe
@@ -25,6 +26,9 @@ abstract class RouterWrapper : ExceptionMapper<Throwable> {
     }
 
     override fun toResponse(e: Throwable): Response {
+        // Adds exception too XRay segment
+        RequestLogger.logXRayException(e)
+
         return when (e) {
             is NotFoundException,
             is HttpException -> {

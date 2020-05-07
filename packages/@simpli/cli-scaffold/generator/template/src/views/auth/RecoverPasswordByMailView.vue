@@ -41,7 +41,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-import {Helper} from 'simpli-web-sdk'
 <%_ var recoverPasswordByMailRequestModel = rootOptions.scaffoldSetup.auth.model.recoverPasswordByMailRequest _%>
 <%-recoverPasswordByMailRequestModel.injectIntoDependence().build()%>
 <%-recoverPasswordByMailRequestModel.injectSchemaIntoDependence('Input', false).build(1)%>
@@ -53,10 +52,8 @@ export default class RecoverPasswordByMailView extends Vue {
 
   async submit() {
     await this.request.recoverPasswordByMail()
-    await Helper.successAndPush(
-      'system.success.recoverPasswordByMail',
-      '/sign-in'
-    )
+    this.$toast.success('system.success.recoverPasswordByMail')
+    await this.$nav.push('/sign-in')
   }
 }
 </script>
