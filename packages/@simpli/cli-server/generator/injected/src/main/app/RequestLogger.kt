@@ -73,11 +73,13 @@ class RequestLogger : ContainerRequestFilter, ContainerResponseFilter, ReaderInt
     }
 
     private class RequestLog(request: ContainerRequestContext?, sr: HttpServletRequest?) {
+        // Those properties will be serialized
+        // Do not remove even though those are not being used
         val uri = request?.uriInfo?.requestUri?.toString()
-        // val method = sr?.method
-        // val ip = sr?.ip()
-        // val forwarded = sr?.forwarded()
-        // val headers = request?.headers
+        val method = sr?.method
+        val ip = sr?.ip()
+        val forwarded = sr?.forwarded()
+        val headers = request?.headers
 
         var request: Any? = null
             private set
