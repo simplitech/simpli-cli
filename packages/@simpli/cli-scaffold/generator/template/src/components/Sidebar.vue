@@ -52,7 +52,7 @@
 <%_ } _%>
         </ul>
 
-        <div class="weight-1" />
+        <div class="weight-1"></div>
 <%_ if (rootOptions.scaffoldSetup.useAuth) { _%>
 
         <a @click="$auth.signOut" class="pill mb-1">

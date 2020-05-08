@@ -17,7 +17,7 @@
         <await name="list" :spinnerScale="0.8" class="w-12" />
 <%_ } _%>
 
-        <div class="weight-1" />
+        <div class="weight-1"></div>
 
         <span v-if="!collection.isEmpty()">
           {{ $t('app.totalLines', {total: collection.total}) }}
