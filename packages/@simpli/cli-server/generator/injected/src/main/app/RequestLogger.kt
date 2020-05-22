@@ -28,7 +28,7 @@ import javax.ws.rs.container.ContainerRequestFilter
 class RequestLogger : ContainerRequestFilter, ContainerResponseFilter, ReaderInterceptor {
     companion object {
         private val logger = LogManager.getLogger(RequestLogger::class.java)
-        private val requestMap = HashMap<HttpServletRequest?, RequestLog>()
+        private val requestMap = HashMap<Int, RequestLog>()
 
         const val XRAY_METADATA_NAMESPACE = "request"
         const val XRAY_METADATA_KEY = "body"
@@ -42,11 +42,11 @@ class RequestLogger : ContainerRequestFilter, ContainerResponseFilter, ReaderInt
     var sr: HttpServletRequest? = null
 
     override fun filter(request: ContainerRequestContext?) {
-        requestMap[sr] = RequestLog(request, sr)
+        requestMap[sr.hashCode()] = RequestLog(request, sr)
     }
 
     override fun filter(request: ContainerRequestContext?, response: ContainerResponseContext?) {
-        requestMap.remove(sr)?.apply {
+        requestMap.remove(sr.hashCode())?.apply {
             // Health check is logged at TRACE level
             if (this.uri?.contains(HealthCheckRouter.PATH) == true) {
                 logger.trace(this.toString())
@@ -65,9 +65,7 @@ class RequestLogger : ContainerRequestFilter, ContainerResponseFilter, ReaderInt
     }
 
     override fun aroundReadFrom(context: ReaderInterceptorContext?): Any? {
-        if (logger.isDebugEnabled) {
-            requestMap[sr]?.addRequestBody(context)
-        }
+        requestMap[sr.hashCode()]?.addRequestBody(context)
 
         return context?.proceed()
     }
