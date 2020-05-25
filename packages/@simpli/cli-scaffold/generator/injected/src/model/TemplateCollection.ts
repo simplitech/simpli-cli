@@ -10,7 +10,7 @@
 <%-dependence.buildAsCollection()%>
 <%_ } _%>
 
-/* TODO: review generated class */
+/* unreviewed generated class */
 @HttpExclude()
 export class <%-model.name%> extends PageCollection<<%-itemModel.name%>> {
   constructor() {

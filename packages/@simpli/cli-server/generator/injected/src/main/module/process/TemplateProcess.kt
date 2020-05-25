@@ -25,7 +25,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
     val dao = <%-table.modelName%>Dao(context.con)
 
     fun get(<%-table.primariesByParam(true, true)%>): <%-table.modelName%> {
-        // TODO: review generated method
+        // unreviewed generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
         if (id == null) throw BadRequestException()
 <%_ } else { _%>
@@ -51,7 +51,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
     }
 
     fun list(filter: <%-table.modelName%>ListFilter): PageCollection<<%-table.modelName%>> {
-        // TODO: review generated method
+        // unreviewed generated method
         val items = dao.getList(filter)
         val total = dao.count(filter)
 
@@ -102,7 +102,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
     }
 
     fun create(model: <%-table.modelName%>): Long {
-        // TODO: review generated method
+        // unreviewed generated method
 <%-table.buildCreateApplyModel()%>
 <%_ if (table.idsColumn.length <= 1) { _%>
         model.id = dao.run {
@@ -122,7 +122,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
     }
 
     fun update(model: <%-table.modelName%>): Int {
-        // TODO: review generated method
+        // unreviewed generated method
 <%-table.buildUpdateApplyModel()%>
         return dao.run {
             validate(model, updating = true)
@@ -133,7 +133,7 @@ class <%-table.modelName%>Process(val context: RequestContext) {
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
     fun remove(<%-table.primariesByParam(true, true)%>): Long {
-        // TODO: review generated method
+        // unreviewed generated method
 <%_ if (table.idsColumn.length <= 1) { _%>
         if (id == null) throw BadRequestException()
 <%_ } else { _%>

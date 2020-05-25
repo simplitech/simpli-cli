@@ -12,7 +12,7 @@ import org.junit.Test
 class MailTest: ProcessTest() {
     @Test
     fun testRecoverPasswordMail() {
-        // TODO: review generated method
+        // unreviewed generated method
         // Step1: Go to AwsCredentials.properties and set your AWS credentials
         // Step2: Go to Env and set the EMAIL_SENDER_PROVIDER correctly
 

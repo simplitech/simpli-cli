@@ -11,7 +11,7 @@
 <%-dependence.build()%>
 <%_ } _%>
 
-/* TODO: review generated class */
+/* unreviewed generated class */
 export class <%-model.name%><%-model.extendedClass%> {
 
 <%-model.buildIdsAttr()-%>

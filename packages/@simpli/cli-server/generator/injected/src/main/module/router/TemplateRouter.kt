@@ -32,7 +32,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @Path("<%-table.primariesBySlash()%>")
     @Operation(tags = ["<%-table.modelName%>"], summary = "Gets a instance of a given ID of <%-table.modelName%>")
     fun get<%-table.modelName%>(@BeanParam param: <%-table.hasUniqueDefaultId ? 'DefaultParam' : table.modelName%>.RequiredPathId): <%-table.modelName%> {
-        // TODO: review generated method
+        // unreviewed generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).get(<%-table.primariesByParamCall('param')%>)
 		}
@@ -41,7 +41,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @GET
     @Operation(tags = ["<%-table.modelName%>"], summary = "Lists the instances of <%-table.modelName%>")
     fun list<%-table.modelName%>(@BeanParam param: Auth<%-table.modelName%>ListParam): PageCollection<<%-table.modelName%>> {
-        // TODO: review generated method
+        // unreviewed generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).list(param)
 		}
@@ -51,7 +51,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @Path("/export")
     @Operation(tags = ["<%-table.modelName%>"], summary = "Lists the instances of <%-table.modelName%> to export as a file")
     fun listExport<%-table.modelName%>(@BeanParam param: Auth<%-table.modelName%>ListParam): PageCollection<<%-table.modelName%>> {
-        // TODO: review generated method
+        // unreviewed generated method
         return AuthPipe.handle(connectionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).list(param)
 		}
@@ -61,7 +61,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @POST
     @Operation(tags = ["<%-table.modelName%>"], summary = "Persists a new instance of <%-table.modelName%>. Use ID = 0 to create a new one, or ID > 0 to update a current one")
     fun persist<%-table.modelName%>(@BeanParam param: DefaultParam.Auth, model: <%-table.modelName%>): Long {
-        // TODO: review generated method
+        // unreviewed generated method
         return AuthPipe.handle(transactionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).persist(model)
 		}
@@ -73,7 +73,7 @@ class <%-table.modelName%>Router : RouterWrapper() {
     @Path("<%-table.primariesBySlash()%>")
     @Operation(tags = ["<%-table.modelName%>"], summary = "Deletes a instance of a given ID of <%-table.modelName%>")
     fun remove<%-table.modelName%>(@BeanParam param: <%-table.hasUniqueDefaultId ? 'DefaultParam' : table.modelName%>.RequiredPathId): Long {
-        // TODO: review generated method
+        // unreviewed generated method
         return AuthPipe.handle(transactionPipe, param) { context, _ ->
             <%-table.modelName%>Process(context).remove(<%-table.primariesByParamCall('param')%>)
 		}
