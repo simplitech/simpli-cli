@@ -306,7 +306,7 @@ module.exports = class Table {
   }
 
   buildValidate () {
-    let result = '        // TODO: review generated method\n'
+    let result = '        // unreviewed generated method\n'
 
     if (!this.hasID) {
       this.foreignColumns.forEach((column) => {

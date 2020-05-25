@@ -8,7 +8,7 @@ import {FieldComponent, FieldSet} from '@simpli/meta-schema'
 import * as Component from '@simpli/vue-render-schema'
 <%-model.injectIntoDependence().build()%>
 
-/* TODO: review generated schema */
+/* unreviewed generated schema */
 export class List<%-model.name%>Schema extends DefaultSchema {
   readonly name = 'List<%-model.name%>'
 

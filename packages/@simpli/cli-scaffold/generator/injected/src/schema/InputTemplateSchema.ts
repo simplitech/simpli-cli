@@ -10,7 +10,7 @@ import * as Component from '@simpli/vue-input'
 <%-dependence.buildAsCollection()%>
 <%_ } _%>
 
-/* TODO: review generated schema */
+/* unreviewed generated schema */
 export class Input<%-model.name%>Schema extends DefaultSchema {
 <%_ if (model.resolvedPersistDependencies.length) { _%>
 <%-model.buildPersistResourceInstances()%>

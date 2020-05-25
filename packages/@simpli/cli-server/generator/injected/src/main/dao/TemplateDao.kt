@@ -30,7 +30,7 @@ import br.com.simpli.sql.Query
 class <%-table.modelName%>Dao(val con: AbstractConnector) {
 <%_ if (!table.isPivot) { _%>
     fun getOne(<%-table.primariesByParam()%>): <%-table.modelName%>? {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .select<%-table.modelName%>()
                 .from("<%-table.name%>")
@@ -42,7 +42,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun getList(filter: <%-table.modelName%>ListFilter): MutableList<<%-table.modelName%>> {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
 <%-table.buildSelectDao()-%>
                 .from("<%-table.name%>")
@@ -56,7 +56,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun count(filter: <%-table.modelName%>ListFilter): Int {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .countRaw("DISTINCT <%-table.idColumn.field%>")
                 .from("<%-table.name%>")
@@ -66,7 +66,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun update(<%-table.instanceName%>: <%-table.modelName%>): Int {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .updateTable("<%-table.name%>")
                 .update<%-table.modelName%>Set(<%-table.instanceName%>)
@@ -76,7 +76,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun insert(<%-table.instanceName%>: <%-table.modelName%>): Long {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .insertInto("<%-table.name%>")
                 .insert<%-table.modelName%>Values(<%-table.instanceName%>)
@@ -85,7 +85,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun exist(<%-table.primariesByParam()%>): Boolean {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .select("<%-table.idColumn.field%>")
                 .from("<%-table.name%>")
@@ -96,7 +96,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
 
 <%_ for (var i in table.uniqueColumns) { var column = table.uniqueColumns[i] _%>
     fun exist<%-options.serverSetup.capitalizeFirstLetter(column.name)%>(<%-column.name%>: <%-column.kotlinType%>, <%-table.primariesByParam()%>): Boolean {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .select("<%-column.field%>")
                 .from("<%-table.name%>")
@@ -109,7 +109,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
 <%_ } _%>
 <%_ if (table.isRemovable) { _%>
     fun softDelete(<%-table.primariesByParam()%>): Int {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .updateTable("<%-table.name%>")
                 .updateSet("<%-table.removableColumn.field%>" to false)
@@ -171,7 +171,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
 <%_ var columnRef2 = foreignColumns[1] _%>
 
     fun insert(<%-table.primariesByParam()%>): Long {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .insertInto("<%-table.name%>")
                 .insertValues(
@@ -189,7 +189,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
 <%_ var columnCross = column.name === columnRef2.name ? columnRef2 : columnRef1 _%>
 <%_ if (!cache.includes(columnRef.foreign.referencedTableModelName)) { _%>
     fun removeAllFrom<%-columnRef.foreign.referencedTableModelName%>(<%-columnRef.name%>: <%-columnRef.kotlinType%>): Int {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .deleteFrom("<%-table.name%>")
                 .whereEq("<%-columnRef.field%>", <%-columnRef.name%>)
@@ -198,7 +198,7 @@ class <%-table.modelName%>Dao(val con: AbstractConnector) {
     }
 
     fun list<%-columnRef.foreign.referencedTableModelName%>Of<%-columnCross.foreign.referencedTableModelName%>(<%-columnCross.name%>: <%-columnCross.kotlinType%>): MutableList<<%-columnRef.foreign.referencedTableModelName%>> {
-        // TODO: review generated method
+        // unreviewed generated method
         val query = Query()
                 .selectFields(<%-columnRef.foreign.referencedTableModelName%>RM.selectFields())
                 .from("<%-columnRef.foreign.referencedTableName%>")

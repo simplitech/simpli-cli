@@ -11,7 +11,7 @@ import {I<%-collection.name%>ResourcesHolder} from '@/model/collection/<%-collec
 <%-dependence.buildAsCollection()%>
 <%_ } _%>
 
-/* TODO: review generated schema */
+/* unreviewed generated schema */
 export class Filter<%-model.name%>Schema extends DefaultSchema implements I<%-collection.name%>ResourcesHolder {
 <%_ if (model.resolvedPersistDependencies.length) { _%>
 <%-model.buildPersistResourceInstances()%>
